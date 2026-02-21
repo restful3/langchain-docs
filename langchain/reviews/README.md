@@ -125,10 +125,10 @@ flowchart LR
     A --> C["개선 제안"]
 
     B --> B1["반드시 고쳐야 할 문제"]
-    B --> B2["오타, 잘못된 코드\ndeprecated API, 링크 깨짐"]
+    B --> B2["오타, 잘못된 코드,<br/>deprecated API, 링크 깨짐"]
 
     C --> C1["논의 후 결정할 사항"]
-    C --> C2["설명 보충, 예제 추가\n구조 변경, 난이도 조정"]
+    C --> C2["설명 보충, 예제 추가,<br/>구조 변경, 난이도 조정"]
 
     style B fill:#ffcdd2
     style C fill:#c8e6c9
