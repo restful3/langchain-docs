@@ -54,7 +54,7 @@ flowchart TD
 
 ## 리뷰 일정
 
-주 1파트씩, Part 2부터 총 9주간 진행합니다.
+주 1파트씩, 2026년 2월 28일(토)부터 매주 토요일 진행합니다. 총 9주.
 
 ```mermaid
 gantt
@@ -63,7 +63,7 @@ gantt
     axisFormat %m/%d
 
     section 기초
-    Part 2 LangChain 기초 (S종훈, L종훈)     :p2, 2025-02-24, 7d
+    Part 2 LangChain 기초 (S종훈, L종훈)     :p2, 2026-02-28, 7d
     Part 3 첫 번째 Agent (L종훈, S종훈)       :p3, after p2, 7d
 
     section 중급
