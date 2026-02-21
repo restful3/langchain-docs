@@ -77,7 +77,7 @@ gantt
 
     section 프로덕션
     Part 9 프로덕션 (C성진, S종훈)             :p9, after p8, 7d
-    Part 10 배포와 관측성 (L종훈, 세훈)              :p10, after p9, 7d
+    Part 10 배포와 관측성 (L종훈, 세훈)        :p10, after p9, 7d
 ```
 
 | 주차 | 파트 | 리뷰어 | 리뷰 대상 |
@@ -90,7 +90,7 @@ gantt
 | 6주 | Part 7: 멀티에이전트 시스템 | 태호, 보현 | [docs/part07_multi_agent.md](../docs/part07_multi_agent.md) + [src/part07_multi_agent/](../src/part07_multi_agent/) |
 | 7주 | Part 8: RAG와 MCP | C성진, 태호 | [docs/part08_rag_mcp.md](../docs/part08_rag_mcp.md) + [src/part08_rag_mcp/](../src/part08_rag_mcp/) |
 | 8주 | Part 9: 프로덕션 | C성진, S종훈 | [docs/part09_production.md](../docs/part09_production.md) + [src/part09_production/](../src/part09_production/) |
-| 9주 | Part 10: 배포와 관측성 | L종훈 | [docs/part10_deployment.md](../docs/part10_deployment.md) + [src/part10_deployment/](../src/part10_deployment/) |
+| 9주 | Part 10: 배포와 관측성 | L종훈, 세훈 | [docs/part10_deployment.md](../docs/part10_deployment.md) + [src/part10_deployment/](../src/part10_deployment/) |
 
 ---
 
