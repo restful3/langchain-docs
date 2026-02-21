@@ -21,9 +21,12 @@
 ## 주간 사이클
 
 ```
-월~금 (스터디 전)    리뷰어가 review_이름.md 작성 후 git push
-토 스터디 회의       리뷰 논의 -> decisions.md 작성
-토~일 (스터디 후)    편집자가 agent_requests.md 정리 -> 에이전트 실행 -> 결과 확인 후 push
+월~금 (스터디 전)    1. 리뷰어가 review_이름.md 작성 후 git push
+토 스터디 회의       2. 리뷰 논의 -> decisions.md 작성
+토~일 (스터디 후)    3. 편집자가 agent_requests.md 정리 (요청별 검증 체크리스트 포함)
+                     4. 코딩에이전트 실행
+                     5. 요청별 검증 체크리스트 확인 + 최종 확인 수행
+                     6. 검증 통과 시 push
 ```
 
 ## 리뷰어 가이드
@@ -66,12 +69,13 @@ git push
 
 ```
 reviews/
-├── README.md              # 이 파일
-├── TEMPLATE.md            # 리뷰 작성 템플릿
+├── README.md                     # 이 파일
+├── TEMPLATE.md                   # 리뷰 작성 템플릿
+├── AGENT_REQUESTS_TEMPLATE.md    # 에이전트 요청 템플릿 (검증 체크리스트 포함)
 ├── part02_fundamentals/
-│   ├── review_이름.md     # 리뷰어별 피드백 (리뷰어가 push)
-│   ├── decisions.md       # 스터디 회의 후 확정사항 (편집자 작성)
-│   └── agent_requests.md  # 코딩에이전트 요청사항 (편집자 작성)
+│   ├── review_이름.md            # 리뷰어별 피드백 (리뷰어가 push)
+│   ├── decisions.md              # 스터디 회의 후 확정사항 (편집자 작성)
+│   └── agent_requests.md         # 에이전트 요청 + 검증 체크리스트 (편집자 작성)
 ├── part03_first_agent/
 │   └── ...
 └── ...
@@ -83,3 +87,28 @@ reviews/
 |------|------|-----------|
 | 리뷰어 | 배정된 스터디원 | `review_이름.md` |
 | 편집자 | 교재 관리자 | `decisions.md`, `agent_requests.md` |
+
+## 에이전트 요청 및 검증 가이드 (편집자용)
+
+### agent_requests.md 작성
+
+`AGENT_REQUESTS_TEMPLATE.md`를 복사하여 해당 파트 폴더에 `agent_requests.md`로 작성합니다.
+
+각 요청에는 다음을 포함합니다:
+
+- **대상 파일 경로**: 정확한 상대 경로
+- **수정 위치**: 라인 번호 또는 섹션 번호
+- **현재/변경**: 현재 내용과 변경할 내용을 명시
+- **검증 체크리스트**: 해당 요청의 결과를 어떻게 확인할지
+
+### 검증 절차
+
+에이전트 실행 후 다음 순서로 검증합니다:
+
+1. **요청별 검증**: 각 요청의 체크리스트 항목을 하나씩 확인
+2. **최종 확인**: 모든 요청 반영 후 전체 검증 수행
+   - 교안 통독하여 흐름 확인
+   - 예제 코드 `python -m py_compile` 통과 여부
+   - `decisions.md` 확정 항목과 대조하여 누락 없는지 확인
+   - `git diff`로 변경 사항 최종 리뷰
+3. **검증 통과 시** push, 미통과 시 에이전트에게 재요청
