@@ -82,15 +82,15 @@ gantt
 
 | 주차 | 파트 | 리뷰어 | 리뷰 대상 |
 |------|------|--------|-----------|
-| 1주 | Part 2: LangChain 기초 | S종훈, L종훈 | `docs/part02_fundamentals.md` + `src/part02_fundamentals/` |
-| 2주 | Part 3: 첫 번째 Agent | L종훈, S종훈 | `docs/part03_first_agent.md` + `src/part03_first_agent/` |
-| 3주 | Part 4: 메모리 시스템 | 재익, 우석 | `docs/part04_memory.md` + `src/part04_memory/` |
-| 4주 | Part 5: 미들웨어 | 우석, 재익 | `docs/part05_middleware.md` + `src/part05_middleware/` |
-| 5주 | Part 6: 컨텍스트와 런타임 | 보현, 태호 | `docs/part06_context.md` + `src/part06_context/` |
-| 6주 | Part 7: 멀티에이전트 시스템 | 태호, 보현 | `docs/part07_multi_agent.md` + `src/part07_multi_agent/` |
-| 7주 | Part 8: RAG와 MCP | C성진, 태호 | `docs/part08_rag_mcp.md` + `src/part08_rag_mcp/` |
-| 8주 | Part 9: 프로덕션 | C성진, S종훈 | `docs/part09_production.md` + `src/part09_production/` |
-| 9주 | Part 10: 배포와 관측성 | L종훈 | `docs/part10_deployment.md` + `src/part10_deployment/` |
+| 1주 | Part 2: LangChain 기초 | S종훈, L종훈 | [docs/part02_fundamentals.md](../docs/part02_fundamentals.md) + [src/part02_fundamentals/](../src/part02_fundamentals/) |
+| 2주 | Part 3: 첫 번째 Agent | L종훈, S종훈 | [docs/part03_first_agent.md](../docs/part03_first_agent.md) + [src/part03_first_agent/](../src/part03_first_agent/) |
+| 3주 | Part 4: 메모리 시스템 | 재익, 우석 | [docs/part04_memory.md](../docs/part04_memory.md) + [src/part04_memory/](../src/part04_memory/) |
+| 4주 | Part 5: 미들웨어 | 우석, 재익 | [docs/part05_middleware.md](../docs/part05_middleware.md) + [src/part05_middleware/](../src/part05_middleware/) |
+| 5주 | Part 6: 컨텍스트와 런타임 | 보현, 태호 | [docs/part06_context.md](../docs/part06_context.md) + [src/part06_context/](../src/part06_context/) |
+| 6주 | Part 7: 멀티에이전트 시스템 | 태호, 보현 | [docs/part07_multi_agent.md](../docs/part07_multi_agent.md) + [src/part07_multi_agent/](../src/part07_multi_agent/) |
+| 7주 | Part 8: RAG와 MCP | C성진, 태호 | [docs/part08_rag_mcp.md](../docs/part08_rag_mcp.md) + [src/part08_rag_mcp/](../src/part08_rag_mcp/) |
+| 8주 | Part 9: 프로덕션 | C성진, S종훈 | [docs/part09_production.md](../docs/part09_production.md) + [src/part09_production/](../src/part09_production/) |
+| 9주 | Part 10: 배포와 관측성 | L종훈 | [docs/part10_deployment.md](../docs/part10_deployment.md) + [src/part10_deployment/](../src/part10_deployment/) |
 
 ---
 
@@ -201,8 +201,8 @@ git push
 flowchart LR
     A["리뷰어 피드백 공유"] --> B["항목별 논의"]
     B --> C{"반영할까?"}
-    C -- "반영 O" --> D["decisions.md\n반영 확정에 기록"]
-    C -- "반영 X" --> E["decisions.md\n보류/기각에 사유와 함께 기록"]
+    C -- "반영 O" --> D["decisions.md<br/>반영 확정에 기록"]
+    C -- "반영 X" --> E["decisions.md<br/>보류/기각에 사유와 함께 기록"]
 ```
 
 `decisions.md`에 논의 결과를 기록합니다:
