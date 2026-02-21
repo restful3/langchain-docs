@@ -1,0 +1,166 @@
+{
+  "conversations": [
+    {
+      "id": "multi_001",
+      "title": "날씨 대화 - 여러 도시",
+      "turns": [
+        {"role": "user", "content": "서울 날씨 어때?"},
+        {"role": "assistant", "content": "서울은 현재 맑고 22도입니다."},
+        {"role": "user", "content": "부산은?"},
+        {"role": "assistant", "content": "부산은 현재 흐리고 19도입니다."},
+        {"role": "user", "content": "어디가 더 따뜻해?"},
+        {"role": "assistant", "content": "서울이 3도 더 따뜻합니다."}
+      ],
+      "metadata": {
+        "topic": "weather_comparison",
+        "difficulty": 2,
+        "context_required": true
+      }
+    },
+    {
+      "id": "multi_002",
+      "title": "고객 서비스 - 주문 조회",
+      "turns": [
+        {"role": "user", "content": "주문 확인하고 싶어요"},
+        {"role": "assistant", "content": "주문번호를 알려주시겠어요?"},
+        {"role": "user", "content": "12345"},
+        {"role": "assistant", "content": "주문번호 12345를 확인했습니다. 현재 배송 중이며 내일 도착 예정입니다."},
+        {"role": "user", "content": "배송지 변경 가능한가요?"},
+        {"role": "assistant", "content": "이미 배송이 시작되어 배송지 변경이 어렵습니다. 고객센터로 연락해주시면 확인 도와드리겠습니다."}
+      ],
+      "metadata": {
+        "topic": "customer_service",
+        "difficulty": 3,
+        "context_required": true
+      }
+    },
+    {
+      "id": "multi_003",
+      "title": "계산 도우미 - 복합 계산",
+      "turns": [
+        {"role": "user", "content": "25 곱하기 4는?"},
+        {"role": "assistant", "content": "100입니다."},
+        {"role": "user", "content": "거기에 50 더해줘"},
+        {"role": "assistant", "content": "150입니다."},
+        {"role": "user", "content": "3으로 나누면?"},
+        {"role": "assistant", "content": "50입니다."}
+      ],
+      "metadata": {
+        "topic": "math",
+        "difficulty": 2,
+        "context_required": true,
+        "requires_memory": true
+      }
+    },
+    {
+      "id": "multi_004",
+      "title": "레시피 도우미",
+      "turns": [
+        {"role": "user", "content": "김치찌개 만들고 싶어"},
+        {"role": "assistant", "content": "김치찌개 레시피를 알려드릴게요. 몇 인분 만드실 건가요?"},
+        {"role": "user", "content": "2인분"},
+        {"role": "assistant", "content": "2인분 기준으로 알려드립니다.\n재료: 김치 200g, 돼지고기 100g, 두부 1/2모, 대파 1/2대\n양념: 고춧가루 1큰술, 다진 마늘 1큰술"},
+        {"role": "user", "content": "고기 없이 만들 수 있어?"},
+        {"role": "assistant", "content": "네, 가능합니다! 돼지고기 대신 참치 1캔 또는 두부를 추가하시면 됩니다. 국물은 멸치육수나 다시다를 사용하세요."}
+      ],
+      "metadata": {
+        "topic": "recipe",
+        "difficulty": 3,
+        "context_required": true
+      }
+    },
+    {
+      "id": "multi_005",
+      "title": "여행 계획",
+      "turns": [
+        {"role": "user", "content": "제주도 여행 가려고 하는데"},
+        {"role": "assistant", "content": "좋은 선택이세요! 언제 가실 예정인가요?"},
+        {"role": "user", "content": "다음 주 주말"},
+        {"role": "assistant", "content": "다음 주 주말이면 좋은 시기네요. 몇 박을 계획하고 계신가요?"},
+        {"role": "user", "content": "2박 3일"},
+        {"role": "assistant", "content": "2박 3일이면 충분히 주요 명소를 돌아볼 수 있어요.\n추천 일정:\n1일차: 성산일출봉, 섭지코지\n2일차: 한라산 등반 또는 서귀포 관광\n3일차: 카페 투어, 공항 이동"},
+        {"role": "user", "content": "렌터카 필요할까?"},
+        {"role": "assistant", "content": "제주도는 대중교통이 제한적이어서 렌터카를 추천드립니다. 2박 3일 기준 약 10-15만원이면 렌트 가능합니다."}
+      ],
+      "metadata": {
+        "topic": "travel",
+        "difficulty": 4,
+        "context_required": true,
+        "turns": 6
+      }
+    },
+    {
+      "id": "multi_006",
+      "title": "코딩 도움 - 디버깅",
+      "turns": [
+        {"role": "user", "content": "Python 코드에서 에러가 나요"},
+        {"role": "assistant", "content": "어떤 에러인가요? 에러 메시지를 보여주시겠어요?"},
+        {"role": "user", "content": "IndexError: list index out of range"},
+        {"role": "assistant", "content": "리스트 인덱스 범위를 벗어났네요. 코드를 보여주시면 정확한 원인을 찾을 수 있습니다."},
+        {"role": "user", "content": "arr = [1, 2, 3]\nprint(arr[3])"},
+        {"role": "assistant", "content": "문제를 찾았습니다! arr[3]은 4번째 요소를 찾으려 하지만, 리스트는 0부터 시작해서 arr[0], arr[1], arr[2]만 있습니다.\n\n수정:\nprint(arr[2])  # 마지막 요소"}
+      ],
+      "metadata": {
+        "topic": "coding_help",
+        "difficulty": 2,
+        "context_required": true
+      }
+    },
+    {
+      "id": "multi_007",
+      "title": "건강 상담",
+      "turns": [
+        {"role": "user", "content": "요즘 피곤해요"},
+        {"role": "assistant", "content": "피곤함이 얼마나 지속되셨나요?"},
+        {"role": "user", "content": "2주 정도요"},
+        {"role": "assistant", "content": "2주 이상 지속되는 피로는 주의가 필요합니다. 수면은 충분히 취하고 계신가요?"},
+        {"role": "user", "content": "6시간 정도 자요"},
+        {"role": "assistant", "content": "성인 권장 수면 시간은 7-9시간입니다. 수면 부족이 피로의 주요 원인일 수 있습니다.\n\n권장사항:\n1. 매일 같은 시간에 취침/기상\n2. 카페인 오후 2시 이후 자제\n3. 증상 지속 시 병원 방문"}
+      ],
+      "metadata": {
+        "topic": "health",
+        "difficulty": 3,
+        "context_required": true,
+        "disclaimer": "의학적 조언이 아닌 일반 정보"
+      }
+    },
+    {
+      "id": "multi_008",
+      "title": "쇼핑 추천",
+      "turns": [
+        {"role": "user", "content": "노트북 사고 싶어요"},
+        {"role": "assistant", "content": "어떤 용도로 사용하실 건가요?"},
+        {"role": "user", "content": "코딩이랑 영상 편집"},
+        {"role": "assistant", "content": "코딩과 영상 편집이면 성능이 중요하네요. 예산은 어느 정도 생각하고 계신가요?"},
+        {"role": "user", "content": "200만원 이하"},
+        {"role": "assistant", "content": "200만원 예산이면 좋은 옵션들이 많습니다.\n\n추천:\n1. MacBook Air M3 (160만원대)\n   - 장점: 뛰어난 배터리, 조용함\n   - 단점: 업그레이드 불가\n\n2. LG 그램 17 (180만원대)\n   - 장점: 큰 화면, 가벼움\n   - 단점: GPU 성능 낮음"},
+        {"role": "user", "content": "맥북이 나을까요?"},
+        {"role": "assistant", "content": "영상 편집에는 맥북이 더 좋습니다. Final Cut Pro 최적화와 M3 칩의 뛰어난 성능 때문입니다. 다만 Windows 전용 프로그램을 쓰신다면 LG가 낫습니다."}
+      ],
+      "metadata": {
+        "topic": "shopping",
+        "difficulty": 4,
+        "context_required": true,
+        "turns": 6
+      }
+    }
+  ],
+  "metadata": {
+    "total_conversations": 8,
+    "difficulty_distribution": {
+      "2": 3,
+      "3": 3,
+      "4": 2
+    },
+    "topics": [
+      "weather_comparison",
+      "customer_service",
+      "math",
+      "recipe",
+      "travel",
+      "coding_help",
+      "health",
+      "shopping"
+    ]
+  }
+}

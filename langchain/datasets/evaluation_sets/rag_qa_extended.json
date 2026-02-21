@@ -1,0 +1,84 @@
+{
+  "extended_qa_pairs": [
+    {
+      "id": "rag_ext_001",
+      "question": "Agent가 도구를 호출하는 과정을 설명해주세요",
+      "context_document": "agent_patterns.md",
+      "expected_keywords": ["ReAct", "생각", "행동", "관찰"],
+      "difficulty": 2
+    },
+    {
+      "id": "rag_ext_002",
+      "question": "프로덕션 환경에서 API 키를 어떻게 관리해야 하나요?",
+      "context_document": "production_best_practices.md",
+      "expected_keywords": ["환경변수", "비밀 관리", "하드코딩 금지"],
+      "difficulty": 2
+    },
+    {
+      "id": "rag_ext_003",
+      "question": "Temperature 파라미터는 무엇을 조절하나요?",
+      "context_document": "prompt_engineering.md",
+      "expected_keywords": ["창의성", "무작위성", "결정적"],
+      "difficulty": 2
+    },
+    {
+      "id": "rag_ext_004",
+      "question": "멀티에이전트 패턴 중 Handoffs 패턴을 설명해주세요",
+      "context_document": "agent_patterns.md",
+      "expected_keywords": ["제어권 전달", "에스컬레이션", "순차적"],
+      "difficulty": 3
+    },
+    {
+      "id": "rag_ext_005",
+      "question": "RAG 시스템의 세 가지 주요 단계는 무엇인가요?",
+      "context_document": "rag_fundamentals.md",
+      "expected_keywords": ["문서 처리", "검색", "생성"],
+      "difficulty": 2
+    },
+    {
+      "id": "rag_ext_006",
+      "question": "적절한 청크 크기는 얼마인가요?",
+      "context_document": "rag_fundamentals.md",
+      "expected_answer": "500-1000 토큰",
+      "difficulty": 1
+    },
+    {
+      "id": "rag_ext_007",
+      "question": "System Prompt에서 Agent의 역할을 어떻게 정의하나요?",
+      "context_document": "prompt_engineering.md",
+      "expected_keywords": ["역할", "목표", "제약사항", "응답 형식"],
+      "difficulty": 2
+    },
+    {
+      "id": "rag_ext_008",
+      "question": "Agentic RAG란 무엇인가요?",
+      "context_document": "rag_fundamentals.md",
+      "expected_keywords": ["Agent", "검색 전략", "반복 검색", "결과 검증"],
+      "difficulty": 3
+    },
+    {
+      "id": "rag_ext_009",
+      "question": "작업별 최적 Temperature 값은?",
+      "context_document": "prompt_engineering.md",
+      "expected_keywords": ["사실 기반 0.0-0.3", "대화 0.7-1.0", "창작 1.2-2.0"],
+      "difficulty": 3
+    },
+    {
+      "id": "rag_ext_010",
+      "question": "Router 패턴의 특징은 무엇인가요?",
+      "context_document": "agent_patterns.md",
+      "expected_keywords": ["입력 분류", "라우팅", "전문화된 Agent"],
+      "difficulty": 2
+    }
+  ],
+  "metadata": {
+    "purpose": "확장된 RAG 평가 데이터",
+    "total_pairs": 10,
+    "documents_covered": [
+      "rag_fundamentals.md",
+      "agent_patterns.md",
+      "production_best_practices.md",
+      "prompt_engineering.md"
+    ]
+  }
+}

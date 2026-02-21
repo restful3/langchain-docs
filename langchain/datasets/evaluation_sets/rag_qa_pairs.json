@@ -1,0 +1,80 @@
+{
+  "qa_pairs": [
+    {
+      "id": "rag_001",
+      "question": "LangChain은 누가 개발했나요?",
+      "answer": "Harrison Chase",
+      "source_document": "langchain_overview.md",
+      "difficulty": 1
+    },
+    {
+      "id": "rag_002",
+      "question": "LangChain의 핵심 개념 4가지는 무엇인가요?",
+      "answer": "Chains, Agents, Memory, Tools",
+      "source_document": "langchain_overview.md",
+      "difficulty": 2
+    },
+    {
+      "id": "rag_003",
+      "question": "Python은 언제 개발되었나요?",
+      "answer": "1991년",
+      "source_document": "python_basics.md",
+      "difficulty": 1
+    },
+    {
+      "id": "rag_004",
+      "question": "Python의 주요 데이터 타입에는 어떤 것들이 있나요?",
+      "answer": "정수(int), 실수(float), 문자열(str), 불린(bool), 리스트(list), 튜플(tuple), 딕셔너리(dict), 집합(set)",
+      "source_document": "python_basics.md",
+      "difficulty": 2
+    },
+    {
+      "id": "rag_005",
+      "question": "AI 윤리의 주요 원칙 5가지는 무엇인가요?",
+      "answer": "인간 중심, 투명성, 책임성, 공정성, 안전성",
+      "source_document": "ai_ethics.md",
+      "difficulty": 2
+    },
+    {
+      "id": "rag_006",
+      "question": "LangChain은 어떤 사용 사례에 활용될 수 있나요?",
+      "answer": "챗봇, 문서 분석, 코드 생성, 데이터 분석",
+      "source_document": "langchain_overview.md",
+      "difficulty": 2
+    },
+    {
+      "id": "rag_007",
+      "question": "Python의 활용 분야는 무엇인가요?",
+      "answer": "웹 개발, 데이터 과학, 머신러닝, 자동화",
+      "source_document": "python_basics.md",
+      "difficulty": 2
+    },
+    {
+      "id": "rag_008",
+      "question": "AI 편향 문제를 해결하기 위한 방안은 무엇인가요?",
+      "answer": "다양한 데이터셋 확보, 정기적인 편향 테스트, 투명한 알고리즘",
+      "source_document": "ai_ethics.md",
+      "difficulty": 3
+    },
+    {
+      "id": "rag_009",
+      "question": "LangChain과 Python을 함께 사용하는 이유는 무엇인가요?",
+      "answer": "Python은 AI 및 머신러닝 분야의 사실상 표준 언어이며, LangChain은 Python으로 개발된 LLM 애플리케이션 프레임워크이기 때문입니다.",
+      "source_document": "langchain_overview.md, python_basics.md",
+      "difficulty": 3
+    },
+    {
+      "id": "rag_010",
+      "question": "AI 윤리와 LangChain 개발 시 고려해야 할 공통점은 무엇인가요?",
+      "answer": "투명성, 책임성, 안전성을 고려하여 AI 시스템을 개발해야 합니다. LangChain으로 구축한 Agent도 편향 없고 공정하며 사용자에게 해를 끼치지 않도록 설계해야 합니다.",
+      "source_document": "langchain_overview.md, ai_ethics.md",
+      "difficulty": 4
+    }
+  ],
+  "evaluation_metrics": {
+    "exact_match": "정답과 정확히 일치하는 비율",
+    "semantic_similarity": "의미적 유사도 (0-1)",
+    "source_accuracy": "올바른 문서를 참조했는지 여부",
+    "answer_relevance": "답변이 질문과 관련있는지"
+  }
+}

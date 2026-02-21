@@ -1,0 +1,57 @@
+{
+  "conversations": [
+    {
+      "id": "cs_001",
+      "category": "product_inquiry",
+      "turns": [
+        {"role": "user", "content": "이 제품 재고 있나요?"},
+        {"role": "assistant", "content": "어떤 제품을 찾으시나요? 제품명이나 모델명을 알려주시면 재고를 확인해드리겠습니다."},
+        {"role": "user", "content": "노트북 X1"},
+        {"role": "assistant", "content": "노트북 X1 모델은 현재 5개 재고가 있습니다. 구매를 원하시면 바로 주문 가능합니다."}
+      ],
+      "metadata": {"difficulty": 2}
+    },
+    {
+      "id": "cs_002",
+      "category": "refund",
+      "turns": [
+        {"role": "user", "content": "환불 요청하고 싶어요"},
+        {"role": "assistant", "content": "주문번호를 알려주시면 환불 절차를 도와드리겠습니다. 환불 사유도 간단히 말씀해주세요."},
+        {"role": "user", "content": "ORD12345, 사이즈가 맞지 않아요"},
+        {"role": "assistant", "content": "주문 ORD12345 확인되었습니다. 사이즈 불일치로 환불 요청을 접수했습니다. 반품 택배를 보내드리며, 제품 수령 후 3-5일 내에 환불 처리됩니다."}
+      ],
+      "metadata": {"difficulty": 3}
+    },
+    {
+      "id": "cs_003",
+      "category": "technical_support",
+      "turns": [
+        {"role": "user", "content": "제품이 작동하지 않아요"},
+        {"role": "assistant", "content": "불편을 드려 죄송합니다. 어떤 증상인지 자세히 설명해주시겠어요?"},
+        {"role": "user", "content": "전원이 안 켜져요"},
+        {"role": "assistant", "content": "다음을 확인해주세요:\n1. 충전이 되어 있는지\n2. 전원 버튼을 3초 이상 눌렀는지\n3. 배터리가 제대로 장착되었는지\n\n이후에도 문제가 계속되면 A/S 센터로 안내해드리겠습니다."}
+      ],
+      "metadata": {"difficulty": 4}
+    },
+    {
+      "id": "cs_004",
+      "category": "shipping",
+      "turns": [
+        {"role": "user", "content": "배송 조회 부탁해요"},
+        {"role": "assistant", "content": "주문번호를 알려주시면 배송 상태를 확인해드리겠습니다."},
+        {"role": "user", "content": "ORD67890"},
+        {"role": "assistant", "content": "주문 ORD67890은 현재 배송 중이며, 내일 도착 예정입니다. 송장번호는 1234567890입니다."}
+      ],
+      "metadata": {"difficulty": 2}
+    },
+    {
+      "id": "cs_005",
+      "category": "general_inquiry",
+      "turns": [
+        {"role": "user", "content": "영업시간 알려주세요"},
+        {"role": "assistant", "content": "고객센터 영업시간은 평일 오전 9시부터 오후 6시까지입니다. 주말과 공휴일은 휴무입니다."}
+      ],
+      "metadata": {"difficulty": 1}
+    }
+  ]
+}
