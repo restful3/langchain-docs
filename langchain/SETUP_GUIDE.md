@@ -321,6 +321,9 @@ python -c "from dotenv import load_dotenv; import os; load_dotenv(); print('OPEN
 2. **설치 확인**
    ```bash
    python -c "from langchain_google_genai import ChatGoogleGenerativeAI; model = ChatGoogleGenerativeAI(model='gemini-1.5-flash'); print(model.invoke('안녕하세요!').content)"
+   
+   uv run --env-file .env python -c "from langchain_google_genai import ChatGoogleGenerativeAI; model = ChatGoogleGenerativeAI(model='gemini-2.5-flash'); print(model.invoke('안녕!').content)"
+
    ```
 
 3. **권장 모델**
