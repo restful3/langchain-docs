@@ -327,8 +327,8 @@ python -c "from dotenv import load_dotenv; import os; load_dotenv(); print('OPEN
    ```
 
 3. **권장 모델**
-   - **학습/개발**: `gemini-1.5-flash` (무료 할당량)
-   - **프로덕션**: `gemini-1.5-pro` (고성능)
+   - **학습/개발**: `gemini-2.5-flash` (무료 할당량)
+   - **프로덕션**: `gemini-2.5-pro` (고성능)
 
 ### 비용 가이드
 
@@ -338,7 +338,7 @@ python -c "from dotenv import load_dotenv; import os; load_dotenv(); print('OPEN
 | OpenAI | gpt-4o | $2.50 | $10.00 | 프로덕션 |
 | Anthropic | claude-3-5-haiku | $0.80 | $4.00 | 학습 |
 | Anthropic | claude-3-5-sonnet | $3.00 | $15.00 | 프로덕션 |
-| Google | gemini-1.5-flash | 무료* | 무료* | 학습 |
+| Google | gemini-2.5-flash | 무료* | 무료* | 학습 |
 
 *Google은 일일 무료 할당량 제공 (2024년 기준)
 
