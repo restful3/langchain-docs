@@ -102,7 +102,7 @@ langchain/
 │
 ├── src/                            # 예제 소스코드 (96개 .py 파일)
 │   ├── part01_introduction/            # 예제 4개 + 솔루션 2개
-│   ├── part02_fundamentals/            # 예제 8개 + 솔루션 3개
+│   ├── part02_fundamentals/            # 예제 4개 + 솔루션 3개
 │   ├── part03_first_agent/             # 예제 8개 + 솔루션 3개
 │   ├── part04_memory/                  # 예제 9개 + 솔루션 3개
 │   ├── part05_middleware/              # 예제 10개 + 솔루션 3개
@@ -191,7 +191,7 @@ flowchart LR
         B3[Tools]
     end
     subgraph Part3["Part 3: Agent"]
-        C1[create_agent]
+        C1[create_react_agent]
         C2[ReAct 패턴]
         C3[Streaming]
     end
@@ -306,8 +306,8 @@ LANGSMITH_TRACING=true
 ### 2. 첫 Agent 실행
 
 ```python
-from langchain.tools import tool
-from langchain.agents import create_agent
+from langchain_core.tools import tool
+from langgraph.prebuilt import create_react_agent
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
@@ -319,7 +319,7 @@ def get_weather(city: str) -> str:
     return f"{city}의 날씨는 맑고 기온은 22도입니다."
 
 model = ChatOpenAI(model="gpt-4o-mini")
-agent = create_agent(
+agent = create_react_agent(
     model=model,
     tools=[get_weather],
     prompt="당신은 친절한 날씨 도우미입니다."
@@ -340,7 +340,7 @@ print(result["messages"][-1].content)
 python src/part01_introduction/01_what_is_agent.py
 
 # Part 2로 넘어가기
-python src/part02_fundamentals/01_models_basic.py
+python src/part02_fundamentals/01_chat_models.py
 ```
 
 ---
@@ -441,7 +441,7 @@ pie title 공식 문서 반영 방식
 |---------|----------|------|
 | 01-overview, 05-philosophy | Part 1 | LangChain 개요, 설계 철학 |
 | 02-install, 03-quickstart | Part 1-3, SETUP_GUIDE | 설치, 빠른 시작 |
-| 06-agents | Part 3 | create_agent, ReAct, Streaming |
+| 06-agents | Part 3 | create_react_agent, ReAct, Streaming |
 | 07-models | Part 2, 9 | Chat Models, Structured Output |
 | 08-messages, 09-tools | Part 2 | 메시지 타입, Tool 정의 |
 | 10-short-term-memory, 29-long-term-memory | Part 4 | Checkpointer, Store |
@@ -568,4 +568,4 @@ pydantic>=2.9.0
 
 ---
 
-*마지막 업데이트: 2025-02-21*
+*마지막 업데이트: 2026-03-01*

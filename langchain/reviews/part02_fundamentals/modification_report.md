@@ -235,3 +235,36 @@
 - [x] `SETUP_GUIDE.md` 링크가 교안 메타 블록에 존재
 - [x] 모든 소스 파일 `python -m py_compile` 통과
 - [x] 모든 Anthropic 모델 ID 공식 문서와 일치 확인
+
+---
+
+## 7. 관련 문서 및 코드
+
+### 7.1 교안 문서
+
+- [part02_fundamentals.md](../../docs/part02_fundamentals.md) -- Part 2 교안 본문 (수정 대상, 1,696줄)
+- [SETUP_GUIDE.md](../../SETUP_GUIDE.md) -- 환경 설정 가이드 (교안 메타 블록에서 링크)
+
+### 7.2 실습 소스 코드
+
+- [01_chat_models.py](../../src/part02_fundamentals/01_chat_models.py) -- Chat Models 예제 5개 (교안 라인 참조 대상)
+- [02_messages.py](../../src/part02_fundamentals/02_messages.py) -- Messages 예제 5개 (변경 없음)
+- [03_tools_basic.py](../../src/part02_fundamentals/03_tools_basic.py) -- Tools 기초 예제 5개 (교안 라인 참조 대상)
+- [04_tool_advanced.py](../../src/part02_fundamentals/04_tool_advanced.py) -- Tools 고급 + Tool Calling 예제 5개 (신규 병합)
+- [README.md](../../src/part02_fundamentals/README.md) -- 소스 디렉토리 안내
+- [solutions/](../../src/part02_fundamentals/solutions/) -- 실습 풀이 코드
+
+### 7.3 리뷰 자료
+
+- [agent_requests.md](./agent_requests.md) -- 수정 요청 10건 (리뷰어 피드백 취합)
+- [decisions.md](./decisions.md) -- 2026-02-28 리뷰 회의 확정 사항
+- [implementation_plan.md](./implementation_plan.md) -- 소스 파일 병합 구현 계획
+- [review_태영.md](./review_태영.md) -- 리뷰어 피드백 (태영)
+- [review_L종훈.md](./review_L종훈.md) -- 리뷰어 피드백 (L종훈)
+- [review_S종훈.md](./review_S종훈.md) -- 리뷰어 피드백 (S종훈)
+- [회의록전사_260228.txt](./회의록전사_260228.txt) -- 2026-02-28 리뷰 회의 녹취록
+
+### 7.4 삭제된 파일
+
+- `04_tools_advanced.py` -- `04_tool_advanced.py`로 교체
+- `05_tool_calling.py` -- `04_tool_advanced.py`로 병합

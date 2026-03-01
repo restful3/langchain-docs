@@ -114,7 +114,8 @@ reviews/part02_fundamentals/
 ├── review_S종훈.md      <-- S종훈이 여기에 작성
 ├── review_L종훈.md      <-- L종훈이 여기에 작성
 ├── decisions.md          (스터디 회의 후 편집자가 작성)
-└── agent_requests.md     (편집자가 작성)
+├── agent_requests.md     (편집자가 작성)
+└── modification_report.md (편집자가 작업 완료 후 작성)
 ```
 
 피드백은 **두 가지로 분류**하여 작성합니다:
@@ -260,8 +261,9 @@ flowchart TD
     C --> C3["decisions.md 확정 항목과 대조 - 누락 없는가"]
     C --> C4["git diff로 변경 사항 최종 리뷰"]
     C1 & C2 & C3 & C4 --> D{"모두 통과?"}
-    D -- Yes --> E["git push"]
-    D -- No --> F["문제 항목 재요청"] --> A
+    D -- Yes --> E["modification_report.md 작성"]
+    E --> F["git push"]
+    D -- No --> G["문제 항목 재요청"] --> A
 ```
 
 ---
@@ -273,12 +275,14 @@ langchain/reviews/
 ├── README.md                        # 이 문서 (리뷰 프로세스 가이드)
 ├── TEMPLATE.md                      # 리뷰 작성 템플릿 (참고용)
 ├── AGENT_REQUESTS_TEMPLATE.md       # 에이전트 요청 템플릿 (참고용)
+├── MODIFICATION_REPORT_TEMPLATE.md  # 수정 보고서 템플릿 (참고용)
 │
 ├── part02_fundamentals/             # Part 2 리뷰 폴더
 │   ├── review_S종훈.md              #   리뷰어 S종훈의 피드백
 │   ├── review_L종훈.md              #   리뷰어 L종훈의 피드백
 │   ├── decisions.md                 #   스터디 회의 결정사항
-│   └── agent_requests.md            #   에이전트 요청 + 검증 체크리스트
+│   ├── agent_requests.md            #   에이전트 요청 + 검증 체크리스트
+│   └── modification_report.md       #   최종 수정 보고서
 │
 ├── part03_first_agent/              # Part 3 리뷰 폴더
 │   ├── review_L종훈.md

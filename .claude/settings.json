@@ -19,13 +19,19 @@
       "Read(//home/restful3/workspace/langchain-docs/langchain/reviews/**)",
       "Read(//media/restful3/data/workspace/langchain-docs/langchain/reviews/**)",
       "Read(//home/restful3/workspace/langchain-docs/langchain/src/part02_fundamentals/**)",
-      "Read(//media/restful3/data/workspace/langchain-docs/langchain/src/part02_fundamentals/**)"
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/src/part02_fundamentals/**)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/**)"
     ],
     "additionalDirectories": [
       "/home/restful3/workspace/langchain-docs/langchain/reviews/part02_fundamentals",
       "/media/restful3/data/workspace/langchain-docs/langchain/reviews/part02_fundamentals",
       "/home/restful3/workspace/langchain-docs/langchain/docs",
-      "/media/restful3/data/workspace/langchain-docs/langchain/docs"
+      "/media/restful3/data/workspace/langchain-docs/langchain/docs",
+      "/home/restful3/workspace/langchain-docs/langchain/reviews",
+      "/media/restful3/data/workspace/langchain-docs/langchain/reviews",
+      "/home/restful3/workspace/langchain-docs/langchain",
+      "/media/restful3/data/workspace/langchain-docs/langchain"
     ]
   }
 }
