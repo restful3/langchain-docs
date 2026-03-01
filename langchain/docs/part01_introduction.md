@@ -1,8 +1,11 @@
 # Part 1: AI Agent의 이해
 
 > 📚 **학습 시간**: 약 2-3시간
+>
 > 🎯 **난이도**: ⭐☆☆☆☆ (입문)
+>
 > 📖 **공식 문서**: [01-overview.md](../official/01-overview_ko.md), [05-philosophy.md](../official/05-philosophy_ko.md)
+>
 > 💻 **예제 코드**: [part01_introduction 디렉토리](../src/part01_introduction/)
 
 ---

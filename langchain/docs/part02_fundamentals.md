@@ -1,8 +1,13 @@
 # Part 2: LangChain 핵심 구성 요소
 
 > 📚 **학습 시간**: 약 3-4시간
+>
 > 🎯 **난이도**: ⭐⭐☆☆☆ (초급)
+>
+> 🛠️ **환경 설정**: [SETUP_GUIDE.md](../SETUP_GUIDE.md) — API 키 설정, 패키지 설치, 실행 환경 구성
+>
 > 📖 **공식 문서**: [07-models.md](../official/07-models_ko.md), [08-messages.md](../official/08-messages_ko.md), [09-tools.md](../official/09-tools_ko.md)
+>
 > 💻 **예제 코드**: [part02_fundamentals 디렉토리](../src/part02_fundamentals/)
 
 ---
@@ -363,8 +368,8 @@ def create_agent_with_fallback(model_name):
 
     if model.profile.get("tool_calling", False):
         # Tool calling 지원 → Agent 생성
-        from langchain.agents import create_agent
-        return create_agent(model=model, tools=[get_weather])
+        from langgraph.prebuilt import create_react_agent
+        return create_react_agent(model=model, tools=[get_weather])
     else:
         # Tool calling 미지원 → 프롬프트 기반 fallback
         print(f"⚠️ {model_name}은 tool calling을 지원하지 않습니다.")
@@ -622,7 +627,7 @@ print(response.content)  # "2+2는 4입니다."
 
 ### 2.5 ToolMessage - 도구 실행 결과
 
-`ToolMessage`는 Tool Calling에서 도구 실행 결과를 모델에 전달할 때 사용됩니다. (Tool Calling은 섹션 5에서 자세히 다룹니다)
+`ToolMessage`는 Tool Calling에서 도구 실행 결과를 모델에 전달할 때 사용됩니다. (Tool Calling은 섹션 6에서 자세히 다룹니다)
 
 #### 기본 구조
 
@@ -799,202 +804,16 @@ message = {
 response = model.invoke([message])
 ```
 
-#### 2. PDF 문서 입력
-
-```python
-# PDF 파일을 base64로 인코딩
-with open("document.pdf", "rb") as pdf_file:
-    base64_pdf = base64.b64encode(pdf_file.read()).decode("utf-8")
-
-message = {
-    "role": "user",
-    "content": [
-        {"type": "text", "text": "이 문서의 내용을 요약해주세요."},
-        {
-            "type": "file",
-            "base64": base64_pdf,
-            "mime_type": "application/pdf",
-            # 일부 provider는 filename 필요 (AWS Bedrock, OpenAI)
-            "extras": {"filename": "document.pdf"}
-        }
-    ]
-}
-
-response = model.invoke([message])
-```
-
-#### 3. 오디오 입력 (Audio Input)
-
-```python
-# 오디오 파일을 base64로 인코딩
-with open("audio.wav", "rb") as audio_file:
-    base64_audio = base64.b64encode(audio_file.read()).decode("utf-8")
-
-message = {
-    "role": "user",
-    "content": [
-        {"type": "text", "text": "이 오디오의 내용을 텍스트로 변환해주세요."},
-        {
-            "type": "audio",
-            "base64": base64_audio,
-            "mime_type": "audio/wav"
-        }
-    ]
-}
-
-response = model.invoke([message])
-```
-
-#### 4. 비디오 입력 (Video Input)
-
-```python
-# 비디오 파일을 base64로 인코딩
-with open("video.mp4", "rb") as video_file:
-    base64_video = base64.b64encode(video_file.read()).decode("utf-8")
-
-message = {
-    "role": "user",
-    "content": [
-        {"type": "text", "text": "이 비디오에서 무슨 일이 일어나고 있나요?"},
-        {
-            "type": "video",
-            "base64": base64_video,
-            "mime_type": "video/mp4"
-        }
-    ]
-}
-
-response = model.invoke([message])
-```
-
-#### 실전 예제: 이미지 분석 Agent
-
-```python
-from langchain.chat_models import init_chat_model
-from langchain.agents import create_agent
-from langchain.tools import tool
-import base64
-
-@tool
-def analyze_chart(image_path: str) -> str:
-    """차트 이미지를 분석하여 인사이트를 제공합니다."""
-    # 이미지를 base64로 인코딩
-    with open(image_path, "rb") as f:
-        base64_image = base64.b64encode(f.read()).decode("utf-8")
-
-    # Multimodal 모델 생성
-    model = init_chat_model("gpt-4o")
-
-    # 이미지 분석
-    response = model.invoke([
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": "이 차트를 분석하고 주요 트렌드를 설명해주세요."
-                },
-                {
-                    "type": "image",
-                    "base64": base64_image,
-                    "mime_type": "image/png"
-                }
-            ]
-        }
-    ])
-
-    return response.content
-
-# Agent 생성
-agent = create_agent(
-    model="gpt-4o",
-    tools=[analyze_chart]
-)
-
-# 사용
-result = agent.invoke({
-    "messages": [{
-        "role": "user",
-        "content": "/path/to/sales_chart.png 파일의 차트를 분석해줘"
-    }]
-})
-```
-
 #### 주의사항
 
-**1. 파일 크기 제한**:
-```python
-import os
-
-def check_file_size(file_path, max_mb=10):
-    """파일 크기 확인"""
-    size_mb = os.path.getsize(file_path) / (1024 * 1024)
-
-    if size_mb > max_mb:
-        raise ValueError(f"파일 크기({size_mb:.2f}MB)가 제한({max_mb}MB)을 초과합니다.")
-
-    return size_mb
-
-# 사용
-try:
-    size = check_file_size("large_image.jpg", max_mb=10)
-    print(f"✅ 파일 크기: {size:.2f}MB")
-except ValueError as e:
-    print(f"❌ {e}")
-```
-
-**2. 지원 포맷 확인**:
-
-| 모델 | 이미지 | 오디오 | 비디오 | PDF |
-|------|-------|-------|-------|-----|
-| GPT-4o | PNG, JPEG, GIF, WebP | WAV, MP3 | MP4 | ✅ |
-| Claude 4.5 | PNG, JPEG, GIF, WebP | ❌ | ❌ | ✅ |
-| Gemini 2.5 | PNG, JPEG, WebP | WAV, MP3, AAC | MP4, MOV | ✅ |
-
-**3. Base64 vs URL vs File ID**:
-
-```python
-# Base64: 작은 파일 (<5MB), 로컬 파일
-# 장점: 간단함, 추가 요청 없음
-# 단점: 메시지 크기 증가, 인코딩 오버헤드
-
-# URL: 중간 크기 파일 (~10MB), 이미 호스팅된 파일
-# 장점: 메시지 크기 작음
-# 단점: 모델이 URL 접근 필요, 네트워크 의존
-
-# File ID: 큰 파일 (>10MB), 재사용되는 파일
-# 장점: 효율적, 한 번만 업로드
-# 단점: Provider-specific, 추가 API 호출
-```
-
-**4. 비용 고려**:
-
-Multimodal 입력은 일반 텍스트보다 비용이 높습니다:
-
-```python
-# GPT-4o 기준 (2026년 2월)
-# - 텍스트: $2.50 / 1M tokens
-# - 이미지 (1024x1024): ~765 tokens (~$0.002)
-# - 이미지 (512x512): ~255 tokens (~$0.0006)
-
-# 이미지 크기 조정으로 비용 절감
-from PIL import Image
-
-def resize_image(image_path, max_size=512):
-    """이미지 크기를 조정하여 비용 절감"""
-    img = Image.open(image_path)
-
-    if max(img.size) > max_size:
-        img.thumbnail((max_size, max_size))
-
-    return img
-```
+- **파일 크기**: 이미지는 일반적으로 10MB 이하를 권장합니다. 큰 이미지는 리사이즈 후 전송하세요.
+- **지원 포맷**: PNG, JPEG, GIF, WebP가 대부분의 모델에서 지원됩니다.
+- **Base64 vs URL**: 로컬 파일은 Base64, 이미 호스팅된 파일은 URL이 효율적입니다.
+- **비용**: 이미지 입력은 텍스트보다 토큰 소비가 큽니다. 해상도를 낮추면 비용을 절감할 수 있습니다.
 
 > 💡 **핵심 포인트**:
-> - Multimodal은 이미지, 오디오, 비디오, PDF 등 다양한 형식 지원
-> - 3가지 입력 방법: URL, Base64, File ID
-> - 모델별 지원 포맷과 크기 제한 확인 필수
-> - 파일 크기와 비용 최적화 고려
+> - 여기서는 이미지 입력(URL, Base64)만 다룹니다
+> - PDF, 오디오, 비디오 등 추가 멀티모달 입력은 [공식 문서](../official/08-messages_ko.md)를 참조하세요
 
 ---
 
@@ -1199,302 +1018,25 @@ def get_user_preference(
     return f"User {user_id}의 {category} 설정: ..."
 ```
 
-### 4.2 Runtime 속성
-
-ToolRuntime은 5가지 주요 속성을 제공합니다.
-
-#### 1. runtime.state - Agent 상태 접근
-
-Agent의 현재 상태(State)에 접근합니다.
-
-```python
-@tool
-def count_messages(runtime: ToolRuntime) -> int:
-    """현재까지의 대화 메시지 수를 세습니다."""
-    return len(runtime.state["messages"])
-```
-
-#### 2. runtime.context - 요청 컨텍스트 접근
-
-요청별 컨텍스트 정보에 접근합니다.
-
-```python
-@tool
-def personalized_search(
-    query: str,
-    runtime: ToolRuntime
-) -> str:
-    """사용자 언어에 맞게 검색합니다."""
-    lang = runtime.context.get("language", "en")
-    return search_api(query, language=lang)
-```
-
-#### 3. runtime.store - 장기 메모리 접근
-
-Store를 통해 장기 메모리에 접근합니다.
-
-```python
-@tool
-def remember_preference(
-    key: str,
-    value: str,
-    runtime: ToolRuntime
-) -> str:
-    """사용자 선호도를 저장합니다."""
-    user_id = runtime.context["user_id"]
-
-    runtime.store.put(
-        namespace=("preferences", user_id),
-        key=key,
-        value={"data": value}
-    )
-
-    return f"'{key}={value}'를 저장했습니다."
-```
-
-#### 4. runtime.stream_writer - 실시간 이벤트 발행
-
-Tool 실행 중 진행 상황을 실시간으로 전송합니다.
-
-```python
-@tool
-def long_running_task(
-    runtime: ToolRuntime
-) -> str:
-    """진행률을 실시간으로 전송하는 작업"""
-    import time
-
-    for i in range(5):
-        runtime.stream_writer(
-            {"progress": i * 20, "status": "processing"}
-        )
-        time.sleep(1)
-
-    return "완료"
-```
-
-#### 5. runtime.tool_call_id - 현재 Tool Call ID
-
-현재 Tool 호출의 고유 ID를 조회합니다.
-
-```python
-@tool
-def log_tool_call(runtime: ToolRuntime) -> str:
-    """Tool 호출을 로깅합니다."""
-    import logging
-
-    logger = logging.getLogger(__name__)
-    logger.info(f"Tool called: {runtime.tool_call_id}")
-
-    return "로깅 완료"
-```
-
-### 4.3 Type-Safe ToolRuntime
-
-**Generic Type Parameters**로 타입 안전성을 확보할 수 있습니다.
-
-```python
-from typing import TypedDict
-from langchain.tools import tool, ToolRuntime
-
-class UserContext(TypedDict):
-    user_id: str
-    role: str
-
-class CustomState(TypedDict):
-    messages: list
-    counter: int
-
-@tool
-def typed_tool(
-    runtime: ToolRuntime[UserContext, CustomState]
-) -> str:
-    """타입 안전한 Tool"""
-    # IDE 자동완성 지원
-    user_id: str = runtime.context["user_id"]  # ✅ 타입 체크
-    counter: int = runtime.state["counter"]    # ✅ 타입 체크
-
-    return f"User {user_id}, count: {counter}"
-```
-
-**타입 옵션**:
-- `ToolRuntime`: 기본 (context, state 타입 없음)
-- `ToolRuntime[Context]`: Context만 타입 지정
-- `ToolRuntime[Context, State]`: 둘 다 타입 지정
-
-### 4.4 실전 활용 패턴
-
-#### 패턴 1: 사용자별 개인화
-
-```python
-@tool
-def recommend_products(
-    category: str,
-    runtime: ToolRuntime
-) -> list:
-    """사용자 구매 이력 기반 추천"""
-    user_id = runtime.context["user_id"]
-
-    # Store에서 구매 이력 조회
-    history = runtime.store.search(
-        namespace=("purchases", user_id),
-        limit=10
-    )
-
-    # 개인화된 추천
-    return personalize_recommendations(category, history)
-```
-
-#### 패턴 2: 진행률 스트리밍
-
-```python
-@tool
-def process_large_file(
-    file_path: str,
-    runtime: ToolRuntime
-) -> str:
-    """대용량 파일 처리 with 진행률"""
-    total_lines = count_lines(file_path)
-
-    with open(file_path) as f:
-        for i, line in enumerate(f):
-            process_line(line)
-
-            # 10%마다 진행률 전송
-            if i % (total_lines // 10) == 0:
-                runtime.stream_writer({
-                    "progress": i / total_lines * 100,
-                    "processed": i
-                })
-
-    return "파일 처리 완료"
-```
-
-#### 패턴 3: 대화 히스토리 분석
-
-```python
-@tool
-def summarize_conversation(
-    runtime: ToolRuntime
-) -> str:
-    """지금까지의 대화를 요약합니다."""
-    messages = runtime.state["messages"]
-
-    # 최근 10개 메시지만
-    recent = messages[-10:]
-
-    summary = "\n".join([
-        f"{m['role']}: {m['content'][:50]}..."
-        for m in recent
-    ])
-
-    return f"대화 요약:\n{summary}"
-```
-
-### 4.5 주의사항
-
-**1. Runtime은 선택적 파라미터**:
-
-Runtime 없이도 Tool을 정의하고 호출할 수 있습니다.
-
-```python
-# ✅ 동작함 - runtime 없이도 호출 가능
-@tool
-def simple_tool(query: str) -> str:
-    return search(query)
-
-# ✅ 동작함 - runtime 추가 가능
-@tool
-def advanced_tool(query: str, runtime: ToolRuntime) -> str:
-    user_id = runtime.context["user_id"]
-    return search(query, user=user_id)
-```
-
-**2. Store는 Checkpointer와 별개**:
-
-- **State**: Checkpointer에 자동 저장
-- **Store**: `store.put()` 으로 명시적 저장 필요
-
-```python
-@tool
-def save_data(data: str, runtime: ToolRuntime) -> str:
-    # State 수정 (자동 저장됨)
-    runtime.state["last_data"] = data
-
-    # Store 저장 (명시적으로 put 호출)
-    runtime.store.put(
-        namespace=("data",),
-        key="last",
-        value={"data": data}
-    )
-
-    return "저장 완료"
-```
-
-**3. Context는 불변**:
-
-Context는 읽기 전용입니다.
-
-```python
-@tool
-def cannot_modify_context(runtime: ToolRuntime):
-    # ❌ 동작하지 않음 - Context는 불변
-    runtime.context["user_id"] = "new_id"
-
-    # ✅ 대신 State를 수정하거나 Store를 사용
-    runtime.state["user_override"] = "new_id"
-```
-
-### 4.6 성능 고려사항
-
-**Store 접근 비용**:
-- `store.get()`: 빠름 (단일 키 조회)
-- `store.search()`: 느림 (임베딩 검색)
-
-**권장 사항**:
-- 필수적인 경우만 `store.search()` 사용
-- 캐싱으로 반복 조회 최소화
-
-```python
-@tool
-def optimized_search(
-    query: str,
-    runtime: ToolRuntime
-) -> str:
-    # 캐시 확인
-    cache_key = f"search:{query}"
-    cached = runtime.store.get(
-        namespace=("cache",),
-        key=cache_key
-    )
-
-    if cached:
-        return cached.value["result"]
-
-    # 실제 검색 (비용 높음)
-    result = expensive_search(query)
-
-    # 캐시 저장
-    runtime.store.put(
-        namespace=("cache",),
-        key=cache_key,
-        value={"result": result}
-    )
-
-    return result
-```
-
-> 💡 **핵심 포인트**:
-> - ToolRuntime은 Tool에서 Agent 상태, 컨텍스트, 메모리에 접근하는 인터페이스
-> - 5가지 속성: state, context, store, stream_writer, tool_call_id
-> - Type-Safe 패턴으로 타입 안전성 확보
-> - Store 접근은 비용이 높으니 캐싱 활용
+### 4.2 Runtime 속성 요약
+
+ToolRuntime은 5가지 주요 속성을 제공합니다:
+
+| 속성 | 용도 | 설명 |
+|------|------|------|
+| `runtime.state` | Agent 상태 접근 | 메시지 기록 등 현재 상태 조회 |
+| `runtime.context` | 요청 컨텍스트 | 사용자 ID, 언어 등 요청별 정보 |
+| `runtime.store` | 장기 메모리 | 사용자 선호도 등 영속 데이터 접근 |
+| `runtime.stream_writer` | 실시간 이벤트 | 진행률 등 중간 결과 스트리밍 |
+| `runtime.tool_call_id` | Tool Call ID | 현재 호출의 고유 식별자 |
+
+> 💡 ToolRuntime의 상세 활용법은 Agent/MCP를 다루는 후속 파트에서 실습합니다.
 
 ---
 
-## 5. Tools 고급
+## 5. Tools 고급 — Pydantic 스키마
 
-> 💻 **예제 코드**: [04_tools_advanced.py](../src/part02_fundamentals/04_tools_advanced.py)
+> 💻 **예제 코드**: [04_tool_advanced.py](../src/part02_fundamentals/04_tool_advanced.py)
 
 ### 5.1 Pydantic 스키마로 복잡한 입력 정의
 
@@ -1528,100 +1070,17 @@ def get_weather(location: str, units: str = "celsius", include_forecast: bool = 
     return result
 ```
 
-> 💻 **예제 코드**: [04_tools_advanced.py](../src/part02_fundamentals/04_tools_advanced.py) 라인 40-58
+> 💻 **예제 코드**: [04_tool_advanced.py](../src/part02_fundamentals/04_tool_advanced.py) 라인 44-61
 
-### 5.2 Field Descriptions로 더 나은 가이드 제공
+각 필드에 `Field(description=...)`를 사용하면 LLM이 각 파라미터의 용도를 더 정확히 이해합니다. 위 `WeatherInput` 예제처럼 `description`, `default`, `ge`/`le` 등의 옵션을 활용할 수 있습니다.
 
-`Field(description=...)`를 사용하면 각 필드에 대한 상세한 설명을 제공할 수 있습니다.
-
-```python
-from pydantic import BaseModel, Field
-from typing import Literal
-
-class SearchInput(BaseModel):
-    """데이터베이스 검색을 위한 입력"""
-    query: str = Field(
-        description="검색 쿼리. 자연어 또는 키워드를 사용하세요."
-    )
-    filters: dict = Field(
-        default={},
-        description="필터 조건. 예: {'category': 'electronics', 'in_stock': True}"
-    )
-    sort_by: Literal["relevance", "price", "date"] = Field(
-        default="relevance",
-        description="정렬 기준. 'relevance'(관련성), 'price'(가격), 'date'(날짜)"
-    )
-    limit: int = Field(
-        default=10,
-        ge=1,
-        le=100,
-        description="반환할 최대 결과 수 (1-100)"
-    )
-
-@tool(args_schema=SearchInput)
-def search_database(query: str, filters: dict = {},
-                   sort_by: str = "relevance", limit: int = 10) -> str:
-    """고급 데이터베이스 검색을 수행합니다."""
-    return f"Found results for '{query}' with {len(filters)} filters"
-```
-
-**Field 검증 옵션**:
-- `ge`, `le`: 숫자 범위 제한 (greater/less than or equal)
-- `min_length`, `max_length`: 문자열 길이 제한
-- `regex`: 정규식 패턴 매칭
-- `default`: 기본값
-- `default_factory`: 동적 기본값 (함수)
-
-### 5.3 중첩된 복잡한 입력 타입
-
-실무에서는 종종 중첩된 복잡한 데이터 구조가 필요합니다.
-
-```python
-from pydantic import BaseModel, Field
-from typing import List, Optional
-
-class Address(BaseModel):
-    """주소 정보"""
-    street: str = Field(description="도로명")
-    city: str = Field(description="도시")
-    postal_code: str = Field(description="우편번호")
-
-class ContactInfo(BaseModel):
-    """연락처 정보"""
-    email: str = Field(description="이메일 주소")
-    phone: Optional[str] = Field(None, description="전화번호 (선택)")
-
-class CustomerInput(BaseModel):
-    """고객 등록을 위한 입력"""
-    name: str = Field(description="고객 이름")
-    contact: ContactInfo = Field(description="연락처 정보")
-    addresses: List[Address] = Field(
-        description="배송 주소 목록 (최소 1개)"
-    )
-    preferred_contact: str = Field(
-        default="email",
-        description="선호하는 연락 방법 ('email' 또는 'phone')"
-    )
-
-@tool(args_schema=CustomerInput)
-def register_customer(name: str, contact: dict, addresses: list,
-                     preferred_contact: str = "email") -> str:
-    """새로운 고객을 등록합니다."""
-    return f"Registered customer: {name} with {len(addresses)} addresses"
-```
-
-**중첩 스키마의 장점**:
-1. **명확한 구조**: 복잡한 데이터도 계층적으로 표현
-2. **재사용성**: 서브 모델을 여러 도구에서 재사용
-3. **자동 검증**: Pydantic이 모든 레벨에서 타입과 제약 조건 검증
-
-> 💻 **예제 코드**: [04_tools_advanced.py](../src/part02_fundamentals/04_tools_advanced.py) 라인 301-340
+> 💡 독스트링과 타입힌트만으로도 대부분의 Tool은 잘 동작합니다. Pydantic 스키마는 복잡한 입력 검증이 필요할 때 사용하세요.
 
 ---
 
 ## 6. Tool Calling 이해하기
 
-> 💻 **예제 코드**: [05_tool_calling.py](../src/part02_fundamentals/05_tool_calling.py)
+> 💻 **예제 코드**: [04_tool_advanced.py](../src/part02_fundamentals/04_tool_advanced.py)
 
 ### 6.1 Tool Calling이란?
 
@@ -1761,7 +1220,7 @@ print("Final answer:", final_response.content)
 4. **결과 전달**: ToolMessage로 결과를 모델에 다시 전달
 5. **최종 답변**: 모델이 도구 결과를 바탕으로 사용자 친화적인 답변 생성
 
-> ⚠️ **중요**: LangChain의 Agent (예: `create_agent()`)를 사용하면 이 전체 루프가 자동으로 처리됩니다. 수동으로 구현하는 것은 이해를 돕기 위한 것입니다.
+> ⚠️ **중요**: LangGraph의 Agent (예: `create_react_agent()`)를 사용하면 이 전체 루프가 자동으로 처리됩니다. 수동으로 구현하는 것은 이해를 돕기 위한 것입니다.
 
 #### 병렬 Tool Calls
 
@@ -2191,7 +1650,7 @@ def risky_operation(param: str) -> str:
 ### 4. 다음 단계
 
 - [Part 3: 첫 번째 Agent 만들기](./part03_first_agent.md) (⭐⭐☆)
-  - `create_agent()`로 완전한 Agent 구축
+  - `create_react_agent()`로 완전한 Agent 구축
   - Tool Calling 자동 루프
   - System Prompt 설계
 
@@ -2230,4 +1689,4 @@ Part 2를 완료하기 전에 다음을 확인하세요:
 
 **학습 진도**: ▓▓░░░░░░░░ 20% (Part 2/10 완료)
 
-*마지막 업데이트: 2026-02-18*
+*마지막 업데이트: 2026-03-01*

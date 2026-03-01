@@ -3,7 +3,29 @@
     "allow": [
       "Read(//home/restful3/workspace/langchain-docs/langchain/reviews/part02_fundamentals/**)",
       "Read(//media/restful3/data/workspace/langchain-docs/langchain/reviews/part02_fundamentals/**)",
-      "Bash(git status -u)"
+      "Bash(git status -u)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/src/part02_fundamentals/solutions/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/src/part02_fundamentals/solutions/**)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/reviews/part03_first_agent/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/reviews/part03_first_agent/**)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/reviews/part04_memory/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/reviews/part04_memory/**)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/reviews/part06_context/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/reviews/part06_context/**)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/reviews/part07_multi_agent/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/reviews/part07_multi_agent/**)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/docs/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/docs/**)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/reviews/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/reviews/**)",
+      "Read(//home/restful3/workspace/langchain-docs/langchain/src/part02_fundamentals/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/src/part02_fundamentals/**)"
+    ],
+    "additionalDirectories": [
+      "/home/restful3/workspace/langchain-docs/langchain/reviews/part02_fundamentals",
+      "/media/restful3/data/workspace/langchain-docs/langchain/reviews/part02_fundamentals",
+      "/home/restful3/workspace/langchain-docs/langchain/docs",
+      "/media/restful3/data/workspace/langchain-docs/langchain/docs"
     ]
   }
 }

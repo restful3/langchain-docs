@@ -4,52 +4,155 @@ LangChain AI Agent 마스터 교안
 Part 2: LangChain 기초
 ================================================================================
 
-파일명: 05_tool_calling.py
+파일명: 04_tool_advanced.py
 난이도: ⭐⭐⭐☆☆ (중급)
 예상 시간: 25분
 
 📚 학습 목표:
+  - Pydantic BaseModel을 사용한 Tool 스키마 정의
+  - Field를 사용한 파라미터 검증 및 설명
   - bind_tools()로 LLM에 도구 연결하기
-  - Tool call 요청 검사 및 이해
-  - Tool call 실행하기
-  - 여러 도구를 한번에 호출하는 케이스
-  - Tool call 에러 핸들링 방법
+  - Tool call 실행 (전체 워크플로우)
+  - Tool call 에러 핸들링
 
 📖 공식 문서:
+  • Tools: /official/09-tools.md
   • Tool Calling: /official/09-tools.md
-  • Agents: /official/11-agents.md
 
 🔧 필요한 패키지:
-  pip install langchain langchain-openai python-dotenv
+  pip install langchain langchain-openai pydantic python-dotenv
 
 🚀 실행 방법:
-  python 05_tool_calling.py
+  python 04_tool_advanced.py
 
 ================================================================================
 """
 
 import os
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 from langchain.tools import tool
-from langchain.messages import HumanMessage, ToolMessage
-from pydantic import BaseModel, Field
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, ToolMessage
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
-# ============================================================================
-# 환경 설정
-# ============================================================================
-
-load_dotenv()
-
-if not os.getenv("OPENAI_API_KEY"):
-    print("❌ 오류: OPENAI_API_KEY가 설정되지 않았습니다.")
-    print("📝 .env 파일을 확인하고 API 키를 설정하세요.")
-    exit(1)
-
 
 # ============================================================================
-# 도구 정의
+# 예제 1: Pydantic BaseModel로 Tool 입력 스키마 정의
+# ============================================================================
+
+class WeatherInput(BaseModel):
+    """날씨 조회를 위한 입력 스키마"""
+    city: str = Field(description="날씨를 조회할 도시 이름 (예: 서울, 부산)")
+    country: str = Field(default="한국", description="국가 이름")
+
+
+@tool(args_schema=WeatherInput)
+def get_weather_advanced(city: str, country: str = "한국") -> str:
+    """주어진 도시의 날씨를 상세하게 조회합니다."""
+    # 실제로는 API를 호출
+    weather_data = {
+        ("서울", "한국"): "맑음, 22도, 습도 60%",
+        ("부산", "한국"): "흐림, 20도, 습도 75%",
+        ("뉴욕", "미국"): "비, 15도, 습도 85%",
+    }
+
+    weather = weather_data.get((city, country), "날씨 정보를 찾을 수 없습니다")
+    return f"{country} {city}의 날씨: {weather}"
+
+
+def example_1_pydantic_schema():
+    """Pydantic BaseModel을 사용한 스키마 정의"""
+    print("=" * 70)
+    print("📌 예제 1: Pydantic BaseModel로 Tool 입력 스키마 정의")
+    print("=" * 70)
+
+    # Tool 정보 확인
+    print(f"\n🔧 도구 이름: {get_weather_advanced.name}")
+    print(f"📝 도구 설명: {get_weather_advanced.description}")
+    print(f"\n📋 입력 스키마:")
+    print(f"   {get_weather_advanced.args_schema.model_json_schema()}")
+
+    # Tool 실행
+    result1 = get_weather_advanced.invoke({"city": "서울"})
+    print(f"\n🌤️  {result1}")
+
+    result2 = get_weather_advanced.invoke({"city": "뉴욕", "country": "미국"})
+    print(f"🌤️  {result2}")
+
+    print("\n💡 Pydantic으로 타입 검증, 기본값, 설명을 한번에 정의!\n")
+
+
+# ============================================================================
+# 예제 2: Field 설명과 검증
+# ============================================================================
+
+class UserProfileInput(BaseModel):
+    """사용자 프로필 생성 입력"""
+    name: str = Field(description="사용자 이름", min_length=2, max_length=50)
+    age: int = Field(description="사용자 나이", ge=0, le=150)  # ge=greater or equal
+    email: str = Field(description="이메일 주소")
+    bio: Optional[str] = Field(default=None, description="자기소개 (선택사항)")
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v):
+        """이메일 형식 검증"""
+        if '@' not in v:
+            raise ValueError('올바른 이메일 형식이 아닙니다')
+        return v
+
+
+@tool(args_schema=UserProfileInput)
+def create_user_profile(name: str, age: int, email: str, bio: Optional[str] = None) -> str:
+    """사용자 프로필을 생성합니다."""
+    profile = f"👤 이름: {name}\n   나이: {age}세\n   이메일: {email}"
+    if bio:
+        profile += f"\n   소개: {bio}"
+    return profile
+
+
+def example_2_field_validation():
+    """Field를 사용한 상세 검증"""
+    print("=" * 70)
+    print("📌 예제 2: Field 설명과 검증")
+    print("=" * 70)
+
+    # 정상 케이스
+    print("\n✅ 정상 케이스:")
+    result1 = create_user_profile.invoke({
+        "name": "김철수",
+        "age": 30,
+        "email": "kim@example.com",
+        "bio": "파이썬 개발자입니다."
+    })
+    print(result1)
+
+    # bio 없이 (Optional)
+    print("\n✅ bio 없이 (Optional):")
+    result2 = create_user_profile.invoke({
+        "name": "이영희",
+        "age": 25,
+        "email": "lee@example.com"
+    })
+    print(result2)
+
+    # 에러 케이스 처리
+    print("\n❌ 잘못된 입력 (나이 음수):")
+    try:
+        result3 = create_user_profile.invoke({
+            "name": "박민수",
+            "age": -5,  # 잘못된 나이
+            "email": "park@example.com"
+        })
+    except Exception as e:
+        print(f"   오류 발생: {str(e)}")
+
+    print("\n💡 Field로 최소/최대값, 길이 등을 자동으로 검증!\n")
+
+
+# ============================================================================
+# Tool Calling용 도구 정의 (예제 3-5에서 사용)
 # ============================================================================
 
 @tool
@@ -76,6 +179,8 @@ def calculate(expression: str) -> str:
         expression: 계산할 수식 (예: "2 + 2", "10 * 5")
     """
     try:
+        # 주의: eval()은 임의 코드 실행 위험이 있습니다.
+        # 프로덕션에서는 ast.literal_eval() 또는 numexpr.evaluate()를 사용하세요.
         result = eval(expression)
         return f"{expression} = {result}"
     except Exception as e:
@@ -93,14 +198,28 @@ def search_web(query: str) -> str:
     return f"'{query}'에 대한 검색 결과: LangChain은 LLM 애플리케이션 개발 프레임워크입니다."
 
 
+@tool
+def divide_numbers(a: float, b: float) -> str:
+    """두 숫자를 나눕니다.
+
+    Args:
+        a: 분자
+        b: 분모
+    """
+    if b == 0:
+        raise ValueError("0으로 나눌 수 없습니다")
+    result = a / b
+    return f"{a} ÷ {b} = {result}"
+
+
 # ============================================================================
-# 예제 1: bind_tools()로 도구 연결하기
+# 예제 3: bind_tools()로 도구 연결하기
 # ============================================================================
 
-def example_1_bind_tools():
+def example_3_bind_tools():
     """LLM에 도구를 연결하는 기본 방법"""
     print("=" * 70)
-    print("📌 예제 1: bind_tools()로 도구 연결하기")
+    print("📌 예제 3: bind_tools()로 도구 연결하기")
     print("=" * 70)
 
     # LLM 초기화
@@ -132,53 +251,13 @@ def example_1_bind_tools():
 
 
 # ============================================================================
-# 예제 2: Tool call 요청 상세 검사
+# 예제 4: Tool call 실행하기
 # ============================================================================
 
-def example_2_examine_tool_calls():
-    """Tool call 요청의 구조 이해하기"""
-    print("=" * 70)
-    print("📌 예제 2: Tool call 요청 상세 검사")
-    print("=" * 70)
-
-    model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    model_with_tools = model.bind_tools([get_weather, calculate, search_web])
-
-    # 다양한 질문으로 테스트
-    questions = [
-        "서울 날씨 알려줘",
-        "25 곱하기 4는 얼마야?",
-        "LangChain이 뭐야?",
-    ]
-
-    for i, question in enumerate(questions, 1):
-        print(f"\n{'='*70}")
-        print(f"질문 {i}: {question}")
-        print('='*70)
-
-        response = model_with_tools.invoke(question)
-
-        if response.tool_calls:
-            print(f"✅ 도구 호출 요청됨:")
-            for tool_call in response.tool_calls:
-                print(f"\n   🔧 도구명: {tool_call['name']}")
-                print(f"   📝 ID: {tool_call['id']}")
-                print(f"   📋 인자: {tool_call['args']}")
-        else:
-            print(f"⚠️  도구 호출 없음 (직접 답변)")
-            print(f"   응답: {response.content}")
-
-    print("\n💡 LLM이 질문에 따라 적절한 도구를 자동 선택!\n")
-
-
-# ============================================================================
-# 예제 3: Tool call 실행하기
-# ============================================================================
-
-def example_3_execute_tool_calls():
+def example_4_execute_tool_calls():
     """Tool call을 실제로 실행하기"""
     print("=" * 70)
-    print("📌 예제 3: Tool call 실행하기")
+    print("📌 예제 4: Tool call 실행하기")
     print("=" * 70)
 
     model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
@@ -230,77 +309,8 @@ def example_3_execute_tool_calls():
 
 
 # ============================================================================
-# 예제 4: 여러 도구 동시 호출
-# ============================================================================
-
-def example_4_multiple_tool_calls():
-    """한 번에 여러 도구 호출하기"""
-    print("=" * 70)
-    print("📌 예제 4: 여러 도구 동시 호출")
-    print("=" * 70)
-
-    model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    tools = [get_weather, calculate]
-    model_with_tools = model.bind_tools(tools)
-
-    tools_map = {tool.name: tool for tool in tools}
-
-    # 여러 도구가 필요한 복잡한 질문
-    user_question = "서울과 부산의 날씨를 알려주고, 두 도시의 평균 온도를 계산해줘"
-    print(f"\n👤 사용자: {user_question}")
-
-    messages = [HumanMessage(content=user_question)]
-    response = model_with_tools.invoke(messages)
-
-    print(f"\n🤖 LLM이 요청한 도구 개수: {len(response.tool_calls)}")
-
-    if response.tool_calls:
-        messages.append(response)
-
-        # 모든 tool call 실행
-        for i, tool_call in enumerate(response.tool_calls, 1):
-            tool_name = tool_call['name']
-            tool_args = tool_call['args']
-
-            print(f"\n🔧 도구 {i}: {tool_name}")
-            print(f"   인자: {tool_args}")
-
-            selected_tool = tools_map[tool_name]
-            tool_result = selected_tool.invoke(tool_args)
-
-            print(f"   결과: {tool_result}")
-
-            messages.append(
-                ToolMessage(
-                    content=tool_result,
-                    tool_call_id=tool_call['id']
-                )
-            )
-
-        # 최종 답변
-        final_response = model_with_tools.invoke(messages)
-        print(f"\n🤖 최종 답변:\n   {final_response.content}")
-
-    print("\n💡 복잡한 작업을 여러 도구로 나누어 처리!\n")
-
-
-# ============================================================================
 # 예제 5: Tool call 에러 핸들링
 # ============================================================================
-
-@tool
-def divide_numbers(a: float, b: float) -> str:
-    """두 숫자를 나눕니다.
-
-    Args:
-        a: 분자
-        b: 분모
-    """
-    if b == 0:
-        raise ValueError("0으로 나눌 수 없습니다")
-    result = a / b
-    return f"{a} ÷ {b} = {result}"
-
 
 def example_5_error_handling():
     """Tool call 에러 핸들링"""
@@ -367,24 +377,33 @@ def example_5_error_handling():
 # ============================================================================
 
 def main():
-    print("\n🎓 Part 2: LangChain 기초 - Tool Calling\n")
+    print("\n🎓 Part 2: LangChain 기초 - Tools 고급 & Tool Calling\n")
 
-    example_1_bind_tools()
+    # Part A: Pydantic 스키마 (API 키 불필요)
+    example_1_pydantic_schema()
     input("⏎ 계속하려면 Enter...")
 
-    example_2_examine_tool_calls()
+    example_2_field_validation()
     input("⏎ 계속하려면 Enter...")
 
-    example_3_execute_tool_calls()
-    input("⏎ 계속하려면 Enter...")
+    # Part B: Tool Calling (OPENAI_API_KEY 필요)
+    load_dotenv()
+    if not os.getenv("OPENAI_API_KEY"):
+        print("\n" + "=" * 70)
+        print("⚠️  OPENAI_API_KEY가 설정되지 않아 예제 3-5를 건너뜁니다.")
+        print("📝 .env 파일에 API 키를 설정하면 Tool Calling 예제를 실행할 수 있습니다.")
+        print("=" * 70 + "\n")
+    else:
+        example_3_bind_tools()
+        input("⏎ 계속하려면 Enter...")
 
-    example_4_multiple_tool_calls()
-    input("⏎ 계속하려면 Enter...")
+        example_4_execute_tool_calls()
+        input("⏎ 계속하려면 Enter...")
 
-    example_5_error_handling()
+        example_5_error_handling()
 
     print("=" * 70)
-    print("🎉 Tool Calling 학습 완료!")
+    print("🎉 Tools 고급 & Tool Calling 학습 완료!")
     print("📖 다음: Part 3 - 첫 번째 Agent 만들기")
     print("=" * 70 + "\n")
 
@@ -397,49 +416,38 @@ if __name__ == "__main__":
 # 📚 추가 학습 포인트
 # ============================================================================
 #
-# 1. Tool Calling 프로세스:
+# 1. Pydantic BaseModel 장점:
+#    - 자동 타입 검증 + 명확한 스키마 정의
+#    - Field로 설명, 기본값, 검증 조건을 한번에 지정
+#    - field_validator로 커스텀 검증 로직 추가 가능
+#
+# 2. Tool Calling 프로세스:
 #    ① 사용자 질문 → LLM
 #    ② LLM이 필요한 도구 선택 및 인자 생성
 #    ③ 도구 실행
 #    ④ 결과를 ToolMessage로 LLM에 전달
 #    ⑤ LLM이 최종 답변 생성
 #
-# 2. bind_tools() vs Agent:
+# 3. bind_tools() vs Agent:
 #    - bind_tools(): 수동으로 tool call 실행 필요
 #    - Agent: 자동으로 tool call 실행 (Part 3에서 학습)
 #
-# 3. ToolMessage의 역할:
+# 4. ToolMessage의 역할:
 #    - 도구 실행 결과를 LLM에 전달
 #    - tool_call_id로 어떤 요청의 결과인지 연결
-#    - 에러도 ToolMessage로 전달 가능
-#
-# 4. 여러 도구 호출:
-#    - LLM이 한번에 여러 도구를 요청할 수 있음
-#    - 각 tool call마다 ToolMessage 생성 필요
-#    - 순서대로 또는 병렬로 실행 가능
-#
-# 5. 실전 팁:
-#    - 도구 설명을 명확하게 작성 (LLM이 읽음)
-#    - 에러 핸들링 필수 (도구가 실패할 수 있음)
-#    - Agent를 사용하면 이 과정이 자동화됨
+#    - 에러도 ToolMessage(status="error")로 전달 가능
 #
 # ============================================================================
 # 🐛 자주 발생하는 문제
 # ============================================================================
 #
-# 문제: LLM이 도구를 호출하지 않고 직접 답변
-# 해결: 도구 설명을 더 명확하게 작성, temperature=0으로 설정
+# 문제: "validation error"가 계속 발생
+# 해결: Pydantic 스키마와 실제 함수 시그니처가 일치하는지 확인
 #
 # 문제: tool_call_id 매칭 오류
 # 해결: ToolMessage의 tool_call_id는 반드시 원래 요청의 ID와 일치해야 함
 #
-# 문제: 여러 도구 호출 시 순서 문제
-# 해결: 각 tool call을 순서대로 처리하거나, 병렬 처리 후 모두 전달
-#
 # 문제: 도구 실행 에러가 발생하면 전체 중단
 # 해결: try-except로 에러를 잡아 ToolMessage로 전달하면 LLM이 처리
-#
-# 문제: 너무 많은 도구를 연결하면 성능 저하
-# 해결: 필요한 도구만 선택적으로 연결, 또는 도구를 카테고리로 분류
 #
 # ============================================================================
