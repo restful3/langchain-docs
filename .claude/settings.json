@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/restful3/workspace/langchain-docs/langchain/reviews/part02_fundamentals/**)",
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/reviews/part02_fundamentals/**)",
+      "Bash(git status -u)"
+    ]
+  }
+}

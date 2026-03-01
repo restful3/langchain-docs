@@ -102,7 +102,7 @@ LangChain은 LLM(Large Language Model) 기반 애플리케이션을 쉽게 개�
 돕는 오픈소스 프레임워크입니다...
 ```
 
-> 💻 **예제 코드**: [01_chat_models.py](../src/part02_fundamentals/01_chat_models.py) 라인 10-20
+> 💻 **예제 코드**: [01_chat_models.py](../src/part02_fundamentals/01_chat_models.py) 라인 39-55
 
 #### 프로바이더 명시적 지정
 
@@ -202,7 +202,7 @@ model = init_chat_model(
 )
 ```
 
-> 💻 **예제 코드**: [01_chat_models.py](../src/part02_fundamentals/01_chat_models.py) 라인 30-80
+> 💻 **예제 코드**: [01_chat_models.py](../src/part02_fundamentals/01_chat_models.py) 라인 129-158
 
 ### 1.4 Temperature와 주요 파라미터
 
@@ -266,7 +266,7 @@ model = init_chat_model(
 | `timeout` | `int` | 요청 타임아웃 (초) | 60 |
 | `max_retries` | `int` | 재시도 횟수 | 2 |
 
-> 💻 **예제 코드**: [01_chat_models.py](../src/part02_fundamentals/01_chat_models.py) 라인 90-130
+> 💻 **예제 코드**: [01_chat_models.py](../src/part02_fundamentals/01_chat_models.py) 라인 81-101
 
 ### 1.5 Model Profiles & Capabilities Detection
 
@@ -1058,7 +1058,7 @@ print(search_database.args)  # 파라미터 스키마
 2. **Docstring 권장**: 모델이 도구를 언제 사용할지 이해하는데 필수적입니다
 3. **반환 타입**: 일반적으로 `str`을 반환하지만, 다른 타입도 가능합니다
 
-> 💻 **예제 코드**: [03_tools_basic.py](../src/part02_fundamentals/03_tools_basic.py) 라인 10-30
+> 💻 **예제 코드**: [03_tools_basic.py](../src/part02_fundamentals/03_tools_basic.py) 라인 32-51
 
 #### 실용적인 예제
 
@@ -1169,7 +1169,7 @@ def search_products(
 - 선택적: `Optional[T]`, `Union[T1, T2]`
 - 제한: `Literal["a", "b", "c"]`
 
-> 💻 **예제 코드**: [03_tools_basic.py](../src/part02_fundamentals/03_tools_basic.py) 라인 40-80
+> 💻 **예제 코드**: [03_tools_basic.py](../src/part02_fundamentals/03_tools_basic.py) 라인 58-84
 
 ---
 
@@ -1528,7 +1528,7 @@ def get_weather(location: str, units: str = "celsius", include_forecast: bool = 
     return result
 ```
 
-> 💻 **예제 코드**: [03_tools_basic.py](../src/part02_fundamentals/03_tools_basic.py) 라인 90-120
+> 💻 **예제 코드**: [04_tools_advanced.py](../src/part02_fundamentals/04_tools_advanced.py) 라인 40-58
 
 ### 5.2 Field Descriptions로 더 나은 가이드 제공
 
@@ -1615,7 +1615,7 @@ def register_customer(name: str, contact: dict, addresses: list,
 2. **재사용성**: 서브 모델을 여러 도구에서 재사용
 3. **자동 검증**: Pydantic이 모든 레벨에서 타입과 제약 조건 검증
 
-> 💻 **예제 코드**: [03_tools_basic.py](../src/part02_fundamentals/03_tools_basic.py) 라인 130-180
+> 💻 **예제 코드**: [04_tools_advanced.py](../src/part02_fundamentals/04_tools_advanced.py) 라인 301-340
 
 ---
 

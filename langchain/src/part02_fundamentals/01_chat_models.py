@@ -66,7 +66,7 @@ def example_2_init_chat_model():
     print("=" * 70)
 
     # 환경변수에 설정된 API 키 기반으로 자동 선택
-    model = init_chat_model()
+    model = init_chat_model("gpt-4o-mini")
 
     response = model.invoke("안녕하세요!")
 
