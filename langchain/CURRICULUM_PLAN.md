@@ -113,11 +113,9 @@ langchain_curriculum/
 │   │
 │   ├── part03_first_agent/
 │   │   ├── README.md
-│   │   ├── 01_basic_agent.py            # ⭐⭐ 난이도: 2
-│   │   ├── 02_weather_agent.py          # ⭐⭐ 난이도: 2
-│   │   ├── 03_react_pattern.py          # ⭐⭐⭐ 난이도: 3
-│   │   ├── 04_custom_prompt.py          # ⭐⭐ 난이도: 2
-│   │   ├── 05_streaming_agent.py        # ⭐⭐⭐ 난이도: 3
+│   │   ├── 01_basic_agent.py            # ⭐⭐ 난이도: 2 (Agent 기본 + System Prompt)
+│   │   ├── 02_react_agent.py            # ⭐⭐⭐ 난이도: 3 (ReAct 패턴 + 날씨 Agent)
+│   │   ├── 03_streaming_agent.py        # ⭐⭐⭐ 난이도: 3 (Streaming)
 │   │   └── solutions/
 │   │
 │   ├── part04_memory/
@@ -436,16 +434,16 @@ cat src/.env
 | **01-overview.md** | create_agent 소개 | Part 3.1 | `03_first_agent/01_basic_agent.py` | |
 | **02-install.md** | Python 설치 | SETUP_GUIDE.md | `01_introduction/02_environment_check.py` | |
 | **02-install.md** | uv 사용법 | SETUP_GUIDE.md | - | 환경 설정 |
-| **03-quickstart.md** | 날씨 Agent 예제 | Part 3.2 | `03_first_agent/02_weather_agent.py` | |
+| **03-quickstart.md** | 날씨 Agent 예제 | Part 3.2 | `03_first_agent/02_react_agent.py` | |
 | **03-quickstart.md** | 실습 프로젝트 | Part 3 | Project 1: Weather Assistant | |
 | **04-changelog.md** | 버전 변경사항 | appendix/changelog.md | - | 참조용 문서 |
 | **04-changelog.md** | 마이그레이션 가이드 | appendix/changelog.md | - | |
 | **05-philosophy.md** | LangChain 철학 | Part 1.2 | - | 개념 설명 |
 | **05-philosophy.md** | 디자인 원칙 | Part 1.2 | - | |
 | **06-agents.md** | create_agent API | Part 3.1 | `03_first_agent/01_basic_agent.py` | |
-| **06-agents.md** | ReAct 패턴 | Part 3.3 | `03_first_agent/03_react_pattern.py` | |
-| **06-agents.md** | System Prompt | Part 3.4 | `03_first_agent/04_custom_prompt.py` | |
-| **06-agents.md** | Streaming | Part 3.5 | `03_first_agent/05_streaming_agent.py` | |
+| **06-agents.md** | ReAct 패턴 | Part 3.2\~3 | `03_first_agent/02_react_agent.py` | |
+| **06-agents.md** | System Prompt | Part 3.4 | `03_first_agent/01_basic_agent.py` | |
+| **06-agents.md** | Streaming | Part 3.5 | `03_first_agent/03_streaming_agent.py` | |
 | **07-models.md** | Chat Models 개요 | Part 2.1 | `02_fundamentals/01_chat_models.py` | ✅ 상세 매핑됨 |
 | **07-models.md** | init_chat_model() | Part 2.1 | `02_fundamentals/01_chat_models.py:15-25` | |
 | **07-models.md** | 프로바이더 설정 | Part 2.1, SETUP_GUIDE.md | `02_fundamentals/01_chat_models.py:30-80` | |

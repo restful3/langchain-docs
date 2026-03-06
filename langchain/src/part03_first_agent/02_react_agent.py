@@ -4,58 +4,45 @@ LangChain AI Agent 마스터 교안
 Part 3: 첫 번째 Agent 만들기
 ================================================================================
 
-파일명: 03_react_pattern.py
+파일명: 02_react_agent.py
 난이도: ⭐⭐⭐☆☆ (중급)
-예상 시간: 25분
+예상 시간: 30분
 
 📚 학습 목표:
   - ReAct 패턴(Reasoning + Acting)의 개념 이해
-  - 단일 및 순차 도구 호출 패턴 학습
-  - 병렬 도구 호출의 활용
-  - 완전한 ReAct 루프 실습
+  - 날씨 Agent 구현과 ToolRuntime 활용
+  - 단일/순차/병렬 도구 호출 패턴 학습
+  - Agent 실행 과정 상세 분석
 
 📖 공식 문서:
-  • Agents: /official/06-agents.md (라인 178-237)
+  • Agents: /official/06-agents.md
   • ReAct 패턴: https://arxiv.org/abs/2210.03629
+  • Quickstart: /official/03-quickstart.md
 
 📄 교안 문서:
-  • Part 3 개요: /docs/part03_first_agent.md (섹션 3)
-
-🔧 필요한 패키지:
-  pip install langchain langchain-openai python-dotenv
-
-🔑 필요한 환경변수:
-  - OPENAI_API_KEY
+  • Part 3 개요: /docs/part03_first_agent.md (섹션 2, 3)
 
 🚀 실행 방법:
-  python 03_react_pattern.py
+  python 02_react_agent.py
 
 ================================================================================
 """
 
-# ============================================================================
-# Imports
-# ============================================================================
-
 import os
+import time
+from dataclasses import dataclass
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
-from langchain.tools import tool
-import time
+from langchain.tools import tool, ToolRuntime
 
-# ============================================================================
-# 환경 설정
-# ============================================================================
-
-# .env 파일에서 환경변수 로드
 load_dotenv()
 
-# API 키 확인
 if not os.getenv("OPENAI_API_KEY"):
     print("❌ 오류: OPENAI_API_KEY가 설정되지 않았습니다.")
     print("📝 .env 파일을 확인하고 API 키를 설정하세요.")
     exit(1)
+
 
 # ============================================================================
 # 예제 1: ReAct란? (개념 설명)
@@ -108,14 +95,11 @@ def example_1_what_is_react():
    - 디버깅 용이: 어느 단계에서 문제가 발생했는지 파악 가능
     """)
 
-    print("\n💡 핵심 포인트:")
-    print("  - ReAct는 LLM이 도구를 사용하여 문제를 해결하는 방법입니다")
-    print("  - 추론 → 행동 → 관찰을 반복하여 목표 달성")
-    print("  - LangChain의 create_agent()는 자동으로 ReAct 루프를 구현합니다\n")
+    print("💡 핵심: LangChain의 create_agent()는 자동으로 ReAct 루프를 구현합니다\n")
 
 
 # ============================================================================
-# 예제 2: 단일 도구 호출 (Reasoning → Action → Observation)
+# 예제 2: 단일 도구 호출 - 기본 ReAct
 # ============================================================================
 
 def example_2_single_tool_call():
@@ -124,7 +108,6 @@ def example_2_single_tool_call():
     print("📌 예제 2: 단일 도구 호출 - 기본 ReAct")
     print("=" * 70)
 
-    # 도구 정의
     @tool
     def get_weather(city: str) -> str:
         """주어진 도시의 현재 날씨를 조회합니다.
@@ -133,17 +116,17 @@ def example_2_single_tool_call():
             city: 도시 이름 (예: 서울, 부산)
         """
         print(f"      [도구 실행] get_weather('{city}') 호출")
-        time.sleep(0.5)  # API 호출 시뮬레이션
-
+        time.sleep(0.5)
         weather_data = {
-            "서울": "맑음, 22°C",
-            "부산": "흐림, 20°C",
+            "서울": "맑음, 22°C, 습도 60%",
+            "부산": "흐림, 20°C, 습도 70%",
+            "뉴욕": "비, 15°C, 습도 85%",
+            "파리": "맑음, 18°C, 습도 55%",
         }
         result = weather_data.get(city, f"{city}의 날씨 정보를 찾을 수 없습니다")
         print(f"      [도구 결과] {result}")
         return result
 
-    # Agent 생성
     model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     agent = create_agent(
         model=model,
@@ -151,14 +134,12 @@ def example_2_single_tool_call():
         system_prompt="당신은 날씨 정보를 제공하는 Agent입니다. 항상 도구를 사용하세요.",
     )
 
-    # ReAct 실행
     print("\n👤 사용자: 서울 날씨는?")
     print("\n🔄 ReAct 루프 시작:\n")
-
     print("   1️⃣ [Reasoning] Agent가 생각 중...")
     print("      '서울의 날씨 정보가 필요하므로 get_weather 도구를 사용해야겠다'")
-
     print("\n   2️⃣ [Acting] 도구 호출 중...")
+
     result = agent.invoke({
         "messages": [{"role": "user", "content": "서울 날씨는?"}]
     })
@@ -166,23 +147,155 @@ def example_2_single_tool_call():
     print("\n   3️⃣ [Observation] 결과를 바탕으로 최종 답변 생성")
     print(f"\n🤖 Agent: {result['messages'][-1].content}")
 
-    print("\n💡 핵심 포인트:")
-    print("  - 단순한 질문도 Reasoning → Acting → Observation 과정을 거칩니다")
-    print("  - Agent가 자동으로 도구 사용 여부를 결정했습니다")
-    print("  - 도구 결과를 자연어로 변환하여 답변했습니다\n")
+    print("\n💡 핵심: 단순한 질문도 Reasoning → Acting → Observation 과정을 거칩니다\n")
 
 
 # ============================================================================
-# 예제 3: 순차적 도구 호출 (Multiple Sequential Tool Calls)
+# 예제 3: 두 도구 조합 + ToolRuntime
 # ============================================================================
 
-def example_3_sequential_tool_calls():
+def example_3_two_tools_with_runtime():
+    """get_weather_for_location과 get_user_location 도구 + ToolRuntime"""
+    print("=" * 70)
+    print("📌 예제 3: 두 도구 조합 + ToolRuntime 컨텍스트")
+    print("=" * 70)
+
+    @tool
+    def get_weather_for_location(city: str) -> str:
+        """주어진 도시의 날씨를 조회합니다.
+
+        Args:
+            city: 날씨를 조회할 도시 이름
+        """
+        weather_data = {
+            "서울": "맑음, 22°C, 습도 60%",
+            "부산": "흐림, 20°C, 습도 70%",
+            "뉴욕": "비, 15°C, 습도 85%",
+            "플로리다": "맑음, 28°C, 습도 75%",
+        }
+        return weather_data.get(city, f"{city}의 날씨 정보를 찾을 수 없습니다")
+
+    @dataclass
+    class Context:
+        """런타임 컨텍스트 스키마"""
+        user_id: str
+
+    @tool
+    def get_user_location(runtime: ToolRuntime[Context]) -> str:
+        """현재 사용자의 위치를 조회합니다.
+
+        ToolRuntime을 통해 런타임 컨텍스트에 접근합니다.
+        """
+        user_id = runtime.context.user_id
+        location_map = {
+            "1": "서울",
+            "2": "부산",
+            "3": "뉴욕",
+        }
+        return location_map.get(user_id, "서울")
+
+    model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+    agent = create_agent(
+        model=model,
+        tools=[get_weather_for_location, get_user_location],
+        context_schema=Context,
+    )
+
+    print("\n👤 사용자 1: 밖에 날씨 어때?")
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": "밖에 날씨 어때?"}]},
+        context=Context(user_id="1")
+    )
+
+    print(f"🤖 Agent: {result['messages'][-1].content}")
+
+    print("\n💡 포인트:")
+    print("  - Agent가 '밖에'라는 표현에서 위치 파악이 필요함을 인지했습니다")
+    print("  - get_user_location → get_weather_for_location 순서로 도구를 사용했습니다")
+    print("  - ToolRuntime[Context]로 런타임 컨텍스트에 접근했습니다\n")
+
+
+# ============================================================================
+# 예제 4: Agent 실행 과정 상세 분석
+# ============================================================================
+
+def example_4_execution_analysis():
+    """Agent의 실행 과정을 단계별로 분석"""
+    print("=" * 70)
+    print("📌 예제 4: Agent 실행 과정 상세 분석")
+    print("=" * 70)
+
+    @tool
+    def get_weather_for_location(city: str) -> str:
+        """주어진 도시의 날씨를 조회합니다."""
+        weather_data = {
+            "서울": "맑음, 22°C, 습도 60%",
+            "부산": "흐림, 20°C, 습도 70%",
+        }
+        return weather_data.get(city, f"{city}의 날씨 정보를 찾을 수 없습니다")
+
+    @dataclass
+    class Context:
+        user_id: str
+
+    @tool
+    def get_user_location(runtime: ToolRuntime[Context]) -> str:
+        """현재 사용자의 위치를 조회합니다."""
+        user_id = runtime.context.user_id
+        location_map = {"1": "서울", "2": "부산"}
+        return location_map.get(user_id, "서울")
+
+    model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    agent = create_agent(
+        model=model,
+        tools=[get_weather_for_location, get_user_location],
+        context_schema=Context,
+        system_prompt="당신은 날씨 정보를 제공하는 친절한 Agent입니다.",
+    )
+
+    print("\n👤 사용자: 현재 날씨 알려줘")
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": "현재 날씨 알려줘"}]},
+        context=Context(user_id="1")
+    )
+
+    print("\n🔍 실행 과정 분석:\n")
+    for i, msg in enumerate(result["messages"], 1):
+        role = msg.__class__.__name__
+
+        if role == "HumanMessage":
+            print(f"[Step {i}] 👤 사용자 입력")
+            print(f"         '{msg.content}'")
+
+        elif role == "AIMessage":
+            if hasattr(msg, "tool_calls") and msg.tool_calls:
+                print(f"\n[Step {i}] 🤔 Agent 추론 + 도구 호출")
+                for tc in msg.tool_calls:
+                    print(f"         도구: {tc['name']}({tc['args']})")
+            else:
+                print(f"\n[Step {i}] 💡 최종 답변")
+                print(f"         {msg.content}")
+
+        elif role == "ToolMessage":
+            print(f"\n[Step {i}] 👀 도구 실행 결과")
+            print(f"         결과: {msg.content}")
+
+    print("\n💡 포인트:")
+    print("  - HumanMessage → AIMessage (tool_calls) → ToolMessage → AIMessage (final)")
+    print("  - 각 단계를 추적하여 디버깅할 수 있습니다\n")
+
+
+# ============================================================================
+# 예제 5: 순차적 도구 호출
+# ============================================================================
+
+def example_5_sequential_tool_calls():
     """여러 도구를 순차적으로 호출하는 ReAct"""
     print("=" * 70)
-    print("📌 예제 3: 순차적 도구 호출 - 복잡한 ReAct")
+    print("📌 예제 5: 순차적 도구 호출 - 복잡한 ReAct")
     print("=" * 70)
 
-    # 도구 정의
     @tool
     def search_product(query: str) -> str:
         """제품을 검색합니다.
@@ -192,7 +305,6 @@ def example_3_sequential_tool_calls():
         """
         print(f"      [도구 실행] search_product('{query}')")
         time.sleep(0.5)
-
         products = {
             "wireless headphones": "상위 5개 제품: WH-1000XM5, AirPods Max, Bose QC45, Sennheiser Momentum, Bang & Olufsen H95",
             "laptop": "상위 5개 제품: MacBook Pro, Dell XPS, ThinkPad X1, Surface Laptop, HP Spectre",
@@ -210,7 +322,6 @@ def example_3_sequential_tool_calls():
         """
         print(f"      [도구 실행] check_inventory('{product_id}')")
         time.sleep(0.5)
-
         inventory = {
             "WH-1000XM5": "재고 10개 있음",
             "AirPods Max": "품절",
@@ -220,7 +331,6 @@ def example_3_sequential_tool_calls():
         print(f"      [도구 결과] {result}")
         return result
 
-    # Agent 생성
     model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     agent = create_agent(
         model=model,
@@ -228,48 +338,36 @@ def example_3_sequential_tool_calls():
         system_prompt="당신은 제품 검색과 재고 확인을 도와주는 쇼핑 Agent입니다.",
     )
 
-    # ReAct 실행
     print("\n👤 사용자: 지금 가장 인기있는 무선 헤드폰을 찾아서 재고가 있는지 확인해줘")
     print("\n🔄 ReAct 루프 시작:\n")
-
-    print("   1️⃣ [Reasoning 1] '인기 제품을 찾기 위해 search_product를 먼저 사용해야겠다'")
-    print("\n   2️⃣ [Acting 1] 제품 검색...")
 
     result = agent.invoke({
         "messages": [{"role": "user", "content": "지금 가장 인기있는 무선 헤드폰을 찾아서 재고가 있는지 확인해줘"}]
     })
-
-    print("\n   3️⃣ [Observation 1] 검색 결과 확인: WH-1000XM5가 1순위")
-    print("\n   4️⃣ [Reasoning 2] '이제 WH-1000XM5의 재고를 확인해야겠다'")
-    print("\n   5️⃣ [Acting 2] 재고 확인...")
-    print("\n   6️⃣ [Observation 2] 재고 10개 있음")
-    print("\n   7️⃣ [Final Answer] 모든 정보가 모였으므로 최종 답변 생성")
 
     print(f"\n🤖 Agent: {result['messages'][-1].content}")
 
     print("\n💡 핵심 포인트:")
     print("  - Agent가 자동으로 2개의 도구를 순차적으로 호출했습니다")
     print("  - 첫 번째 도구의 결과가 두 번째 도구의 입력이 되었습니다")
-    print("  - 이것이 ReAct 패턴의 힘입니다: 체인처럼 연결된 추론과 행동\n")
+    print("  - 이것이 ReAct 패턴의 힘: 체인처럼 연결된 추론과 행동\n")
 
 
 # ============================================================================
-# 예제 4: 병렬 도구 호출 (Parallel Tool Calls)
+# 예제 6: 병렬 도구 호출
 # ============================================================================
 
-def example_4_parallel_tool_calls():
+def example_6_parallel_tool_calls():
     """독립적인 도구들을 병렬로 호출하는 ReAct"""
     print("=" * 70)
-    print("📌 예제 4: 병렬 도구 호출 - 효율적인 ReAct")
+    print("📌 예제 6: 병렬 도구 호출 - 효율적인 ReAct")
     print("=" * 70)
 
-    # 도구 정의
     @tool
     def get_weather(city: str) -> str:
         """도시의 날씨를 조회합니다."""
         print(f"      [도구 실행] get_weather('{city}')")
         time.sleep(0.5)
-
         weather_data = {
             "서울": "맑음, 22°C",
             "부산": "흐림, 20°C",
@@ -279,7 +377,6 @@ def example_4_parallel_tool_calls():
         print(f"      [도구 결과] {result}")
         return result
 
-    # Agent 생성
     model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     agent = create_agent(
         model=model,
@@ -287,7 +384,6 @@ def example_4_parallel_tool_calls():
         system_prompt="당신은 날씨 비교를 도와주는 Agent입니다. 여러 도시를 비교할 때는 효율적으로 처리하세요.",
     )
 
-    # ReAct 실행
     print("\n👤 사용자: 서울, 부산, 제주 중 어디가 가장 따뜻해?")
     print("\n🔄 ReAct 루프 시작:\n")
 
@@ -302,121 +398,14 @@ def example_4_parallel_tool_calls():
     })
 
     print("\n   3️⃣ [Observation] 모든 결과를 동시에 받음")
-    print("      서울: 22°C, 부산: 20°C, 제주: 18°C")
     print("\n   4️⃣ [Final Answer] 온도 비교 후 최종 답변")
 
     print(f"\n🤖 Agent: {result['messages'][-1].content}")
 
     print("\n💡 핵심 포인트:")
     print("  - 독립적인 도구 호출은 병렬로 실행되어 효율적입니다")
-    print("  - Agent가 자동으로 병렬 실행 가능 여부를 판단했습니다")
+    print("  - Agent가 자동으로 병렬 실행 가능 여부를 판단합니다")
     print("  - 순차 vs 병렬 결정은 LLM의 추론 능력에 달려있습니다\n")
-
-
-# ============================================================================
-# 예제 5: 완전한 ReAct 루프 with Final Answer
-# ============================================================================
-
-def example_5_complete_react_loop():
-    """실전 수준의 완전한 ReAct 루프"""
-    print("=" * 70)
-    print("📌 예제 5: 완전한 ReAct 루프 - 실전 예제")
-    print("=" * 70)
-
-    # 도구 정의
-    @tool
-    def search_news(topic: str) -> str:
-        """뉴스를 검색합니다."""
-        print(f"      [도구 실행] search_news('{topic}')")
-        time.sleep(0.5)
-
-        news_db = {
-            "AI": "최신 AI 뉴스: OpenAI가 GPT-5 출시 예정, Google Gemini 업데이트, AI 규제 법안 통과",
-            "날씨": "기상 뉴스: 폭염 경보 발령, 태풍 북상 중, 장마 시작",
-        }
-        result = news_db.get(topic, f"'{topic}'에 대한 뉴스가 없습니다")
-        print(f"      [도구 결과] {result}")
-        return result
-
-    @tool
-    def summarize_text(text: str, max_length: int = 50) -> str:
-        """텍스트를 요약합니다."""
-        print(f"      [도구 실행] summarize_text(max_length={max_length})")
-        time.sleep(0.5)
-
-        # 간단한 요약 (실제로는 LLM 호출)
-        summary = text[:max_length] + "..." if len(text) > max_length else text
-        print(f"      [도구 결과] {summary}")
-        return summary
-
-    @tool
-    def check_fact(statement: str) -> str:
-        """사실 여부를 확인합니다."""
-        print(f"      [도구 실행] check_fact('{statement}')")
-        time.sleep(0.5)
-
-        # 더미 팩트체크
-        if "GPT-5" in statement:
-            result = "확인됨: GPT-5 출시 계획은 공식 발표되지 않았습니다"
-        else:
-            result = "확인 필요: 추가 검증이 필요합니다"
-        print(f"      [도구 결과] {result}")
-        return result
-
-    # Agent 생성
-    model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    agent = create_agent(
-        model=model,
-        tools=[search_news, summarize_text, check_fact],
-        system_prompt="""당신은 뉴스 분석 Agent입니다.
-
-사용자가 뉴스를 요청하면:
-1. search_news로 뉴스 검색
-2. summarize_text로 요약
-3. 중요한 사실은 check_fact로 검증
-4. 최종 분석 제공
-        """,
-    )
-
-    # ReAct 실행
-    print("\n👤 사용자: AI 관련 최신 뉴스를 찾아서 요약하고, 주요 내용이 사실인지 확인해줘")
-    print("\n🔄 ReAct 루프 시작:\n")
-
-    result = agent.invoke({
-        "messages": [{"role": "user", "content": "AI 관련 최신 뉴스를 찾아서 요약하고, 주요 내용이 사실인지 확인해줘"}]
-    })
-
-    # 실행 과정 시각화
-    print("\n📊 실행 과정 시각화:\n")
-    step = 1
-    for msg in result["messages"]:
-        role = msg.__class__.__name__
-
-        if role == "HumanMessage":
-            print(f"[Step {step}] 👤 사용자 입력")
-            step += 1
-
-        elif role == "AIMessage":
-            if hasattr(msg, "tool_calls") and msg.tool_calls:
-                print(f"[Step {step}] 🤔 Reasoning + Acting")
-                for tc in msg.tool_calls:
-                    print(f"         → {tc['name']}()")
-                step += 1
-            else:
-                print(f"[Step {step}] 💡 Final Answer")
-                step += 1
-
-        elif role == "ToolMessage":
-            print(f"[Step {step}] 👀 Observation")
-            step += 1
-
-    print(f"\n🤖 최종 답변:\n{result['messages'][-1].content}")
-
-    print("\n💡 핵심 포인트:")
-    print("  - 복잡한 작업도 ReAct 루프로 자동 분해됩니다")
-    print("  - Agent가 3개의 도구를 순차적으로 사용했습니다")
-    print("  - 각 단계의 결과가 다음 단계의 입력이 됩니다")
-    print("  - 이것이 진정한 'Agent'의 힘입니다: 자율적 문제 해결\n")
 
 
 # ============================================================================
@@ -424,50 +413,44 @@ def example_5_complete_react_loop():
 # ============================================================================
 
 def main():
-    """메인 실행 함수"""
-    print("\n")
-    print("🎓 LangChain AI Agent 마스터 교안")
-    print("📖 Part 3: 첫 번째 Agent 만들기 - ReAct 패턴")
-    print("\n")
+    print("\n🎓 Part 3: ReAct 패턴과 날씨 Agent\n")
 
-    # 모든 예제 실행
     example_1_what_is_react()
     input("\n⏎ 계속하려면 Enter를 누르세요...")
 
     example_2_single_tool_call()
     input("\n⏎ 계속하려면 Enter를 누르세요...")
 
-    example_3_sequential_tool_calls()
+    example_3_two_tools_with_runtime()
     input("\n⏎ 계속하려면 Enter를 누르세요...")
 
-    example_4_parallel_tool_calls()
+    example_4_execution_analysis()
     input("\n⏎ 계속하려면 Enter를 누르세요...")
 
-    example_5_complete_react_loop()
+    example_5_sequential_tool_calls()
+    input("\n⏎ 계속하려면 Enter를 누르세요...")
 
-    # 마무리
+    example_6_parallel_tool_calls()
+
     print("\n" + "=" * 70)
-    print("🎉 ReAct 패턴 예제를 완료했습니다!")
+    print("🎉 ReAct 패턴과 날씨 Agent 학습 완료!")
     print("=" * 70)
-    print("\n💡 다음 단계:")
-    print("  1. 04_custom_prompt.py - System Prompt 커스터마이징")
-    print("  2. 05_streaming_agent.py - 실시간 스트리밍 구현")
-    print("\n📚 추가 학습:")
-    print("  • ReAct 논문: https://arxiv.org/abs/2210.03629")
-    print("  • 공식 문서: /official/06-agents.md (라인 178-237)")
-    print("\n" + "=" * 70 + "\n")
+    print("\n💡 주요 학습 내용:")
+    print("   ✅ ReAct 패턴: Reasoning → Acting → Observation")
+    print("   ✅ ToolRuntime으로 런타임 컨텍스트 활용")
+    print("   ✅ Agent 실행 과정 분석 (messages 추적)")
+    print("   ✅ 순차적 vs 병렬 도구 호출")
+    print("\n📖 다음: 03_streaming_agent.py - Streaming Agent")
+    print("📚 참고: ReAct 논문 https://arxiv.org/abs/2210.03629")
+    print("=" * 70 + "\n")
 
-
-# ============================================================================
-# 스크립트 실행
-# ============================================================================
 
 if __name__ == "__main__":
     main()
 
 
 # ============================================================================
-# 📚 추가 학습 포인트
+# 📚 핵심 포인트
 # ============================================================================
 #
 # 1. ReAct vs Chain-of-Thought (CoT):
@@ -475,49 +458,18 @@ if __name__ == "__main__":
 #    - ReAct: 추론 + 도구 사용 (더 실용적)
 #    - ReAct = CoT + Tool Calling
 #
-# 2. ReAct 패턴의 핵심 원리:
-#    - Reasoning: 현재 상황 분석, 다음 행동 결정
-#    - Acting: 도구 실행, 외부 시스템 호출
-#    - Observation: 결과 확인, 새로운 정보 획득
-#    - 반복: 목표 달성까지 위 과정 반복
+# 2. 런타임 컨텍스트 (ToolRuntime):
+#    - 도구가 실행 시점의 정보에 접근할 수 있게 해줍니다
+#    - user_id, session_id, 시간 등을 전달 가능
+#    - 타입 힌트로 컨텍스트 구조를 명시: ToolRuntime[Context]
 #
 # 3. 순차 vs 병렬 도구 호출:
 #    - 순차: 이전 결과가 다음 입력이 되는 경우
 #    - 병렬: 독립적인 도구들을 동시 실행
 #    - LLM이 자동으로 판단하여 결정
 #
-# 4. ReAct 디버깅 팁:
-#    - result["messages"]로 전체 추론 과정 확인
-#    - 각 단계의 tool_calls와 결과를 추적
-#    - System Prompt로 추론 방식 가이드
-#
-# 5. 실전 활용:
-#    - 멀티스텝 검색: 검색 → 필터링 → 상세 조회
-#    - 데이터 분석: 조회 → 계산 → 시각화
-#    - 워크플로우 자동화: 조건 확인 → 실행 → 검증
-#
-# ============================================================================
-# 🐛 자주 발생하는 문제
-# ============================================================================
-#
-# 문제: Agent가 너무 많은 도구를 호출함 (비효율적)
-# 해결:
-#   System Prompt에 "최소한의 도구만 사용하세요" 추가
-#   temperature를 낮춰서 일관성 향상
-#
-# 문제: Agent가 무한 루프에 빠짐
-# 해결:
-#   config={"recursion_limit": 10}으로 최대 반복 제한
-#   도구가 명확한 종료 조건을 반환하도록 수정
-#
-# 문제: 병렬 실행이 안 되고 순차 실행됨
-# 해결:
-#   더 강력한 모델 사용 (gpt-4o)
-#   System Prompt에 "독립적인 작업은 병렬로 처리하세요" 추가
-#
-# 문제: Reasoning 과정이 보이지 않음
-# 해결:
-#   System Prompt에 "각 단계를 설명하세요" 추가
-#   verbose=True 모드 사용 (LangChain 설정)
+# 4. Agent 디버깅:
+#    result["messages"]를 출력하여 모든 중간 단계를 확인하세요
+#    각 메시지의 타입(HumanMessage, AIMessage, ToolMessage)을 체크하세요
 #
 # ============================================================================

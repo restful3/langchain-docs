@@ -140,7 +140,7 @@ agent = create_agent(
    - 대화 상태를 저장하기 위한 체크포인터
    - 멀티턴 대화에 필요
 
-> 💻 **예제 코드**: [01_basic_agent.py](../src/part03_first_agent/01_basic_agent.py) 라인 78-113
+> 💻 **예제 코드**: [01_basic_agent.py](../src/part03_first_agent/01_basic_agent.py) 예제 1
 
 ### 1.3 Agent 실행 루프
 
@@ -249,7 +249,7 @@ print(result["messages"][-1].content)
 [출력] Agent: "서울의 현재 날씨는 맑고, 기온은 22도입니다."
 ```
 
-> 💻 **예제 코드**: [01_basic_agent.py](../src/part03_first_agent/01_basic_agent.py) 라인 78-113
+> 💻 **예제 코드**: [01_basic_agent.py](../src/part03_first_agent/01_basic_agent.py) 예제 1
 >
 > **💡 실습 포인트**:
 > 1. 코드를 직접 실행하고 여러 도시로 테스트해보세요
@@ -435,7 +435,7 @@ print(response['structured_response'])
 7. [출력] Agent: ResponseFormat(punny_response="...", weather_conditions="...")
 ```
 
-> 💻 **예제 코드**: [02_weather_agent.py](../src/part03_first_agent/02_weather_agent.py)
+> 💻 **예제 코드**: [02_react_agent.py](../src/part03_first_agent/02_react_agent.py) 예제 2\~4
 > 📖 **공식 문서**: [03-quickstart.md](../official/03-quickstart_ko.md) 라인 149-192 - 전체 예제
 
 ### 2.5 결과 분석
@@ -725,7 +725,7 @@ print("=" * 70)
 ======================================================================
 ```
 
-> 💻 **예제 코드**: [03_react_pattern.py](../src/part03_first_agent/03_react_pattern.py)
+> 💻 **예제 코드**: [02_react_agent.py](../src/part03_first_agent/02_react_agent.py) 예제 1, 5\~6
 > 📖 **공식 문서**: [06-agents.md](../official/06-agents_ko.md) 라인 178-237 - 실제 ReAct 예제
 
 **ReAct 패턴의 실전 활용**:
@@ -842,7 +842,7 @@ system_prompt = """당신은 데이터베이스 쿼리 Agent입니다.
 절대 에러 메시지를 그대로 사용자에게 보여주지 마세요."""
 ```
 
-> 💻 **예제 코드**: [04_custom_prompt.py](../src/part03_first_agent/04_custom_prompt.py)
+> 💻 **예제 코드**: [01_basic_agent.py](../src/part03_first_agent/01_basic_agent.py) 예제 4\~6
 
 ### 4.3 역할(Role) 정의
 
@@ -998,7 +998,7 @@ print(poet_agent.invoke(question)["messages"][-1].content)
 바람은 부드러운 속삭임으로 하루를 축복합니다.
 ```
 
-> 💻 **예제 코드**: [04_custom_prompt.py](../src/part03_first_agent/04_custom_prompt.py) 라인 150-220
+> 💻 **예제 코드**: [01_basic_agent.py](../src/part03_first_agent/01_basic_agent.py) 예제 5
 
 ---
 
@@ -1244,7 +1244,7 @@ import asyncio
 asyncio.run(stream_agent_response(agent, "서울 날씨는?"))
 ```
 
-> 💻 **예제 코드**: [05_streaming_agent.py](../src/part03_first_agent/05_streaming_agent.py)
+> 💻 **예제 코드**: [03_streaming_agent.py](../src/part03_first_agent/03_streaming_agent.py)
 >
 > **💡 실습 포인트**:
 > 1. `stream_mode="values"`와 `stream_mode="updates"`의 차이를 직접 비교해보세요
@@ -1257,9 +1257,18 @@ asyncio.run(stream_agent_response(agent, "서울 날씨는?"))
 
 #### 5.5.1 Content Blocks 개요
 
-**Content Blocks**는 AI 응답의 구조화된 표현입니다.
+**Content Blocks** 는 AI 응답을 구성하는 블록들의 **구조화된 리스트(컨테이너)** 입니다. `message.content_blocks`로 접근하며, 다양한 종류의 블록을 포함합니다:
 
-**지원하는 모델**:
+```text
+Content Blocks (리스트)
+├── thinking block  ← 추론/사고 과정
+├── text block      ← 최종 답변 텍스트
+├── image block     ← 이미지 (해당 시)
+└── ...기타 블록들
+```
+
+이 중 **Thinking/Reasoning Block** 은 모델이 최종 답변 전에 수행한 추론 과정을 담는 블록입니다. 모델마다 명칭이 다릅니다:
+
 - **Claude (Anthropic)**: Thinking blocks
 - **GPT-4o (OpenAI)**: Reasoning tokens
 - **Gemini 2.5 (Google)**: Thought blocks
@@ -1572,8 +1581,8 @@ for chunk in agent.stream(
 ```
 
 > 💡 **핵심 포인트**:
-> - Content Blocks는 AI 응답의 구조화된 표현
-> - Thinking blocks는 모델의 추론 과정을 보여줌
+> - Content Blocks는 AI 응답을 구성하는 블록들의 구조화된 컨테이너(리스트)
+> - Thinking Block은 Content Blocks 안에 포함된 추론 과정 블록의 한 종류
 > - Extended thinking은 비용이 높으니 필요한 경우만 사용
 > - Streaming과 결합하면 실시간 추론 과정 표시 가능
 

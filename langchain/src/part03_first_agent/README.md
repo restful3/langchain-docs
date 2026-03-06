@@ -41,13 +41,13 @@
 ### 01_basic_agent.py
 **난이도**: ⭐⭐☆☆☆ | **예상 시간**: 30분
 
-LangChain의 `create_agent()` API를 사용해 첫 Agent를 만듭니다.
+LangChain의 `create_agent()` API를 사용해 첫 Agent를 만들고, System Prompt로 성격을 커스터마이징합니다.
 
 **학습 내용**:
 - `create_agent()` 함수 사용
-- 모델과 도구 연결
-- Agent 실행 및 응답 처리
-- 기본 Agent 구조 이해
+- Agent vs 일반 LLM 비교
+- Agent의 추론 과정 관찰
+- System Prompt로 페르소나/제약사항 설정
 
 **실행 방법**:
 ```bash
@@ -61,96 +61,48 @@ python 01_basic_agent.py
 
 ---
 
-### 02_weather_agent.py
-**난이도**: ⭐⭐☆☆☆ | **예상 시간**: 40분
+### 02_react_agent.py
+**난이도**: ⭐⭐⭐☆☆ | **예상 시간**: 30분
 
-실전 날씨 조회 Agent를 구현합니다. (공식 Quickstart 예제 기반)
+ReAct 패턴과 날씨 Agent를 구현합니다. ToolRuntime을 활용한 컨텍스트 전달, 순차/병렬 도구 호출을 학습합니다.
 
 **학습 내용**:
-- 실전 도구 구현 (날씨 API 연동)
-- 에러 핸들링
-- 사용자 친화적 응답 생성
-- 도구 실행 로그 확인
+- ReAct (Reasoning + Acting) 패턴의 원리
+- ToolRuntime으로 런타임 컨텍스트 활용
+- Agent 실행 과정 상세 분석
+- 순차적/병렬 도구 호출 패턴
 
 **실행 방법**:
 ```bash
-python 02_weather_agent.py
+python 02_react_agent.py
 ```
 
 **주요 개념**:
-- 외부 API와 LLM 연결
-- Agent의 추론 과정 관찰
-- 실제 사용 가능한 Agent 구축
+- Reasoning → Acting → Observation 사이클
+- ToolRuntime[Context]로 사용자 정보 전달
+- 순차 vs 병렬 도구 호출의 차이
 
 ---
 
-### 03_react_pattern.py
-**난이도**: ⭐⭐⭐☆☆ | **예상 시간**: 50분
-
-ReAct (Reasoning + Acting) 패턴의 원리를 깊이 이해합니다.
-
-**학습 내용**:
-- ReAct 루프의 동작 원리
-- Thought → Action → Observation 사이클
-- Agent의 추론 과정 시각화
-- Step-by-step 실행
-
-**실행 방법**:
-```bash
-python 03_react_pattern.py
-```
-
-**주요 개념**:
-- **Thought**: Agent의 내부 추론
-- **Action**: 도구 호출 결정
-- **Observation**: 도구 실행 결과
-- 반복적 문제 해결
-
----
-
-### 04_custom_prompt.py
-**난이도**: ⭐⭐☆☆☆ | **예상 시간**: 35분
-
-Agent의 성격과 행동을 제어하는 Custom System Prompt를 작성합니다.
-
-**학습 내용**:
-- System Prompt의 중요성
-- Agent 페르소나 정의
-- 응답 스타일 제어
-- 제약 조건 설정
-
-**실행 방법**:
-```bash
-python 04_custom_prompt.py
-```
-
-**주요 개념**:
-- System Prompt = Agent의 "지시서"
-- 명확한 역할 정의
-- 출력 형식 제어
-
----
-
-### 05_streaming_agent.py
-**난이도**: ⭐⭐⭐☆☆ | **예상 시간**: 45분
+### 03_streaming_agent.py
+**난이도**: ⭐⭐⭐☆☆ | **예상 시간**: 25분
 
 실시간 스트리밍으로 Agent의 응답을 받습니다.
 
 **학습 내용**:
-- `stream()` 메서드 사용
-- 실시간 토큰 출력
-- 중간 단계 스트리밍
-- 프론트엔드 통합 준비
+- `invoke()` vs `stream()` 비교
+- stream_mode 종류 (values, messages, updates)
+- 실시간 UI 시뮬레이션 구현
 
 **실행 방법**:
 ```bash
-python 05_streaming_agent.py
+python 03_streaming_agent.py
 ```
 
 **주요 개념**:
 - 사용자 경험 개선
-- 긴 응답의 즉각적 피드백
-- 각 단계별 진행 상황 표시
+- 세 가지 스트리밍 모드의 용도
+- 실시간 챗봇 UI 패턴
 
 ---
 
@@ -345,7 +297,7 @@ if hasattr(model, 'stream'):
 
 Part 3을 완료하기 전에 확인하세요:
 
-- [ ] 모든 예제 코드를 실행해봤다 (5개)
+- [ ] 모든 예제 코드를 실행해봤다 (3개)
 - [ ] 실습 과제를 완료했다 (3개)
 - [ ] `create_agent()`의 사용법을 이해했다
 - [ ] ReAct 패턴의 동작 원리를 설명할 수 있다
