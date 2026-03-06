@@ -25,7 +25,8 @@ Part 3: 첫 번째 Agent
 
 import os
 from dotenv import load_dotenv
-from langchain.agents import create_agent, tool
+from langchain.agents import create_agent
+from langchain.tools import tool
 from langchain_openai import ChatOpenAI
 
 load_dotenv()
