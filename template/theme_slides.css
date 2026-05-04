@@ -689,7 +689,7 @@ code {
 }
 .flow__arrow svg { width: 28px; height: 28px; }
 
-/* ===== SVG FIGURE (포팅: lg_report_v2/theme.css §svg-figure) ===== */
+/* ===== SVG FIGURE ===== */
 .svg-figure {
   display: flex;
   flex-direction: column;

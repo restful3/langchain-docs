@@ -51,7 +51,7 @@ try:
         split_front_matter_sections,
         HERO_KPI_HTML,
     )
-    from .svg_recolor import recolor as recolor_lg_to_external
+    from .palette import normalize_palette
 except ImportError:
     from core import (  # type: ignore  # noqa: E402
         build_md,
@@ -67,7 +67,7 @@ except ImportError:
         split_front_matter_sections,
         HERO_KPI_HTML,
     )
-    from svg_recolor import recolor as recolor_lg_to_external  # type: ignore  # noqa: E402
+    from palette import normalize_palette  # type: ignore  # noqa: E402
 
 
 # ---------- sections.yaml ----------
@@ -264,16 +264,15 @@ def build_tier1(src: Path, out_dir: Path, args) -> tuple[Path, Path | None]:
     # 5) 레퍼런스 부록
     body_chunks.append(build_references_appendix(refs))
 
-    # 6) 출력 — build_structured 가 주입했던 LG 색상은 core.py 사전 치환됨.
-    #    그래도 사용자 콘텐츠의 인라인 SVG 등에 LG 색상이 남아 있을 수 있으므로 한 번 더 청소.
+    # 6) 출력 — 사용자 콘텐츠의 비-페르소나 색상을 한 번 더 정규화.
     full_html = SHELL_TIER1.format(
         doc_title=args.doc_title,
         body="\n".join(body_chunks),
         css_href=str((HERE / "theme_report.css").resolve()).replace("file://", ""),
         js_href=str((HERE / "report.js").resolve()).replace("file://", ""),
     )
-    full_html, n_recolor = recolor_lg_to_external(full_html)
-    print(f"  🎨 LG → 외부판 색상 치환: {n_recolor} 건")
+    full_html, n_recolor = normalize_palette(full_html)
+    print(f"  🎨 비-페르소나 색상 정규화: {n_recolor} 건")
 
     out_html = out_dir / f"{args.name}.html"
     out_html.write_text(full_html)

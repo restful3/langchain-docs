@@ -1,11 +1,8 @@
 """ai_odyssey_publisher — 리포트 빌드 코어 헬퍼.
 
-`lg_report_v2/build_structured.py` 에서 외부판 빌드에 필요한 12 심볼만 발췌.
-LG 잔재 2건은 사전 치환됨:
-  - apply_visual_transforms 의 scatter-map 레전드 hex (#A50034 → #0F2C59, #10b981 → #059669)
-  - build_references_appendix 의 var(--lg-red) → var(--brand-primary)
-
-상위 빌더(build.py) 가 추가 svg_recolor 패스를 돌리지만, 사전 치환으로 의존도를 낮춘다.
+원본 키트에서 추출한 12 심볼. 페르소나-중립 토큰을 사용하며,
+상위 빌더(build_report.py / build_slides.py) 가 palette.normalize_palette
+패스로 사용자 콘텐츠의 비-페르소나 색상까지 정규화한다.
 """
 from __future__ import annotations
 
@@ -267,7 +264,7 @@ def apply_visual_transforms(html: str) -> str:
     html = _apply_badges(html)
 
     # 5c. 포지셔닝 맵 자리표시자 → <canvas> 블록
-    #     scatter-map 레전드 hex 는 외부판 토큰으로 사전 치환 (LG → Deep Navy / positive).
+    #     scatter-map 레전드 hex 는 brand.palette 토큰 사용.
     html = re.sub(
         r'<!--\s*positioning-map\s*-->',
         '<div class="scatter-map">'
@@ -441,7 +438,7 @@ def wrap_section(html_body: str, number: str, title_override: str | None = None,
 # ---------- reference appendix ----------
 
 def build_references_appendix(items: list[dict]) -> str:
-    """참고문헌 부록 — var(--brand-primary) 사용 (LG 잔재 사전 치환됨)."""
+    """참고문헌 부록 — var(--brand-primary) 사용."""
     from collections import OrderedDict
     grouped: "OrderedDict[str, list[dict]]" = OrderedDict()
     for it in items:

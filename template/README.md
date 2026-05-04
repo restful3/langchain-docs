@@ -213,7 +213,7 @@ python -m ai_odyssey_publisher.build_slides SRC [options]
 |---|---|---|
 | 커버 워드마크 | [build_report.py::build_cover_external](build_report.py) · [build_slides.py::render_cover](build_slides.py) | "AI Odyssey · External Publishing" 텍스트 |
 | 러닝 헤더 텍스트 | [theme_report.css](theme_report.css) `@page` (top-left / top-right) · [render.py](render.py) `HEADER_TEMPLATE` · [theme_slides.css](theme_slides.css) `.slide--section::after` | 모든 페이지에 노출되는 브랜드 텍스트. 페르소나의 가장 visible 한 표면 — fork 시 첫 번째로 갈아끼울 것 |
-| 색상 매핑 | [svg_recolor.py::COLOR_MAP](svg_recolor.py) | 콘텐츠 인라인 SVG 색상 일괄 치환 룰 |
+| 색상 매핑 | [palette.py::COLOR_MAP](palette.py) | 콘텐츠 인라인 SVG 색상 일괄 정규화 룰 |
 | 테마 토큰 | [theme_report.css](theme_report.css) · [theme_slides.css](theme_slides.css) `:root` | `--brand-primary` 등 CSS 변수 |
 
 이 넷을 건드리면 페르소나가 깨질 수 있다 — AI Odyssey 동결 패키지의 의도와 어긋난다면 fork 권장.
@@ -222,13 +222,13 @@ python -m ai_odyssey_publisher.build_slides SRC [options]
 
 ```text
 build_report.py  ─→  core.py            (마크다운 → HTML · visual transforms)
-                 ─→  svg_recolor.py     (LG 잔재 → Deep Navy 일괄 치환)
+                 ─→  palette.py         (비-페르소나 색상 정규화)
                  ─→  render.py::html_to_pdf      (Selenium → A4 PDF)
                  ─→  theme_report.css   (A4 리포트 CSS 토큰 + 컴포넌트)
                  ─→  report.js          (TOC · 차트 · 카운터)
 
 build_slides.py  ─→  core.py::build_md  (마크다운 파서만 공유)
-                 ─→  svg_recolor.py     (안전장치)
+                 ─→  palette.py         (안전장치)
                  ─→  render.py::slides_to_pdf    (Selenium → 1280×720 PDF)
                  ─→  theme_slides.css   (슬라이드 CSS 토큰 + 컴포넌트)
                  ─→  deck.js            (키보드 nav · 테마 토글 · PNG export)
@@ -252,7 +252,7 @@ build_slides.py  ─→  core.py::build_md  (마크다운 파서만 공유)
 이 패키지는 **단일 페르소나 동결 키트**. 다른 페르소나가 필요하면:
 
 1. 폴더 통째 복사 → 새 이름 (`ai_odyssey_publisher_rose/` 등)
-2. `svg_recolor.py::COLOR_MAP` 매핑 hex 갈아치움
+2. `palette.py::COLOR_MAP` 매핑 hex 갈아치움
 3. `theme_report.css` · `theme_slides.css` 의 `:root` 변수 갈아치움
 4. `build_report.py::build_cover_external` · `build_slides.py::render_cover` 의 워드마크 텍스트 갈아치움
 5. **러닝 헤더 텍스트 갈아치움** — `theme_report.css` 의 `@page` `top-left`/`top-right` + `render.py` 의 `HEADER_TEMPLATE` + `theme_slides.css` 의 `.slide--section::after`. 누락 시 모든 페이지에 이전 페르소나의 브랜드 텍스트가 새어나간다.

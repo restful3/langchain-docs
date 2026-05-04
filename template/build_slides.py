@@ -55,10 +55,10 @@ HERE = Path(__file__).parent.resolve()
 # 양쪽 호출 스타일 지원
 try:
     from .core import build_md
-    from .svg_recolor import recolor as recolor_lg_to_external
+    from .palette import normalize_palette
 except ImportError:
     from core import build_md  # type: ignore  # noqa: E402
-    from svg_recolor import recolor as recolor_lg_to_external  # type: ignore  # noqa: E402
+    from palette import normalize_palette  # type: ignore  # noqa: E402
 
 
 # ---------- frontmatter ----------
@@ -178,7 +178,7 @@ def apply_visual_transforms(html: str) -> str:
 
 # ---------- slide rendering ----------
 
-# AI Odyssey 페르소나 — 외부판 동결 (LG 워드마크 → AI Odyssey)
+# AI Odyssey 페르소나 — 외부판 동결
 BRAND_MARK = (
     '<div class="brand-mark">'
     '<div class="brand-mark__stack">'
@@ -452,10 +452,10 @@ def main() -> None:
         js_href=js_rel,
     )
 
-    # 콘텐츠 안에 LG 잔재가 있을 경우를 대비한 안전장치 (사용자 콘텐츠 출처 다양)
-    full_html, n_recolor = recolor_lg_to_external(full_html)
+    # 콘텐츠 안에 비-페르소나 색상이 있을 경우를 대비한 안전장치 (사용자 콘텐츠 출처 다양)
+    full_html, n_recolor = normalize_palette(full_html)
     if n_recolor:
-        print(f"  🎨 LG → 외부판 색상 치환: {n_recolor} 건")
+        print(f"  🎨 비-페르소나 색상 정규화: {n_recolor} 건")
 
     out_html.write_text(full_html)
     print(

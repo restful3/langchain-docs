@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""SVG/Markdown 의 LG 브랜드 hex/CSS 변수를 AI Odyssey 외부판으로 일괄 치환.
+"""SVG/Markdown 의 비-페르소나 hex/CSS 변수를 페르소나 토큰으로 일괄 정규화.
 
 사용:
-    python svg_recolor.py < input.md > output.md
-    python svg_recolor.py --check < input.md       # 매칭 라인만 출력 (변경 없음)
-    python svg_recolor.py --self-test              # 합성 입력 단위 테스트
+    python palette.py < input.md > output.md
+    python palette.py --check < input.md       # 매칭 라인만 출력 (변경 없음)
+    python palette.py --self-test              # 합성 입력 단위 테스트
 
-매핑 출처: DESIGN.lg-seminar.md → DESIGN.external.md.
 적용 범위: 인라인 SVG fill/stroke, CSS 변수, rgba(), Tailwind/CSS hex.
 """
 from __future__ import annotations
@@ -14,9 +13,9 @@ from __future__ import annotations
 import argparse
 import sys
 
-# (LG 패턴, 외부판 치환) — 순서 의존: 더 긴 변수명을 짧은 것보다 먼저.
+# (비-페르소나 패턴, 페르소나 치환) — 순서 의존: 더 긴 변수명을 짧은 것보다 먼저.
 COLOR_MAP: list[tuple[str, str]] = [
-    # ── 1. Primary brand (LG → Deep Navy) ──
+    # ── 1. Primary brand → Deep Navy ──
     ("#A50034", "#0F2C59"),
     ("#a50034", "#0f2c59"),
     ("#6E0022", "#091F40"),
@@ -28,10 +27,6 @@ COLOR_MAP: list[tuple[str, str]] = [
     ("rgba(165, 0, 52,", "rgba(15, 44, 89,"),
     ("rgba(228,0,43,", "rgba(37,99,235,"),
     ("rgba(228, 0, 43,", "rgba(37, 99, 235,"),
-    # CSS 변수명 — 긴 이름 먼저
-    ("--lg-red-deep", "--brand-deep"),
-    ("--lg-red-soft", "--brand-soft"),
-    ("--lg-red", "--brand-primary"),
 
     # ── 2. 토큰 외 회색 → text-secondary (#6B6B72) ──
     # Tailwind zinc/slate 계열 변형을 단일 토큰으로 통합.
@@ -92,8 +87,8 @@ COLOR_MAP: list[tuple[str, str]] = [
 ]
 
 
-def recolor(text: str) -> tuple[str, int]:
-    """Return (recolored_text, total_replacements)."""
+def normalize_palette(text: str) -> tuple[str, int]:
+    """Return (normalized_text, total_replacements)."""
     total = 0
     for old, new in COLOR_MAP:
         count = text.count(old)
@@ -104,7 +99,7 @@ def recolor(text: str) -> tuple[str, int]:
 
 
 def check(text: str) -> list[tuple[int, str]]:
-    """Return [(lineno, line)] for lines containing any LG brand pattern."""
+    """Return [(lineno, line)] for lines containing any non-persona color pattern."""
     patterns = [old for old, _ in COLOR_MAP]
     matches: list[tuple[int, str]] = []
     for i, line in enumerate(text.splitlines(), start=1):
@@ -120,18 +115,11 @@ def self_test() -> int:
         # ── Phase 1: Primary brand ──
         ('fill="#A50034"', 'fill="#0F2C59"', 1),
         ('color: #a50034;', 'color: #0f2c59;', 1),
-        ('var(--lg-red)', 'var(--brand-primary)', 1),
-        ('var(--lg-red-soft)', 'var(--brand-soft)', 1),
-        ('var(--lg-red-deep)', 'var(--brand-deep)', 1),
         ('rgba(165,0,52,0.08)', 'rgba(15,44,89,0.08)', 1),
         ('rgba(165, 0, 52, 0.08)', 'rgba(15, 44, 89, 0.08)', 1),
         ('rgba(228,0,43,0.10)', 'rgba(37,99,235,0.10)', 1),
-        # 외부판 hex 는 변경 없음
+        # 페르소나 hex 는 변경 없음
         ('fill="#0F2C59"', 'fill="#0F2C59"', 0),
-        # 다중 매칭
-        ('a:#A50034 b:--lg-red-deep', 'a:#0F2C59 b:--brand-deep', 2),
-        # 순서 함정 — --lg-red-soft 가 --lg-red 보다 먼저 매핑되는지
-        ('--lg-red-soft + --lg-red', '--brand-soft + --brand-primary', 2),
         # ── Phase 2: 토큰 외 회색 → text-secondary ──
         ('fill="#5B5B62"', 'fill="#6B6B72"', 1),
         ('fill="#3f3f46"', 'fill="#6b6b72"', 1),
@@ -155,7 +143,7 @@ def self_test() -> int:
     ]
     failures = 0
     for i, (inp, want_out, want_count) in enumerate(cases, start=1):
-        got_out, got_count = recolor(inp)
+        got_out, got_count = normalize_palette(inp)
         if got_out != want_out or got_count != want_count:
             failures += 1
             print(f"FAIL {i}: input={inp!r}", file=sys.stderr)
@@ -171,11 +159,11 @@ def self_test() -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="LG 브랜드 색상 → AI Odyssey 외부판 색상 일괄 치환.",
+        description="비-페르소나 색상 → 페르소나 토큰 일괄 정규화.",
     )
     parser.add_argument(
         "--check", action="store_true",
-        help="LG 브랜드 패턴이 포함된 라인만 출력 (변경 없음)",
+        help="비-페르소나 색상 패턴이 포함된 라인만 출력 (변경 없음)",
     )
     parser.add_argument(
         "--self-test", action="store_true",
@@ -193,7 +181,7 @@ def main() -> int:
         print(f"\n총 {len(check(text))} 매칭", file=sys.stderr)
         return 0
 
-    out, count = recolor(text)
+    out, count = normalize_palette(text)
     sys.stdout.write(out)
     print(f"치환 {count} 건", file=sys.stderr)
     return 0
