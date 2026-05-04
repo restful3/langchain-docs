@@ -195,6 +195,12 @@ h1, h2, h3, h4, h5, h6 {
   page-break-before: auto !important;
   page-break-after: auto !important;
 }
+/* References 만은 continuous-mode 에서도 새 페이지 시작 — 부록 B 와 같은 페이지에 뭉치지 않도록.
+   .continuous-mode .report-appendix.s-refs (3-class) 가 .continuous-mode .page-break (2-class) 보다 specificity 우위. */
+.continuous-mode .report-appendix.s-refs {
+  break-before: page !important;
+  page-break-before: always !important;
+}
 /* SVG/이미지 페이지 폭 가득 — viewBox 비율 유지 */
 .continuous-mode img,
 .continuous-mode svg,
