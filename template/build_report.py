@@ -49,7 +49,8 @@ try:
         build_references_appendix,
         strip_h1_and_front_matter,
         split_front_matter_sections,
-        HERO_KPI_HTML,
+        parse_hero_kpi,
+        build_hero_kpi,
     )
     from .palette import normalize_palette
     from .brand import load_brand, make_brand_style_block
@@ -66,7 +67,8 @@ except ImportError:
         build_references_appendix,
         strip_h1_and_front_matter,
         split_front_matter_sections,
-        HERO_KPI_HTML,
+        parse_hero_kpi,
+        build_hero_kpi,
     )
     from palette import normalize_palette  # type: ignore  # noqa: E402
     from brand import load_brand, make_brand_style_block  # type: ignore  # noqa: E402
@@ -207,6 +209,21 @@ SHELL_TIER1 = """<!DOCTYPE html>
 
 # ---------- Tier 1 build ----------
 
+def _resolve_doc_meta(args, fm_meta: dict, brand: dict) -> dict:
+    """문서 메타 우선순위: CLI 인자 > 00_front_matter h1/메타 > brand.yaml fallback."""
+    bname = brand["brand"]["name"]
+    title = args.title or fm_meta.get("title") or f"{bname} Report"
+    subtitle = args.subtitle or " · ".join(fm_meta.get("subtitle_meta", [])) or ""
+    return {
+        "title": title,
+        "subtitle": subtitle,
+        "version_badge": args.version_badge or "",
+        "doc_title": args.doc_title or title,
+        "author": args.author or bname,
+        "date": args.date or "",
+    }
+
+
 def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path | None]:
     """Tier 1 (풀디자인) HTML + PDF 생성."""
     md = build_md()
@@ -217,22 +234,33 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
     known_nums = {r["num"] for r in refs}
     url_map = extract_ref_urls(refs)
 
+    # 2) Front-matter 선행 파싱 — 커버 메타와 hero-kpi 데이터를 cover 빌드 전에 확보.
+    fm_path = src / "00_front_matter.md"
+    fm_raw = fm_path.read_text() if fm_path.exists() else ""
+    if fm_raw:
+        fm_html_full = md.render(fm_raw)
+        fm_html, fm_meta = strip_h1_and_front_matter(fm_html_full)
+        kpis, kpi_summary = parse_hero_kpi(fm_raw)
+    else:
+        fm_html, fm_meta = "", {"title": "", "subtitle_meta": []}
+        kpis, kpi_summary = [], ""
+
+    doc = _resolve_doc_meta(args, fm_meta, brand)
+
     body_chunks: list[str] = []
 
-    # 2) 커버 + TOC
+    # 3) 커버 + TOC
     body_chunks.append(build_cover_external(
-        title=args.title.replace("—", "<br><span style=\"color:var(--brand-primary);\">—</span>"),
-        subtitle=args.subtitle,
-        version_badge=args.version_badge,
-        meta={"date": args.date},
-        author=args.author,
+        title=doc["title"].replace("—", "<br><span style=\"color:var(--brand-primary);\">—</span>"),
+        subtitle=doc["subtitle"],
+        version_badge=doc["version_badge"],
+        meta={"date": doc["date"]},
+        author=doc["author"],
         brand=brand,
     ))
     body_chunks.append(build_toc_stub())
 
-    # 3) Executive Summary (00_front_matter)
-    fm_html = md.render((src / "00_front_matter.md").read_text())
-    fm_html, _fm_meta = strip_h1_and_front_matter(fm_html)
+    # 4) Executive Summary (00_front_matter)
     fm_sections = split_front_matter_sections(fm_html)
     if fm_sections:
         body_chunks.append(build_section_divider(
@@ -240,7 +268,7 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
             "임원 5분 핵심 요약 — §1~§6 의 결론을 한 페이지에"))
     for es in fm_sections:
         section_label = f'섹션 0. {es["title"]}'
-        body_html = f'<h2>{section_label}</h2>{HERO_KPI_HTML}{es["body"]}'
+        body_html = f'<h2>{section_label}</h2>{build_hero_kpi(kpis, kpi_summary)}{es["body"]}'
         body_html = apply_visual_transforms(body_html)
         wrapped = wrap_section(body_html, number="00",
                                title_override=section_label,
@@ -271,7 +299,7 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
 
     # 6) 출력 — 사용자 콘텐츠의 비-페르소나 색상을 한 번 더 정규화.
     full_html = SHELL_TIER1.format(
-        doc_title=args.doc_title,
+        doc_title=doc["doc_title"],
         body="\n".join(body_chunks),
         brand_style=make_brand_style_block(brand),
         css_href=str((HERE / "theme_report.css").resolve()).replace("file://", ""),
@@ -474,12 +502,16 @@ def main() -> None:
                     help="brand.yaml 경로. 미지정 시 <src>/brand.yaml > template/brand.default.yaml")
     ap.add_argument("--tier", choices=["1", "2", "all"], default="all")
     ap.add_argument("--name", default="detailed_report_external")
-    ap.add_argument("--title", default="Computer Use — AI가 출근했다")
-    ap.add_argument("--subtitle", default="2026 빅3 벤더·오픈소스·이슈·거버넌스 · 종합 리포트")
-    ap.add_argument("--version-badge", default="v5.5-final · 2026-04-30")
-    ap.add_argument("--doc-title", default="Computer Use — AI가 출근했다 (외부 공개판)")
-    ap.add_argument("--author", default="AI Odyssey")
-    ap.add_argument("--date", default="2026년 4월 30일")
+    ap.add_argument("--title", default=None,
+                    help="없으면 frontmatter h1 → '<brand.name> Report'")
+    ap.add_argument("--subtitle", default=None,
+                    help="없으면 frontmatter 메타 문단")
+    ap.add_argument("--version-badge", default=None)
+    ap.add_argument("--doc-title", default=None,
+                    help="HTML <title>. 없으면 --title 과 동일")
+    ap.add_argument("--author", default=None,
+                    help="없으면 brand.name")
+    ap.add_argument("--date", default=None)
     ap.add_argument("--html-only", action="store_true")
     args = ap.parse_args()
 

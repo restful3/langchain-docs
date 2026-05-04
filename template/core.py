@@ -263,22 +263,11 @@ def apply_visual_transforms(html: str) -> str:
     # 5b. 인라인 배지 토큰 치환
     html = _apply_badges(html)
 
-    # 5c. 포지셔닝 맵 자리표시자 → <canvas> 블록
-    #     scatter-map 레전드 hex 는 brand.palette 토큰 사용.
-    html = re.sub(
-        r'<!--\s*positioning-map\s*-->',
-        '<div class="scatter-map">'
-        '<div class="scatter-map__title">3사 포지셔닝 맵 — 통제권 × 제어 범위</div>'
-        '<div class="scatter-map__subtitle">X: 개발자/API 중심 ↔ 비개발자/UI 중심 · Y: 좁은 제어 범위(브라우저) ↔ 넓은 제어 범위(OS 전체)</div>'
-        '<div class="scatter-map__canvas-wrap"><canvas id="positioningMap" role="img" aria-label="3사 포지셔닝 맵"></canvas></div>'
-        '<div class="scatter-map__legend">'
-        '<span class="scatter-map__legend-item"><span class="scatter-map__legend-dot" style="background:#0F2C59"></span>Anthropic</span>'
-        '<span class="scatter-map__legend-item"><span class="scatter-map__legend-dot" style="background:#059669"></span>OpenAI</span>'
-        '<span class="scatter-map__legend-item"><span class="scatter-map__legend-dot" style="background:#2563eb"></span>Google</span>'
-        '</div>'
-        '</div>',
-        html,
-    )
+    # 5c. 포지셔닝 맵 자리표시자 → <canvas> 블록 — 데이터는 콘텐츠 주석에서 받음.
+    #     `<!-- positioning-map: { "title": "...", "subtitle": "...",
+    #                              "legend": [{"label":"X","color":"#..."}] } -->`
+    #     데이터 미제공 시 placeholder 는 제거 (빈 자리표시자 출력 안 함).
+    html = _POSITIONING_MAP_RE.sub(lambda m: _build_scatter_map(m.group(1)), html)
 
     # 6. 최상위 리스트에 bullets / nums 클래스
     html = re.sub(r'<ul>\s*\n<li>', '<ul class="bullets">\n<li>', html)
@@ -314,30 +303,92 @@ def apply_visual_transforms(html: str) -> str:
     return html
 
 
-# Executive Summary hero KPI grid + 한 줄 인사이트 박스
-HERO_KPI_HTML = """
-<div class="kpi-grid hero-kpi" style="--cols: 3;">
-  <div class="kpi">
-    <span class="kpi__value">75<span class="kpi__value-suf">%</span></span>
-    <span class="kpi__label">AI 가 인간을 처음 추월</span>
-    <span class="kpi__sub">OSWorld 벤치마크 — GPT-5.4 75.0% vs 인간 72.4% (§1.4)</span>
-  </div>
-  <div class="kpi">
-    <span class="kpi__value">53<span class="kpi__value-suf">%p</span></span>
-    <span class="kpi__label">도입 계획 vs 안전망 격차</span>
-    <span class="kpi__sub">기술 도입 74% · 거버넌스 성숙 21% (§5.1)</span>
-  </div>
-  <div class="kpi">
-    <span class="kpi__value">21K<span class="kpi__value-suf">+</span></span>
-    <span class="kpi__label">이미 외부 노출된 AI 에이전트</span>
-    <span class="kpi__sub">OpenClaw 인스턴스 — 2026-04 보안 사고 (§5.5)</span>
-  </div>
-</div>
-<div class="callout callout--hero">
-  <span class="callout__kicker">한 줄 요약</span>
-  <span class="callout__body">능력은 이미 인간을 넘었는데 <strong>(75%)</strong>, 운영을 받쳐 줄 거버넌스는 절반에도 못 미친다 <strong>(53%p 격차)</strong>. 그 격차가 만들어 낸 첫 사고가 <strong>OpenClaw 21K+ 인스턴스 노출</strong> 이다.</span>
-</div>
-"""
+# Executive Summary hero KPI grid — 데이터는 콘텐츠 frontmatter 의
+# `<!-- hero-kpi: {kpis: [...], summary: "..."} -->` 주석에서 받는다.
+_HERO_KPI_RE = re.compile(r'<!--\s*hero-kpi:\s*(.+?)\s*-->', re.DOTALL)
+
+# 포지셔닝 맵 — 데이터는 콘텐츠 본문의
+# `<!-- positioning-map: {title, subtitle, legend: [...]} -->` 주석에서 받는다.
+# 데이터 미제공(`<!-- positioning-map -->`) 시 placeholder 제거.
+_POSITIONING_MAP_RE = re.compile(
+    r'<!--\s*positioning-map(?:\s*:\s*(.+?))?\s*-->', re.DOTALL
+)
+
+
+def _build_scatter_map(json_text: str | None) -> str:
+    """positioning-map JSON → scatter-map HTML. JSON 미제공 시 빈 문자열."""
+    if not json_text:
+        return ""
+    import json
+    try:
+        data = json.loads(json_text)
+    except json.JSONDecodeError:
+        return ""
+    title = data.get("title", "")
+    subtitle = data.get("subtitle", "")
+    legend = data.get("legend", [])
+    title_html = f'<div class="scatter-map__title">{title}</div>' if title else ""
+    subtitle_html = f'<div class="scatter-map__subtitle">{subtitle}</div>' if subtitle else ""
+    legend_items = "".join(
+        f'<span class="scatter-map__legend-item">'
+        f'<span class="scatter-map__legend-dot" style="background:{item["color"]}"></span>'
+        f'{item["label"]}</span>'
+        for item in legend
+    )
+    legend_html = f'<div class="scatter-map__legend">{legend_items}</div>' if legend else ""
+    return (
+        '<div class="scatter-map">'
+        f'{title_html}'
+        f'{subtitle_html}'
+        '<div class="scatter-map__canvas-wrap">'
+        '<canvas id="positioningMap" role="img" aria-label="positioning map"></canvas>'
+        '</div>'
+        f'{legend_html}'
+        '</div>'
+    )
+
+
+def parse_hero_kpi(md_text: str) -> tuple[list[dict], str]:
+    """`<!-- hero-kpi: {...} -->` JSON 추출. 없으면 ([], "")."""
+    import json
+    m = _HERO_KPI_RE.search(md_text)
+    if not m:
+        return [], ""
+    try:
+        data = json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return [], ""
+    return data.get("kpis", []), data.get("summary", "")
+
+
+def build_hero_kpi(kpis: list[dict], summary: str = "") -> str:
+    """Executive Summary 의 KPI 그리드 + 한 줄 요약 callout. kpis 비면 빈 문자열."""
+    if not kpis:
+        return ""
+    cols = len(kpis)
+    cards: list[str] = []
+    for k in kpis:
+        cards.append(
+            '  <div class="kpi">\n'
+            f'    <span class="kpi__value">{k["value"]}'
+            f'<span class="kpi__value-suf">{k.get("suffix","")}</span></span>\n'
+            f'    <span class="kpi__label">{k.get("label","")}</span>\n'
+            f'    <span class="kpi__sub">{k.get("sub","")}</span>\n'
+            '  </div>'
+        )
+    summary_html = (
+        '\n<div class="callout callout--hero">\n'
+        '  <span class="callout__kicker">한 줄 요약</span>\n'
+        f'  <span class="callout__body">{summary}</span>\n'
+        '</div>'
+    ) if summary else ""
+    return (
+        f'\n<div class="kpi-grid hero-kpi" style="--cols: {cols};">\n'
+        + "\n".join(cards)
+        + "\n</div>"
+        + summary_html
+        + "\n"
+    )
 
 
 def build_section_divider(num: str, tag: str, title: str, subtitle: str = "") -> str:
