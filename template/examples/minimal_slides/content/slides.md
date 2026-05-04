@@ -9,9 +9,9 @@ date: 2026년 4월 30일
 ---
 
 <!-- slide: variant=cover -->
-# AI 가 출근했다
+# 미니멀 슬라이드 데모
 
-> Computer Use 시대의 일상 변화
+> build_slides.py 동작 검증용 1-페이지 데모 덱
 
 <!-- slide: variant=section, num=01 -->
 # 섹션 01.<br>빌더 검증

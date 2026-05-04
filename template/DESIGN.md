@@ -204,9 +204,22 @@ components:
 - **❌ 둥근 모서리 + 좌측 컬러 보더 컨테이너 (callout 외)** — 이 패턴은 `callout-positive/warning/negative` 한정. 일반 카드·박스·인용에 좌측 액센트 보더 사용 금지 (AI slop 트로프).
 - **❌ SVG 로 사람·아이콘·일러스트 그리기** — placeholder 박스 또는 실제 자산 사용. 인라인 SVG 는 차트·다이어그램·타임라인 한정.
 
+## Notes — DESIGN 토큰 vs brand.yaml 분리
+
+이 문서의 디자인 토큰(spacing/elevation/typography·컴포넌트 룰)은 **모든 페르소나가 공유하는 디자인 시스템** 이다. 페르소나별로 갈아끼우는 것은 `brand.yaml` 의 `brand:` 텍스트와 `palette:` 색상 한정.
+
+| 카테고리 | 위치 | 페르소나별 갈아끼움 |
+|---|---|---|
+| 워드마크·러닝 헤더·키커·시그니처·모노그램 | `brand.yaml` `brand:` | ✅ 권장 |
+| 핵심 색상 (`primary` / `primary-deep` / `primary-active` / `text` / `bg`) | `brand.yaml` `palette:` | ✅ 권장 |
+| spacing/radius/elevation 단계, typography 메트릭 | `template/DESIGN.md` + theme CSS `:root` | ❌ 모든 페르소나 공유 |
+| 컴포넌트 룰 (`.callout--*`, `.cmp-table`, `.kpi-grid`) | theme CSS | ❌ 변경 시 전체 영향 |
+
+같은 디자인 시스템 위에서 brand.yaml 의 페르소나 한 줄을 바꾸면, 워드마크/러닝 헤더가 즉시 반영되고 `--brand-primary` 등 토큰을 통해 본문 컴포넌트 색상이 동기화된다.
+
 ## Notes — AI slop 트로프 의도적 비회피
 
-흔히 "AI 가 만든 디자인" 시그니처로 지목되는 트로프 중 본 페르소나가 **의도적으로 채택** 한 것들. 외부에서 "이거 AI slop 아니냐" 질문이 들어왔을 때의 변호 근거.
+흔히 "AI 가 만든 디자인" 시그니처로 지목되는 트로프 중 본 디자인 시스템이 **의도적으로 채택** 한 것들. 페르소나-독립적 결정이라 brand.yaml 갈아끼움으로 영향받지 않는다.
 
 - **Inter + Noto Sans KR**: 진부한 라틴 폰트 조합으로 인식되지만, **Noto Sans KR 와 x-height·메트릭 호환** 이 목적. 한·영 혼용 본문에서 weight 시각 매칭이 안정적인 거의 유일한 라틴 페어라 의도적 채택. 대안(Söhne, GT America 등 유료 페어) 은 외부 공개 라이선스 부담.
 - **`fig-chip` 둥근 pill**: pill 형태 chip 자체가 트로프이지만, figure numbering 가독성 우선 — 의도적 허용. `rounded.pill` 사용처는 chip 한정이며 다른 곳 확장 금지.
