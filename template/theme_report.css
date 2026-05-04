@@ -129,7 +129,13 @@ h1, h2, h3, h4, h5, h6 {
 .report-section.s5 { page: sec5; }
 .report-section.s6 { page: sec6; }
 .report-section.s7 { page: sec7; }
-.report-appendix.s-refs { page: sec-refs; }
+.report-appendix.s-refs {
+  page: sec-refs;
+  /* References 는 항상 새 페이지에서 시작 — 부록 직후에 끌려오지 않도록.
+     .page-break 클래스(.report-appendix s-refs page-break)보다 더 구체적이어서 continuous-mode override 도 견딘다. */
+  break-before: page !important;
+  page-break-before: always !important;
+}
 
 @page sec0 { @bottom-left { content: "§0 · Executive Summary"; } }
 @page sec1 { @bottom-left { content: "§1 · Computer Use"; } }
@@ -296,7 +302,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ===== REPORT SECTION ===== */
-.report-section { margin-top: 0; }
+.report-section {
+  margin-top: 0;
+  /* 짧은 섹션이 페이지 끝에 한두 줄만 흘리지 않도록 — orphans/widows 보호 */
+  orphans: 3;
+  widows: 3;
+}
+.report-section p, .report-section li {
+  orphans: 3;
+  widows: 3;
+}
 .report-section__kicker {
   font-size: 9pt; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--brand-primary);

@@ -305,8 +305,13 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
         css_href=str((HERE / "theme_report.css").resolve()).replace("file://", ""),
         js_href=str((HERE / "report.js").resolve()).replace("file://", ""),
     )
-    full_html, n_recolor = normalize_palette(full_html)
-    print(f"  🎨 비-페르소나 색상 정규화: {n_recolor} 건")
+    mode = (
+        "monochrome"
+        if (args.monochrome or brand.get("palette", {}).get("normalize") == "monochrome")
+        else "strict"
+    )
+    full_html, n_recolor = normalize_palette(full_html, mode=mode)
+    print(f"  🎨 비-페르소나 색상 정규화: {n_recolor} 건 (mode={mode})")
 
     out_html = out_dir / f"{args.name}.html"
     out_html.write_text(full_html)
@@ -513,6 +518,8 @@ def main() -> None:
                     help="없으면 brand.name")
     ap.add_argument("--date", default=None)
     ap.add_argument("--html-only", action="store_true")
+    ap.add_argument("--monochrome", action="store_true",
+                    help="다색 SVG/배경을 페르소나 단색+명도 단계로 강등 (MONOCHROME_MAP)")
     args = ap.parse_args()
 
     src = args.src.resolve()

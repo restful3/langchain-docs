@@ -406,6 +406,8 @@ def main() -> None:
     ap.add_argument("--brand", type=Path, default=None,
                     help="brand.yaml 경로. 미지정 시 <src 부모>/brand.yaml > template/brand.default.yaml")
     ap.add_argument("--html-only", action="store_true")
+    ap.add_argument("--monochrome", action="store_true",
+                    help="다색 SVG/배경을 페르소나 단색+명도 단계로 강등")
     args = ap.parse_args()
 
     src = args.src.resolve()
@@ -463,9 +465,14 @@ def main() -> None:
     )
 
     # 콘텐츠 안에 비-페르소나 색상이 있을 경우를 대비한 안전장치 (사용자 콘텐츠 출처 다양)
-    full_html, n_recolor = normalize_palette(full_html)
+    mode = (
+        "monochrome"
+        if (args.monochrome or brand.get("palette", {}).get("normalize") == "monochrome")
+        else "strict"
+    )
+    full_html, n_recolor = normalize_palette(full_html, mode=mode)
     if n_recolor:
-        print(f"  🎨 비-페르소나 색상 정규화: {n_recolor} 건")
+        print(f"  🎨 비-페르소나 색상 정규화: {n_recolor} 건 (mode={mode})")
 
     out_html.write_text(full_html)
     print(

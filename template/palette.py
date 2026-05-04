@@ -86,11 +86,52 @@ COLOR_MAP: list[tuple[str, str]] = [
     # 연청 배경 → 그대로 유지 (primary-soft 대응)
 ]
 
+# ─────────────────────────────────────────────────────────────────────────
+# MONOCHROME_MAP — `--monochrome` 모드에서 COLOR_MAP 위에 적용.
+# 따뜻한 hex(노랑/오렌지/핑크/라일락) → primary-soft (8% alpha).
+# 차가운 hex(하늘/민트) → primary-active (10% alpha).
+# 채도 높은 fill (orange/pink/yellow saturated) → primary 단색.
+# Material/Tailwind 팔레트 기준. 페르소나 단색 + 명도 단계로 강등.
+# ─────────────────────────────────────────────────────────────────────────
+MONOCHROME_MAP: list[tuple[str, str]] = [
+    # ── 연한 배경 (warm) → primary-soft ──
+    ("#FFF7E6", "rgba(15,44,89,0.08)"), ("#fff7e6", "rgba(15,44,89,0.08)"),
+    ("#FEF3C7", "rgba(15,44,89,0.08)"), ("#fef3c7", "rgba(15,44,89,0.08)"),
+    ("#FFF9C4", "rgba(15,44,89,0.08)"), ("#fff9c4", "rgba(15,44,89,0.08)"),
+    ("#FCE7F3", "rgba(15,44,89,0.08)"), ("#fce7f3", "rgba(15,44,89,0.08)"),
+    ("#F3E8FF", "rgba(15,44,89,0.08)"), ("#f3e8ff", "rgba(15,44,89,0.08)"),
+    ("#E1BEE7", "rgba(15,44,89,0.08)"), ("#e1bee7", "rgba(15,44,89,0.08)"),
+    ("#FFCDD2", "rgba(15,44,89,0.08)"), ("#ffcdd2", "rgba(15,44,89,0.08)"),
+    ("#C8E6C9", "rgba(15,44,89,0.08)"), ("#c8e6c9", "rgba(15,44,89,0.08)"),
+    # ── 연한 배경 (cool) → primary-active alpha ──
+    ("#D1FAE5", "rgba(37,99,235,0.10)"), ("#d1fae5", "rgba(37,99,235,0.10)"),
+    ("#DBEAFE", "rgba(37,99,235,0.10)"), ("#dbeafe", "rgba(37,99,235,0.10)"),
+    ("#BBDEFB", "rgba(37,99,235,0.10)"), ("#bbdefb", "rgba(37,99,235,0.10)"),
+    # ── 채도 높은 fill (warm/saturated) → primary ──
+    ("#F59E0B", "#0F2C59"), ("#f59e0b", "#0f2c59"),
+    ("#F9A825", "#0F2C59"), ("#f9a825", "#0f2c59"),
+    ("#EC4899", "#0F2C59"), ("#ec4899", "#0f2c59"),
+    ("#4A148C", "#0F2C59"), ("#4a148c", "#0f2c59"),
+    ("#6A1B9A", "#0F2C59"), ("#6a1b9a", "#0f2c59"),
+    ("#C62828", "#0F2C59"), ("#c62828", "#0f2c59"),
+    ("#1565C0", "#0F2C59"), ("#1565c0", "#0f2c59"),
+    ("#2E7D32", "#0F2C59"), ("#2e7d32", "#0f2c59"),
+    # ── 회색 단계 (Material) → text-secondary / 단계 ──
+    ("#455A64", "#6B6B72"), ("#455a64", "#6b6b72"),
+    ("#212121", "#0F0F10"),  # near-black → text
+    ("#CFD8DC", "#F5F5F4"), ("#cfd8dc", "#f5f5f4"),
+]
 
-def normalize_palette(text: str) -> tuple[str, int]:
-    """Return (normalized_text, total_replacements)."""
+
+def normalize_palette(text: str, mode: str = "strict") -> tuple[str, int]:
+    """Return (normalized_text, total_replacements).
+
+    mode="strict" (기본): COLOR_MAP 만 적용. 비-페르소나 → 페르소나 토큰.
+    mode="monochrome": COLOR_MAP + MONOCHROME_MAP. 다색 콘텐츠를 단색 + 명도 단계로 강등.
+    """
+    rules = COLOR_MAP if mode == "strict" else COLOR_MAP + MONOCHROME_MAP
     total = 0
-    for old, new in COLOR_MAP:
+    for old, new in rules:
         count = text.count(old)
         if count:
             text = text.replace(old, new)
@@ -141,15 +182,38 @@ def self_test() -> int:
         ('fill="#059669"', 'fill="#059669"', 0),
         ('fill="#E11D48"', 'fill="#E11D48"', 0),
     ]
+    # ── monochrome 모드 케이스 (COLOR_MAP + MONOCHROME_MAP) ──
+    mono_cases: list[tuple[str, str, int]] = [
+        # 따뜻한 연배경 → primary-soft
+        ('fill="#FEF3C7"', 'fill="rgba(15,44,89,0.08)"', 1),
+        ('fill="#fff9c4"', 'fill="rgba(15,44,89,0.08)"', 1),
+        # 차가운 연배경 → primary-active alpha
+        ('fill="#bbdefb"', 'fill="rgba(37,99,235,0.10)"', 1),
+        # 채도 높은 fill → primary
+        ('fill="#f9a825"', 'fill="#0f2c59"', 1),
+        ('fill="#4a148c"', 'fill="#0f2c59"', 1),
+        # 회색 → text-secondary
+        ('fill="#455a64"', 'fill="#6b6b72"', 1),
+        ('fill="#212121"', 'fill="#0F0F10"', 1),
+        # strict 모드 매핑은 monochrome 에서도 통과
+        ('fill="#A50034"', 'fill="#0F2C59"', 1),
+    ]
     failures = 0
     for i, (inp, want_out, want_count) in enumerate(cases, start=1):
         got_out, got_count = normalize_palette(inp)
         if got_out != want_out or got_count != want_count:
             failures += 1
-            print(f"FAIL {i}: input={inp!r}", file=sys.stderr)
+            print(f"FAIL strict {i}: input={inp!r}", file=sys.stderr)
             print(f"  expected: ({want_out!r}, {want_count})", file=sys.stderr)
             print(f"  got     : ({got_out!r}, {got_count})", file=sys.stderr)
-    total = len(cases)
+    for i, (inp, want_out, want_count) in enumerate(mono_cases, start=1):
+        got_out, got_count = normalize_palette(inp, mode="monochrome")
+        if got_out != want_out or got_count != want_count:
+            failures += 1
+            print(f"FAIL mono {i}: input={inp!r}", file=sys.stderr)
+            print(f"  expected: ({want_out!r}, {want_count})", file=sys.stderr)
+            print(f"  got     : ({got_out!r}, {got_count})", file=sys.stderr)
+    total = len(cases) + len(mono_cases)
     if failures:
         print(f"\n{failures}/{total} cases failed", file=sys.stderr)
         return 1
@@ -169,6 +233,10 @@ def main() -> int:
         "--self-test", action="store_true",
         help="합성 입력으로 단위 테스트 실행",
     )
+    parser.add_argument(
+        "--monochrome", action="store_true",
+        help="다색 콘텐츠를 페르소나 단색 + 명도 단계로 강등 (MONOCHROME_MAP 추가 적용)",
+    )
     args = parser.parse_args()
 
     if args.self_test:
@@ -181,9 +249,10 @@ def main() -> int:
         print(f"\n총 {len(check(text))} 매칭", file=sys.stderr)
         return 0
 
-    out, count = normalize_palette(text)
+    mode = "monochrome" if args.monochrome else "strict"
+    out, count = normalize_palette(text, mode=mode)
     sys.stdout.write(out)
-    print(f"치환 {count} 건", file=sys.stderr)
+    print(f"치환 {count} 건 (mode={mode})", file=sys.stderr)
     return 0
 
 
