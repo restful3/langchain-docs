@@ -148,33 +148,14 @@ h1, h2, h3, h4, h5, h6 {
 @page sec-refs { @bottom-left { content: "참고 문헌"; } }
 
 /* ===== CONTINUOUS MODE — `--continuous` 빌드 옵션 (build_local.py 의 hack 정식화)
- *  · 섹션 디바이더의 풀-페이지 cover → 페이지 상단 컴팩트 hero
+ *  · 섹션 디바이더는 숨김 — wrap_section 의 kicker(SECTION NN · …) 가 이미 섹션 경계
+ *    를 표시하므로 디바이더 hero 는 redundant. 검은 풀블리드 cover 도, 컴팩트 in-flow
+ *    hero 도 wrap_section kicker 와 시각적으로 겹침.
  *  · named @page secN 을 default @page 로 풀어 한 종류 헤더/푸터 흐름
  *  · 강제 page-break 풀기. 자연 흐름 유지.
  *  · References 는 새 페이지 시작 강제 유지 (.report-appendix.s-refs 의 !important 가 우위).
  * ============================================================================ */
-.continuous-mode .section-divider {
-  page: auto !important;
-  margin: 0;
-  padding: 1.5rem 0 1rem;
-  background: none;
-  background-image: none;
-  color: var(--text);
-  border-radius: 0;
-  break-before: auto !important;
-  break-after: auto !important;
-  break-inside: avoid;
-  page-break-before: auto !important;
-  page-break-after: auto !important;
-  min-height: auto !important;
-  height: auto !important;
-  width: auto;
-  display: block;
-  position: static;
-  overflow: visible;
-}
-.continuous-mode .section-divider__title { color: var(--text); }
-.continuous-mode .section-divider__subtitle { color: var(--text-secondary); }
+.continuous-mode .section-divider { display: none !important; }
 .continuous-mode .report-toc,
 .continuous-mode .report-section,
 .continuous-mode .report-section.s0,
