@@ -56,9 +56,11 @@ HERE = Path(__file__).parent.resolve()
 try:
     from .core import build_md
     from .palette import normalize_palette
+    from .brand import load_brand
 except ImportError:
     from core import build_md  # type: ignore  # noqa: E402
     from palette import normalize_palette  # type: ignore  # noqa: E402
+    from brand import load_brand  # type: ignore  # noqa: E402
 
 
 # ---------- frontmatter ----------
@@ -178,25 +180,24 @@ def apply_visual_transforms(html: str) -> str:
 
 # ---------- slide rendering ----------
 
-# AI Odyssey 페르소나 — 외부판 동결
-BRAND_MARK = (
-    '<div class="brand-mark">'
-    '<div class="brand-mark__stack">'
-    '<span class="brand-mark__name">AI Odyssey</span>'
-    '<span class="brand-mark__sub">Deep Research</span>'
-    '</div>'
-    '</div>'
-)
-COVER_SIGNATURE = "YouTube · @AI_odysseys"
-DEFAULT_ORG = "AI Odyssey"
-DEFAULT_KICKER = "Research Deck"
+def _make_brand_mark(brand: dict) -> str:
+    """슬라이드 헤더 워드마크 HTML — brand.yaml 의 name/sub 주입."""
+    b = brand["brand"]
+    return (
+        '<div class="brand-mark">'
+        '<div class="brand-mark__stack">'
+        f'<span class="brand-mark__name">{b["name"]}</span>'
+        f'<span class="brand-mark__sub">{b["sub"]}</span>'
+        '</div>'
+        '</div>'
+    )
 
 
 def _strip_html(text: str) -> str:
     return re.sub(r"<[^>]+>", "", text)
 
 
-def render_default(slide: dict, page: int, total: int, deck: dict) -> str:
+def render_default(slide: dict, page: int, total: int, deck: dict, brand: dict) -> str:
     md = build_md()
     body_md = "\n".join(slide["body_lines"])
     subtitle_md, rest_md = extract_subtitle(body_md)
@@ -216,7 +217,7 @@ def render_default(slide: dict, page: int, total: int, deck: dict) -> str:
         f'<div class="slide-section-tag">{section_tag}</div>' if section_tag else ""
     )
 
-    org = deck.get("org", DEFAULT_ORG)
+    org = deck["org"]
     page_str = f"{page:02d}"
     total_str = f"{total:02d}"
 
@@ -228,7 +229,7 @@ def render_default(slide: dict, page: int, total: int, deck: dict) -> str:
 
     return f"""<section class="slide" aria-label="{aria_label}">
   <div class="slide-header">
-    {BRAND_MARK}
+    {_make_brand_mark(brand)}
     {section_tag_html}
   </div>
   {title_block}
@@ -263,24 +264,25 @@ def render_section(slide: dict, deck: dict) -> str:
 </section>"""
 
 
-def render_cover(slide: dict, deck: dict) -> str:
+def render_cover(slide: dict, deck: dict, brand: dict) -> str:
     md = build_md()
+    b = brand["brand"]
     body_md = "\n".join(slide["body_lines"])
     subtitle_md, _ = extract_subtitle(body_md)
     subtitle_text = subtitle_md or deck.get("subtitle", "")
     subtitle_html = md.renderInline(subtitle_text) if subtitle_text else ""
 
-    kicker = deck.get("kicker", DEFAULT_KICKER)
+    kicker = deck["kicker"]
     author = deck.get("author", "")
-    org = deck.get("org", DEFAULT_ORG)
+    org = deck["org"]
     date = deck.get("date", "")
 
     return f"""<section class="slide slide--cover" aria-label="Cover">
   <div class="cover-wordmark">
-    <span class="cover-wordmark__name">AI Odyssey</span>
-    <span class="cover-wordmark__sub">Deep Research</span>
+    <span class="cover-wordmark__name">{b['name']}</span>
+    <span class="cover-wordmark__sub">{b['sub']}</span>
   </div>
-  <div class="cover-signature">{COVER_SIGNATURE}</div>
+  <div class="cover-signature">{b['signature']}</div>
   <div class="cover-hero">
     <div class="cover-kicker animate-in">{kicker}</div>
     <h1 class="animate-in delay-1">{slide["h1"]}</h1>
@@ -294,7 +296,7 @@ def render_cover(slide: dict, deck: dict) -> str:
 </section>"""
 
 
-def render_closing(slide: dict, deck: dict) -> str:
+def render_closing(slide: dict, deck: dict, brand: dict) -> str:
     md = build_md()
     body_md = "\n".join(slide["body_lines"])
     subtitle_md, rest_md = extract_subtitle(body_md)
@@ -307,7 +309,7 @@ def render_closing(slide: dict, deck: dict) -> str:
 
     return f"""<section class="slide slide--closing" aria-label="{aria}">
   <div class="slide-header">
-    {BRAND_MARK}
+    {_make_brand_mark(brand)}
     <div class="slide-section-tag">Thank you</div>
   </div>
   <div class="slide-body" style="justify-content:flex-start;">
@@ -400,6 +402,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("src", type=Path, help="MD source file or directory of *.md")
     ap.add_argument("--out", type=Path, default=None)
+    ap.add_argument("--brand", type=Path, default=None,
+                    help="brand.yaml 경로. 미지정 시 <src 부모>/brand.yaml > template/brand.default.yaml")
     ap.add_argument("--html-only", action="store_true")
     args = ap.parse_args()
 
@@ -411,14 +415,18 @@ def main() -> None:
     out_html = out_dir / f"{stem}.html"
     out_pdf = out_dir / f"{stem}.pdf"
 
+    # brand 로드: 콘텐츠 기준 폴더는 src 자신(디렉토리) 또는 src.parent(파일).
+    brand_lookup_dir = src if src.is_dir() else src.parent
+    brand = load_brand(content_dir=brand_lookup_dir, override=args.brand)
+
     deck_meta, body = parse_frontmatter(md_text)
 
-    deck_meta.setdefault("title", "AI Odyssey 슬라이드")
+    deck_meta.setdefault("title", f"{brand['brand']['name']} 슬라이드")
     deck_meta.setdefault("subtitle", "")
     deck_meta.setdefault("author", "")
     deck_meta.setdefault("version", "")
-    deck_meta.setdefault("kicker", DEFAULT_KICKER)
-    deck_meta.setdefault("org", DEFAULT_ORG)
+    deck_meta.setdefault("kicker", brand["brand"]["slides_kicker"])
+    deck_meta.setdefault("org", brand["brand"]["name"])
 
     css_rel = os.path.relpath(HERE / "theme_slides.css", out_html.parent).replace("\\", "/")
     js_rel = os.path.relpath(HERE / "deck.js", out_html.parent).replace("\\", "/")
@@ -435,14 +443,14 @@ def main() -> None:
     for slide in slides:
         variant = slide["meta"].get("variant", "default")
         if variant == "cover":
-            rendered.append(render_cover(slide, deck_meta))
+            rendered.append(render_cover(slide, deck_meta, brand))
         elif variant == "section":
             rendered.append(render_section(slide, deck_meta))
         elif variant == "closing":
-            rendered.append(render_closing(slide, deck_meta))
+            rendered.append(render_closing(slide, deck_meta, brand))
         else:
             content_idx += 1
-            rendered.append(render_default(slide, content_idx, content_total, deck_meta))
+            rendered.append(render_default(slide, content_idx, content_total, deck_meta, brand))
 
     full_html = SHELL.format(
         doc_title=deck_meta["title"],

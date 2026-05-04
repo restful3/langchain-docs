@@ -52,6 +52,7 @@ try:
         HERO_KPI_HTML,
     )
     from .palette import normalize_palette
+    from .brand import load_brand
 except ImportError:
     from core import (  # type: ignore  # noqa: E402
         build_md,
@@ -68,6 +69,7 @@ except ImportError:
         HERO_KPI_HTML,
     )
     from palette import normalize_palette  # type: ignore  # noqa: E402
+    from brand import load_brand  # type: ignore  # noqa: E402
 
 
 # ---------- sections.yaml ----------
@@ -138,16 +140,17 @@ def section_meta_for(filepath: Path, sections: dict[str, SectionMeta]) -> Sectio
 # ---------- cover ----------
 
 def build_cover_external(title: str, subtitle: str, version_badge: str,
-                         meta: dict, author: str) -> str:
-    """AI Odyssey 외부판 커버 — 페르소나 동결."""
+                         meta: dict, author: str, brand: dict) -> str:
+    """리포트 커버 — brand.yaml 의 페르소나 워드마크/서명/키커 주입."""
+    b = brand["brand"]
     return f"""
     <section class="report-cover">
       <div class="report-cover__wordmark">
-        <span class="report-cover__wordmark-name">AI Odyssey</span>
-        <span class="report-cover__wordmark-sub">Deep Research</span>
+        <span class="report-cover__wordmark-name">{b['name']}</span>
+        <span class="report-cover__wordmark-sub">{b['sub']}</span>
       </div>
-      <span class="report-cover__signature">YouTube · @AI_odysseys</span>
-      <span class="report-cover__kicker">Research Report · {version_badge}</span>
+      <span class="report-cover__signature">{b['signature']}</span>
+      <span class="report-cover__kicker">{b['cover_kicker']} · {version_badge}</span>
       <h1 class="report-cover__title">{title}</h1>
       <p class="report-cover__subtitle">{subtitle}</p>
       <dl class="report-cover__meta">
@@ -203,7 +206,7 @@ SHELL_TIER1 = """<!DOCTYPE html>
 
 # ---------- Tier 1 build ----------
 
-def build_tier1(src: Path, out_dir: Path, args) -> tuple[Path, Path | None]:
+def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path | None]:
     """Tier 1 (풀디자인) HTML + PDF 생성."""
     md = build_md()
     sections = load_sections(src)
@@ -222,6 +225,7 @@ def build_tier1(src: Path, out_dir: Path, args) -> tuple[Path, Path | None]:
         version_badge=args.version_badge,
         meta={"date": args.date},
         author=args.author,
+        brand=brand,
     ))
     body_chunks.append(build_toc_stub())
 
@@ -464,6 +468,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("src", type=Path)
     ap.add_argument("--out", type=Path, default=None)
+    ap.add_argument("--brand", type=Path, default=None,
+                    help="brand.yaml 경로. 미지정 시 <src>/brand.yaml > template/brand.default.yaml")
     ap.add_argument("--tier", choices=["1", "2", "all"], default="all")
     ap.add_argument("--name", default="detailed_report_external")
     ap.add_argument("--title", default="Computer Use — AI가 출근했다")
@@ -481,11 +487,13 @@ def main() -> None:
     out_dir = (args.out.resolve() if args.out else src.parent)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    brand = load_brand(content_dir=src, override=args.brand)
+
     html_path: Path | None = None
 
     if args.tier in ("1", "all"):
         print(f"▶  Tier 1 (풀디자인 HTML/PDF) 빌드 — {args.name}")
-        html_path, _pdf = build_tier1(src, out_dir, args)
+        html_path, _pdf = build_tier1(src, out_dir, args, brand)
 
     if args.tier in ("2", "all"):
         print(f"▶  Tier 2 (네이버 본문 + PNG @2x) 빌드")
