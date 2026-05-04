@@ -198,7 +198,7 @@ SHELL_TIER1 = """<!DOCTYPE html>
   </style>
 </head>
 <body>
-  <article class="report">
+  <article class="{article_class}">
 {body}
   </article>
   <script src="{js_href}"></script>
@@ -224,13 +224,29 @@ def _resolve_doc_meta(args, fm_meta: dict, brand: dict) -> dict:
     }
 
 
+def _filter_section_files(section_files: list[Path], sections_arg: str | None) -> list[Path]:
+    """--sections "02,03" 매칭. 미지정 시 전체 반환."""
+    if not sections_arg:
+        return section_files
+    wanted = {s.strip() for s in sections_arg.split(",") if s.strip()}
+    out: list[Path] = []
+    for p in section_files:
+        m = _NUM_PREFIX_RE.match(p.name)
+        if m and m.group(1) in wanted:
+            out.append(p)
+    return out
+
+
 def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path | None]:
-    """Tier 1 (풀디자인) HTML + PDF 생성."""
+    """Tier 1 (풀디자인) HTML + PDF 생성. 부분 빌드 옵션:
+    --no-cover/--no-toc/--no-references, --sections, --continuous, --pages.
+    """
     md = build_md()
     sections = load_sections(src)
 
     # 1) 레퍼런스 수집
-    refs = parse_references((src / "99_references.md").read_text())
+    refs_path = src / "99_references.md"
+    refs = parse_references(refs_path.read_text()) if refs_path.exists() else []
     known_nums = {r["num"] for r in refs}
     url_map = extract_ref_urls(refs)
 
@@ -249,19 +265,25 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
 
     body_chunks: list[str] = []
 
-    # 3) 커버 + TOC
-    body_chunks.append(build_cover_external(
-        title=doc["title"].replace("—", "<br><span style=\"color:var(--brand-primary);\">—</span>"),
-        subtitle=doc["subtitle"],
-        version_badge=doc["version_badge"],
-        meta={"date": doc["date"]},
-        author=doc["author"],
-        brand=brand,
-    ))
-    body_chunks.append(build_toc_stub())
+    # 3) 커버 + TOC (--no-cover / --no-toc 시 스킵)
+    if not args.no_cover:
+        body_chunks.append(build_cover_external(
+            title=doc["title"].replace("—", "<br><span style=\"color:var(--brand-primary);\">—</span>"),
+            subtitle=doc["subtitle"],
+            version_badge=doc["version_badge"],
+            meta={"date": doc["date"]},
+            author=doc["author"],
+            brand=brand,
+        ))
+    if not args.no_toc:
+        body_chunks.append(build_toc_stub())
 
-    # 4) Executive Summary (00_front_matter)
-    fm_sections = split_front_matter_sections(fm_html)
+    # 4) Executive Summary (00_front_matter) — --sections 명시 시 "00" 미포함이면 스킵
+    if args.sections:
+        wanted = {s.strip() for s in args.sections.split(",") if s.strip()}
+        fm_sections = split_front_matter_sections(fm_html) if "00" in wanted else []
+    else:
+        fm_sections = split_front_matter_sections(fm_html)
     if fm_sections:
         body_chunks.append(build_section_divider(
             "00", "섹션 00", "Executive Summary",
@@ -275,9 +297,10 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
                                kicker_prefix="Section")
         body_chunks.append(convert_footrefs(wrapped, known_nums, url_map))
 
-    # 4) 본 섹션
+    # 5) 본 섹션 (--sections 필터)
     section_files = sorted(p for p in src.glob("*.md")
                            if p.name not in ("00_front_matter.md", "99_references.md"))
+    section_files = _filter_section_files(section_files, args.sections)
     for p in section_files:
         num, part_tag, part_title, part_sub = section_meta_for(p, sections)
         if part_tag:
@@ -294,12 +317,15 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
             wrapped = wrap_section(html, number=num, kicker_prefix="Section")
         body_chunks.append(wrapped)
 
-    # 5) 레퍼런스 부록
-    body_chunks.append(build_references_appendix(refs))
+    # 6) 레퍼런스 부록 (--no-references 시 스킵)
+    if refs and not args.no_references:
+        body_chunks.append(build_references_appendix(refs))
 
-    # 6) 출력 — 사용자 콘텐츠의 비-페르소나 색상을 한 번 더 정규화.
+    # 7) 출력 — 사용자 콘텐츠의 비-페르소나 색상을 한 번 더 정규화.
+    article_class = "report continuous-mode" if args.continuous else "report"
     full_html = SHELL_TIER1.format(
         doc_title=doc["doc_title"],
+        article_class=article_class,
         body="\n".join(body_chunks),
         brand_style=make_brand_style_block(brand),
         css_href=str((HERE / "theme_report.css").resolve()).replace("file://", ""),
@@ -327,7 +353,7 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
         from render import html_to_pdf  # type: ignore
     out_pdf = out_dir / f"{args.name}.pdf"
     print("  🖨️  PDF 변환 중 ...")
-    html_to_pdf(out_html, out_pdf, brand=brand)
+    html_to_pdf(out_html, out_pdf, brand=brand, page_ranges=args.pages)
     print(f"  💾 PDF:  {out_pdf}")
     return out_html, out_pdf
 
@@ -520,6 +546,18 @@ def main() -> None:
     ap.add_argument("--html-only", action="store_true")
     ap.add_argument("--monochrome", action="store_true",
                     help="다색 SVG/배경을 페르소나 단색+명도 단계로 강등 (MONOCHROME_MAP)")
+    # ─── 부분 빌드 ───
+    ap.add_argument("--sections", default=None,
+                    help='특정 섹션만 빌드 (NN_*.md 의 NN 매칭, 콤마 구분). 예: "02,03"')
+    ap.add_argument("--pages", default=None,
+                    help='PDF 페이지 범위 추출. 예: "5-8" 또는 "1,3,5-7"')
+    ap.add_argument("--no-cover", action="store_true", help="커버 페이지 스킵")
+    ap.add_argument("--no-toc", action="store_true", help="목차 스킵")
+    ap.add_argument("--no-references", action="store_true", help="References 부록 스킵")
+    ap.add_argument("--continuous", action="store_true",
+                    help="섹션 디바이더 풀-페이지 풀기 + 자연 흐름 (build_local.py 의 hack 정식화)")
+    ap.add_argument("--per-section", action="store_true",
+                    help="섹션 별 개별 PDF 도 함께 생성")
     args = ap.parse_args()
 
     src = args.src.resolve()
@@ -535,6 +573,31 @@ def main() -> None:
     if args.tier in ("1", "all"):
         print(f"▶  Tier 1 (풀디자인 HTML/PDF) 빌드 — {args.name}")
         html_path, _pdf = build_tier1(src, out_dir, args, brand)
+
+        # --per-section: 통합 빌드 후 섹션별 개별 PDF 도 추가 생성.
+        if args.per_section:
+            wanted = (
+                {s.strip() for s in args.sections.split(",") if s.strip()}
+                if args.sections else None
+            )
+            section_files = sorted(p for p in src.glob("*.md")
+                                   if p.name not in ("00_front_matter.md", "99_references.md"))
+            base_name = args.name
+            args.no_cover = True
+            args.no_toc = True
+            args.no_references = True
+            for p in section_files:
+                m = _NUM_PREFIX_RE.match(p.name)
+                if not m:
+                    continue
+                nn = m.group(1)
+                if wanted and nn not in wanted:
+                    continue
+                args.sections = nn
+                args.name = f"{base_name}-s{nn}"
+                print(f"▶  per-section 빌드 — s{nn}")
+                build_tier1(src, out_dir, args, brand)
+            # main full 빌드의 figs/ 산출은 args.name 첫 값 기준이지만 tier 2 는 통합 HTML 기준 동작 — 영향 없음.
 
     if args.tier in ("2", "all"):
         print(f"▶  Tier 2 (네이버 본문 + PNG @2x) 빌드")

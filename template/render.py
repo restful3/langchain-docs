@@ -77,7 +77,7 @@ def _make_driver() -> webdriver.Chrome:
 
 
 def html_to_pdf(html_path: Path, pdf_path: Path, fallback_header: bool = False,
-                brand: dict | None = None) -> None:
+                brand: dict | None = None, page_ranges: str | None = None) -> None:
     driver = _make_driver()
     try:
         driver.get(f"file://{html_path}")
@@ -142,6 +142,8 @@ def html_to_pdf(html_path: Path, pdf_path: Path, fallback_header: bool = False,
                 "headerTemplate": make_header(brand),
                 "footerTemplate": make_footer(brand),
             })
+        if page_ranges:
+            params["pageRanges"] = page_ranges
 
         result = driver.execute_cdp_cmd("Page.printToPDF", params)
         pdf_path.write_bytes(base64.b64decode(result["data"]))
@@ -295,8 +297,9 @@ def _make_slides_driver() -> webdriver.Chrome:
     return driver
 
 
-def slides_to_pdf(html_path: Path, pdf_path: Path) -> None:
-    """1280×720 16:9 슬라이드 HTML → PDF (landscape, no margins)."""
+def slides_to_pdf(html_path: Path, pdf_path: Path, page_ranges: str | None = None) -> None:
+    """1280×720 16:9 슬라이드 HTML → PDF (landscape, no margins).
+    page_ranges: CDP pageRanges 형식 ("1,3-5"). 슬라이드 단위 = 1 페이지."""
     driver = _make_slides_driver()
     try:
         driver.get(f"file://{html_path}")
@@ -339,21 +342,21 @@ def slides_to_pdf(html_path: Path, pdf_path: Path) -> None:
         else:
             print("  ✅ 오버플로우 없음")
 
-        result = driver.execute_cdp_cmd(
-            "Page.printToPDF",
-            {
-                "landscape": True,
-                "printBackground": True,
-                "paperWidth": 13.333,
-                "paperHeight": 7.5,
-                "marginTop": 0,
-                "marginBottom": 0,
-                "marginLeft": 0,
-                "marginRight": 0,
-                "preferCSSPageSize": True,
-                "scale": 1.0,
-            },
-        )
+        params = {
+            "landscape": True,
+            "printBackground": True,
+            "paperWidth": 13.333,
+            "paperHeight": 7.5,
+            "marginTop": 0,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "preferCSSPageSize": True,
+            "scale": 1.0,
+        }
+        if page_ranges:
+            params["pageRanges"] = page_ranges
+        result = driver.execute_cdp_cmd("Page.printToPDF", params)
         pdf_path.write_bytes(base64.b64decode(result["data"]))
     finally:
         driver.quit()

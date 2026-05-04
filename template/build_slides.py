@@ -99,6 +99,21 @@ def parse_meta_comment(comment_body: str) -> dict[str, str]:
     return meta
 
 
+def _parse_index_spec(spec: str, total: int) -> list[int]:
+    """`"1,3,5-7"` 또는 `"2-5"` → [1,3,5,6,7] / [2,3,4,5]. 1-based."""
+    out: list[int] = []
+    for part in spec.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" in part:
+            a, b = part.split("-", 1)
+            out.extend(range(int(a), int(b) + 1))
+        else:
+            out.append(int(part))
+    return out
+
+
 def split_slides(md_text: str) -> list[dict]:
     """MD 를 H1 단위 슬라이드 블록으로 분할."""
     lines = md_text.split("\n")
@@ -408,6 +423,13 @@ def main() -> None:
     ap.add_argument("--html-only", action="store_true")
     ap.add_argument("--monochrome", action="store_true",
                     help="다색 SVG/배경을 페르소나 단색+명도 단계로 강등")
+    # ─── 부분 빌드 ───
+    ap.add_argument("--slides", default=None,
+                    help='1-based H1 인덱스 부분집합. 예: "1,3,7" 또는 "2-5"')
+    ap.add_argument("--variant", default=None,
+                    help='특정 variant 만 (콤마 구분). 예: "cover,default"')
+    ap.add_argument("--per-slide", action="store_true",
+                    help="슬라이드 한 장씩 개별 PDF (PDF pageRanges 활용)")
     args = ap.parse_args()
 
     src = args.src.resolve()
@@ -437,6 +459,17 @@ def main() -> None:
     slides = split_slides(body)
     if not slides:
         sys.exit("❌ 슬라이드를 찾을 수 없음 (`# H1` 한 줄 이상 필요)")
+
+    # --variant 필터 (variant 화이트리스트)
+    if args.variant:
+        wanted_v = {v.strip() for v in args.variant.split(",") if v.strip()}
+        slides = [s for s in slides if s["meta"].get("variant", "default") in wanted_v]
+    # --slides 필터 (1-based 인덱스)
+    if args.slides:
+        idxs = _parse_index_spec(args.slides, total=len(slides))
+        slides = [slides[i - 1] for i in idxs if 1 <= i <= len(slides)]
+    if not slides:
+        sys.exit("❌ 부분 빌드 결과 슬라이드가 0장 — 인덱스/필터 확인 필요.")
 
     content_total = sum(
         1 for s in slides if s["meta"].get("variant", "default") == "default"
@@ -491,6 +524,13 @@ def main() -> None:
     print("  🖨️  PDF 변환 중 ...")
     slides_to_pdf(out_html, out_pdf)
     print(f"  💾 PDF:  {out_pdf}  ({out_pdf.stat().st_size // 1024} KB)")
+
+    # --per-slide: 슬라이드 한 장씩 별도 PDF (HTML 한 번 빌드 후 pageRanges 로 추출).
+    if args.per_slide:
+        for i in range(1, len(slides) + 1):
+            per_pdf = out_dir / f"{stem}-{i:02d}.pdf"
+            slides_to_pdf(out_html, per_pdf, page_ranges=str(i))
+            print(f"  💾 PDF:  {per_pdf}  ({per_pdf.stat().st_size // 1024} KB)")
 
 
 if __name__ == "__main__":
