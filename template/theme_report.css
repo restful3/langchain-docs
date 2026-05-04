@@ -66,13 +66,13 @@ h1, h2, h3, h4, h5, h6 {
   size: A4;
   margin: 18mm 16mm 22mm 16mm;
   @top-left {
-    content: "AI Odyssey · Independent Research";
+    content: var(--running-header-left, "AI Odyssey · Independent Research");
     font: 500 9pt 'Inter', 'Noto Sans KR', sans-serif;
     color: #6B6B72;
     padding-bottom: 6mm;
   }
   @top-right {
-    content: "AI Odyssey";
+    content: var(--running-header-right, "AI Odyssey");
     font: 700 9pt 'Inter', 'Noto Sans KR', sans-serif;
     letter-spacing: 0.12em;
     color: #0F2C59;

@@ -335,7 +335,7 @@ p, li, td, th { color: var(--text); }
   pointer-events: none;
 }
 .slide--section::after {
-  content: "AIO";
+  content: var(--slide-section-monogram, "AIO");
   position: absolute;
   bottom: 44px;
   right: 88px;

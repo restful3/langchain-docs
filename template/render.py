@@ -33,20 +33,31 @@ HERE = Path(__file__).parent.resolve()
 A4_WIDTH_IN = 8.2677
 A4_HEIGHT_IN = 11.6929
 
-# CDP fallback 헤더/푸터 템플릿 (CSS @page 마진박스가 동작하지 않을 때만 사용)
-HEADER_TEMPLATE = (
-    '<div style="width:100%;padding:0 14mm;font:500 9pt \'Inter\',sans-serif;'
-    'color:#6B6B72;display:flex;justify-content:space-between;">'
-    '<span>AI Odyssey · Independent Research</span>'
-    '<span class="title"></span>'
-    '</div>'
-)
-FOOTER_TEMPLATE = (
-    '<div style="width:100%;padding:0 14mm;font:700 9pt \'Inter\',sans-serif;'
-    'color:#6B6B72;text-align:center;font-variant-numeric:tabular-nums;">'
-    '<span class="pageNumber"></span> / <span class="totalPages"></span>'
-    '</div>'
-)
+# CDP fallback 헤더/푸터 템플릿 (CSS @page 마진박스가 동작하지 않을 때만 사용).
+# brand 미지정 시 사용되는 fallback 텍스트 — theme_report.css 의 var() fallback 과 동기화.
+_DEFAULT_HEADER_LEFT = "AI Odyssey · Independent Research"
+
+
+def make_header(brand: dict | None = None) -> str:
+    """CDP printToPDF 의 headerTemplate 문자열. brand 가 None 이면 기본 페르소나 텍스트."""
+    left = (brand or {}).get("brand", {}).get("running_header_left", _DEFAULT_HEADER_LEFT)
+    return (
+        '<div style="width:100%;padding:0 14mm;font:500 9pt \'Inter\',sans-serif;'
+        'color:#6B6B72;display:flex;justify-content:space-between;">'
+        f'<span>{left}</span>'
+        '<span class="title"></span>'
+        '</div>'
+    )
+
+
+def make_footer(brand: dict | None = None) -> str:
+    """CDP printToPDF 의 footerTemplate 문자열. 페이지 카운터 — 페르소나 영향 없음."""
+    return (
+        '<div style="width:100%;padding:0 14mm;font:700 9pt \'Inter\',sans-serif;'
+        'color:#6B6B72;text-align:center;font-variant-numeric:tabular-nums;">'
+        '<span class="pageNumber"></span> / <span class="totalPages"></span>'
+        '</div>'
+    )
 
 
 def _make_driver() -> webdriver.Chrome:
@@ -65,7 +76,8 @@ def _make_driver() -> webdriver.Chrome:
     return driver
 
 
-def html_to_pdf(html_path: Path, pdf_path: Path, fallback_header: bool = False) -> None:
+def html_to_pdf(html_path: Path, pdf_path: Path, fallback_header: bool = False,
+                brand: dict | None = None) -> None:
     driver = _make_driver()
     try:
         driver.get(f"file://{html_path}")
@@ -127,8 +139,8 @@ def html_to_pdf(html_path: Path, pdf_path: Path, fallback_header: bool = False) 
                 "marginLeft": 16 / 25.4,     # 16mm
                 "marginRight": 16 / 25.4,    # 16mm
                 "displayHeaderFooter": True,
-                "headerTemplate": HEADER_TEMPLATE,
-                "footerTemplate": FOOTER_TEMPLATE,
+                "headerTemplate": make_header(brand),
+                "footerTemplate": make_footer(brand),
             })
 
         result = driver.execute_cdp_cmd("Page.printToPDF", params)

@@ -56,11 +56,11 @@ HERE = Path(__file__).parent.resolve()
 try:
     from .core import build_md
     from .palette import normalize_palette
-    from .brand import load_brand
+    from .brand import load_brand, make_brand_style_block
 except ImportError:
     from core import build_md  # type: ignore  # noqa: E402
     from palette import normalize_palette  # type: ignore  # noqa: E402
-    from brand import load_brand  # type: ignore  # noqa: E402
+    from brand import load_brand, make_brand_style_block  # type: ignore  # noqa: E402
 
 
 # ---------- frontmatter ----------
@@ -337,6 +337,7 @@ SHELL = """<!DOCTYPE html>
   <script>Chart.defaults.animation = false;</script>
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
   <link rel="stylesheet" href="{css_href}">
+  {brand_style}
 </head>
 <body>
   <a href="#main-content" class="skip-to-content" style="position:absolute;left:-9999px;">Skip to content</a>
@@ -456,6 +457,7 @@ def main() -> None:
         doc_title=deck_meta["title"],
         slides="\n".join(rendered),
         total_all=len(slides),
+        brand_style=make_brand_style_block(brand),
         css_href=css_rel,
         js_href=js_rel,
     )

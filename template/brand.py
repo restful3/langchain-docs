@@ -46,3 +46,20 @@ def _deep_merge(base: dict, override: dict) -> dict:
         else:
             out[k] = v
     return out
+
+
+def make_brand_style_block(brand: dict) -> str:
+    """`<style>:root{...}</style>` — theme CSS 의 var() fallback 을 override 한다.
+
+    러닝 헤더/모노그램 텍스트만 주입 (페이지 마진박스 content 가 var() 로 받음).
+    페이지 색상 토큰은 theme CSS 의 :root 가 이미 페르소나 fallback 을 들고 있으므로
+    여기서는 미주입 — 추후 phase 에서 palette 까지 확장 예정.
+    """
+    b = brand["brand"]
+    return (
+        '<style id="brand-vars">:root{\n'
+        f'  --running-header-left: "{b["running_header_left"]}";\n'
+        f'  --running-header-right: "{b["running_header_right"]}";\n'
+        f'  --slide-section-monogram: "{b["monogram"]}";\n'
+        '}</style>'
+    )

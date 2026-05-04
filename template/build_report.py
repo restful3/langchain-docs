@@ -52,7 +52,7 @@ try:
         HERO_KPI_HTML,
     )
     from .palette import normalize_palette
-    from .brand import load_brand
+    from .brand import load_brand, make_brand_style_block
 except ImportError:
     from core import (  # type: ignore  # noqa: E402
         build_md,
@@ -69,7 +69,7 @@ except ImportError:
         HERO_KPI_HTML,
     )
     from palette import normalize_palette  # type: ignore  # noqa: E402
-    from brand import load_brand  # type: ignore  # noqa: E402
+    from brand import load_brand, make_brand_style_block  # type: ignore  # noqa: E402
 
 
 # ---------- sections.yaml ----------
@@ -177,6 +177,7 @@ SHELL_TIER1 = """<!DOCTYPE html>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script>Chart.defaults.animation = false;</script>
   <link rel="stylesheet" href="{css_href}">
+  {brand_style}
   <style>
     sup.ref-cite a {{
       color: var(--brand-primary);
@@ -272,6 +273,7 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
     full_html = SHELL_TIER1.format(
         doc_title=args.doc_title,
         body="\n".join(body_chunks),
+        brand_style=make_brand_style_block(brand),
         css_href=str((HERE / "theme_report.css").resolve()).replace("file://", ""),
         js_href=str((HERE / "report.js").resolve()).replace("file://", ""),
     )
@@ -292,7 +294,7 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
         from render import html_to_pdf  # type: ignore
     out_pdf = out_dir / f"{args.name}.pdf"
     print("  🖨️  PDF 변환 중 ...")
-    html_to_pdf(out_html, out_pdf)
+    html_to_pdf(out_html, out_pdf, brand=brand)
     print(f"  💾 PDF:  {out_pdf}")
     return out_html, out_pdf
 
