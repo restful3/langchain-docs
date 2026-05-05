@@ -385,6 +385,77 @@ code {
   font-weight: 500;
 }
 
+/* ===== CODE BLOCKS ===== */
+/* IDE-스타일 박스 — theme_report.css 의 pre 룰을 슬라이드 캔버스(1280×720)에 맞춰 포팅.
+   상단 26px 트래픽 라이트 바 + 우상단 언어 라벨 (PYTHON/BASH/...) + 다크 그라데이션. */
+.slide-body pre {
+  margin: 8px auto;               /* 가로 중앙 정렬 */
+  padding: 30px 18px 14px;        /* 22px 바 + 8px 여백 */
+  background: linear-gradient(170deg, #0A0C12 0%, #131722 100%);
+  color: #E8EAED;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', 'D2 Coding', monospace;
+  font-size: clamp(11px, 13.5cqi / 10, 14px);
+  line-height: 1.55;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  /* 오버플로우 방지: 긴 토큰도 줄바꿈 + 컨테이너 폭 초과 금지 */
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  /* 슬라이드 flex 컨테이너에서 자체 높이가 압축되지 않도록 — 압축되면 overflow:hidden 으로
+     코드 일부가 잘려 보이고 (트래픽 라이트 바 ::before 누수 방지를 위해 hidden 필요),
+     빌드 스크립트는 clientHeight 만 비교하므로 오버플로우를 감지하지 못한다. */
+  flex-shrink: 0;
+}
+.slide-body pre::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 22px;
+  background:
+    radial-gradient(circle at 12px 11px, #FF5F57 3px, transparent 3.5px),
+    radial-gradient(circle at 26px 11px, #FEBC2E 3px, transparent 3.5px),
+    radial-gradient(circle at 40px 11px, #28C840 3px, transparent 3.5px),
+    linear-gradient(180deg, #1C2030 0%, #161A26 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.slide-body pre::after {
+  content: "</>";
+  position: absolute;
+  right: 12px; top: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.32);
+  font-family: 'JetBrains Mono', 'D2 Coding', monospace;
+}
+.slide-body pre:has(code.language-python)::after     { content: "PYTHON"; color: rgba(96, 165, 250, 0.55); }
+.slide-body pre:has(code.language-bash)::after       { content: "BASH";   color: rgba(167, 167, 175, 0.55); }
+.slide-body pre:has(code.language-shell)::after      { content: "SHELL";  color: rgba(167, 167, 175, 0.55); }
+.slide-body pre:has(code.language-text)::after       { content: "·";      color: rgba(167, 167, 175, 0.30); }
+.slide-body pre:has(code.language-yaml)::after       { content: "YAML";   color: rgba(167, 167, 175, 0.55); }
+.slide-body pre:has(code.language-json)::after       { content: "JSON";   color: rgba(167, 167, 175, 0.55); }
+.slide-body pre:has(code.language-typescript)::after { content: "TS";     color: rgba(96, 165, 250, 0.55); }
+.slide-body pre:has(code.language-javascript)::after { content: "JS";     color: rgba(251, 191, 36, 0.55); }
+.slide-body pre code {
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  font-family: inherit !important;
+  display: block;
+  white-space: inherit;
+}
+
 /* ===== BULLETS / NUMBERED LIST ===== */
 .slide ul.bullets { list-style: none; padding: 0; margin: 0; }
 .slide ul.bullets li {
@@ -567,7 +638,11 @@ code {
 
 /* ===== COMPARISON TABLE ===== */
 .cmp-table {
-  width: 100%;
+  /* 내용 길이에 맞춰 가로 폭 결정 + 슬라이드 가운데 정렬 (꽉 차서 둔해 보이는 것 방지) */
+  width: auto;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
   border-collapse: separate;
   border-spacing: 0;
   font-size: clamp(12px, 15cqi / 10, 16px);
@@ -744,6 +819,37 @@ code {
 }
 /* slide-body 안의 베어 SVG 도 폭 100% 로 확장 (figure 미사용 시 안전망) */
 .slide-body > svg { width: 100%; height: auto; display: block; }
+
+/* ===== FIGURES (img / figure) — 가로/세로 둘 다 채우되 슬라이드를 넘지 않게, 가운데 ===== */
+/* 마크다운 ![alt](path) 는 <p><img></p> 로 렌더된다.
+   - 너비는 컨테이너 폭까지 확장하되 max-width: 100% 로 가로 오버플로우 차단.
+   - 세로는 takeaway/제목/푸터를 제외한 가용 영역(약 470px) 까지로 한정 — 720px 슬라이드 기준.
+   - width: auto + height: auto 로 두면 브라우저가 두 바운드 안에서 가능한 큰 크기로 종횡비 보존. */
+.slide-body img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 470px;
+  margin: 6px auto;
+}
+.slide-body p:has(> img:only-child) {
+  text-align: center;
+  margin: 6px 0;
+}
+.slide-body figure {
+  margin: 6px auto;
+  text-align: center;
+}
+.slide-body figure img,
+.slide-body figure svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  max-height: 470px;
+  width: auto;
+  height: auto;
+}
 
 /* ===== BODY BLOCKQUOTE (callout / italic note) ===== */
 /* takeaway 인용구 — 빨간 좌측 바 + 항상 슬라이드 하단(footer 구분선 직전) 에 핀.
@@ -1572,4 +1678,3 @@ code {
     box-shadow: 8px 0 0 0 #0A0A0A, -8px 0 0 0 #0A0A0A, inset 0 0 0 2px #0A0A0A !important;
   }
 }
-치환 122 건

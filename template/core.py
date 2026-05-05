@@ -489,20 +489,18 @@ def wrap_section(html_body: str, number: str, title_override: str | None = None,
 # ---------- reference appendix ----------
 
 def build_references_appendix(items: list[dict]) -> str:
-    """참고문헌 부록 — var(--brand-primary) 사용."""
+    """참고문헌 부록 — 다른 부록(용어집·실행 스크립트 등)과 같은 h3 계위로 인라인 렌더."""
     from collections import OrderedDict
     grouped: "OrderedDict[str, list[dict]]" = OrderedDict()
     for it in items:
         grouped.setdefault(it["group"] or "기타", []).append(it)
 
     parts = [
-        '<section class="report-appendix s-refs page-break">',
-        '  <div class="report-section__kicker">Appendix · References</div>',
-        '  <h2>참고 문헌 · 원본 출처</h2>',
-        '  <p class="report-section__lede">본문의 각주 번호 <code>[N]</code> 는 아래 목록의 항목과 1:1 매칭된다. 모든 URL 은 공개 접근 가능한 원본이다 (수집 시점 2026-04-20).</p>',
+        '<section class="s-refs">',
+        '  <h3 id="부록-c.-참고문헌">부록 C. 참고문헌</h3>',
     ]
     for gname, entries in grouped.items():
-        parts.append(f'  <h3>{gname}</h3>')
+        parts.append(f'  <h4>{gname}</h4>')
         parts.append('  <ol class="references" style="list-style:none; padding:0;">')
         for it in entries:
             body_html = render_ref_body(it["body"])

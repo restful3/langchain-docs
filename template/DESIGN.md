@@ -217,6 +217,44 @@ components:
 
 같은 디자인 시스템 위에서 brand.yaml 의 페르소나 한 줄을 바꾸면, 워드마크/러닝 헤더가 즉시 반영되고 `--brand-primary` 등 토큰을 통해 본문 컴포넌트 색상이 동기화된다.
 
+## Notes — 인라인 SVG 다이어그램
+
+본문에 박힐 차트·다이어그램·플로우 (`figs/figXX.svg`) 의 작성 규칙. `--inline-svgs` 모드로 HTML 에 인라이닝되며 `--monochrome` 모드에서 `palette.py` 가 비-페르소나 색을 navy 단색으로 강등한다 — **처음부터 brand 팔레트로 그리면 매핑이 0건이 되어 의도가 보존된다.**
+
+### 권장 토큰 (SVG 안에서 직접 사용)
+
+| 용도 | hex / 값 |
+|---|---|
+| 박스 stroke · 제목 텍스트 · 코드 텍스트 | `#0F2C59` (primary) |
+| 강조(filled) 박스 fill, 도구명 pill fill | `#0F2C59` (primary) |
+| 강조(filled) 박스 안 텍스트 | `#FFFFFF` (on-primary) |
+| 본문 텍스트 (박스 안 일반 한 줄) | `#0F0F10` (text) |
+| 캡션·메타·화살표 stroke | `#6B6B72` (text-secondary) |
+| 그룹/컨테이너 tinted 배경 | `rgba(15,44,89,0.06)` ~ `0.08` (primary-soft) |
+| SVG 자체 배경 | `#FAFAF9` (bg) |
+
+### 컴포넌트 룰
+
+- **박스**: `stroke` `#0F2C59`, `stroke-width` `1.5`, `rx` `6`, `fill` `#FFFFFF` 기본 — 강조 시 `fill` `#0F2C59` (inverse, 텍스트 흰색) — 그룹 시 `fill` `rgba(15,44,89,0.06)` (soft tinted).
+- **화살표**: `stroke` `#6B6B72`, `stroke-width` `1.5`, `marker` 8x8 (refX=6.5, navy fill).
+- **타이포 단계**: 13 sans bold (제목) / 11 sans (본문) / 11 mono (코드) / 10 sans `#6B6B72` (캡션).
+- **라벨 오버랩 회피**: 화살표 위 라벨은 `<rect fill="#FAFAF9">` 로 배경 깔아 가독성 확보.
+
+### Do's
+
+- **brand 팔레트 직접 사용** — monochrome 매핑 0건이 되도록.
+- **inverse navy 박스로 결과/최종/강조 한 곳** 표시 — 한 다이어그램 안 1\~2개 한정.
+- **soft tinted bg** 로 그룹/컨테이너 표현 — 좌측 액센트 보더 대신.
+- **eyebrow 라벨** (`fill="#6B6B72"`, sans 11 bold, uppercase) 로 그룹/단계 구분.
+
+### Don'ts
+
+- **❌ Material 다색 팔레트** (`#fff8e1`, `#e3f2fd`, `#1565c0` …) — 인라이닝 후 `palette.py` 가 매핑하지만 의도 무시되고 시각도 단조로워짐. 처음부터 brand 토큰만 사용.
+- **❌ 박스 좌측 4px 액센트 stripe** — 본문 헌장의 "둥근 모서리 + 좌측 컬러 보더 (callout 외)" 트로프 위반. SVG 도 동일 적용. 시각 위계는 inverse navy 박스 한 곳으로 충분.
+- **❌ 박스 폭 초과 텍스트** — 인라이닝 시 `<svg>` 의 width/height 가 제거되고 컨테이너 폭에 맞춰 재배율되지만, viewBox 안 텍스트가 박스 모서리를 넘으면 그대로 잘려 보임. monospace 11px 기준 한 글자 약 6.6px 로 미리 계산.
+- **❌ 한글 italic** (본문 헌장과 동일).
+- **❌ 사람·아이콘·일러스트** (본문 헌장과 동일) — 다이어그램은 박스 + 텍스트 + 화살표 한정.
+
 ## Notes — AI slop 트로프 의도적 비회피
 
 흔히 "AI 가 만든 디자인" 시그니처로 지목되는 트로프 중 본 디자인 시스템이 **의도적으로 채택** 한 것들. 페르소나-독립적 결정이라 brand.yaml 갈아끼움으로 영향받지 않는다.

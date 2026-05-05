@@ -156,6 +156,13 @@ h1, h2, h3, h4, h5, h6 {
  *  · References 는 새 페이지 시작 강제 유지 (.report-appendix.s-refs 의 !important 가 우위).
  * ============================================================================ */
 .continuous-mode .section-divider { display: none !important; }
+/* `.show-divider` (단일 섹션 모드 등) — continuous-mode 의 display:none 을 무효화하고
+ * 디바이더를 풀-페이지 hero 로 다시 보여준다. break-before:auto 로 빈 첫 페이지도 방지. */
+.continuous-mode.show-divider .section-divider {
+  display: flex !important;
+  break-before: auto !important;
+  page-break-before: auto !important;
+}
 .continuous-mode .report-toc,
 .continuous-mode .report-section,
 .continuous-mode .report-section.s0,
@@ -443,10 +450,19 @@ h1, h2, h3, h4, h5, h6 {
 .report-section > * + h4 { margin-top: 7mm; }
 
 /* 주요 파트 divider — 전용 @page 규칙으로 A4 풀블리드
- * (@page section-divider 의 margin:0 이 헤더/푸터/가장자리 여백을 모두 제거) */
+ * (@page section-divider 의 margin:0 이 헤더/푸터/가장자리 여백을 모두 제거).
+ *
+ * Full-bleed 전략 — negative margins 로 부모 .report (padding: 18mm 16mm 22mm 16mm)
+ * 와 body (padding: 36px 0 ≈ 9.5mm) 를 빠져나가 페이지 모서리까지 채운다.
+ *
+ *  - 좌우: `.report` 의 16mm 패딩만 escape (body 의 좌우 패딩은 0)
+ *  - 상하: 디바이더가 .report 의 첫 자식일 때만 body padding-top + .report padding-top 이 누적되며,
+ *    페이지 break 직후의 일반 자리에서는 .report padding 이 없다. 양쪽 케이스를 모두 만족시키려고
+ *    수직 negative margin 도 항상 적용한다 — 음수 좌표가 page 영역 위로 나가더라도
+ *    `@page section-divider { margin: 0 }` 가 풀-블리드로 잡아주므로 시각 결과는 동일. */
 .section-divider {
   page: section-divider;
-  margin: 0;
+  margin: -28mm -16mm -32mm -16mm;
   padding: 38mm 28mm;
   background-color: #0A0A0A;
   background-image: var(--gradient-section);
@@ -761,7 +777,78 @@ ol.nums li::before {
 .cmp-table tbody tr:last-child td { border-bottom: none; }
 .cmp-table tbody tr:nth-child(even) td { background: var(--surface-hover); }
 
-/* ===== CODE BLOCK ===== */
+/* ===== CODE BLOCK =====
+ * 두 진입점: (1) markdown fenced ```...``` → <pre><code>  (2) 직접 작성한 .codeblock 박스.
+ *
+ * 디자인 — 상단 액센트 stripe + 미세한 blue ring border + 우상단 언어 라벨 + 내부 highlight.
+ * break-inside: auto + orphans/widows 로 긴 코드는 페이지 분할 허용 (1\~2줄짜리 추한 분할은 방지). */
+pre {
+  margin: 14px 0;
+  padding: 36px 22px 18px;  /* 상단 padding 36px = 26px 바 + 10px 여백 */
+  background: linear-gradient(170deg, #0A0C12 0%, #131722 100%);
+  color: #E8EAED;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', 'D2 Coding', monospace;
+  font-size: 9.5pt;
+  line-height: 1.65;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  break-inside: auto;
+  orphans: 3;
+  widows: 3;
+  white-space: pre-wrap;
+}
+/* 상단 IDE 스타일 바 — 좌측 traffic-light 닷 3개 + 본문보다 살짝 밝은 배경, 통짜 검은 박스 인상 완화. */
+pre::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 26px;
+  background:
+    radial-gradient(circle at 14px 13px, #FF5F57 3.5px, transparent 4px),
+    radial-gradient(circle at 30px 13px, #FEBC2E 3.5px, transparent 4px),
+    radial-gradient(circle at 46px 13px, #28C840 3.5px, transparent 4px),
+    linear-gradient(180deg, #1C2030 0%, #161A26 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+/* 우상단 언어 라벨 — 상단 바 안에 사뿐히 — :has() 로 자식 code 의 language-* 클래스 매핑 */
+pre::after {
+  content: "</>";
+  position: absolute;
+  right: 14px; top: 7px;
+  font-size: 7.5pt;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.32);
+  font-family: 'JetBrains Mono', 'D2 Coding', monospace;
+}
+pre:has(code.language-python)::after     { content: "PYTHON"; color: rgba(96, 165, 250, 0.55); }
+pre:has(code.language-bash)::after       { content: "BASH";   color: rgba(167, 167, 175, 0.55); }
+pre:has(code.language-shell)::after      { content: "SHELL";  color: rgba(167, 167, 175, 0.55); }
+pre:has(code.language-text)::after       { content: "·";      color: rgba(167, 167, 175, 0.30); }
+pre:has(code.language-yaml)::after       { content: "YAML";   color: rgba(167, 167, 175, 0.55); }
+pre:has(code.language-json)::after       { content: "JSON";   color: rgba(167, 167, 175, 0.55); }
+pre:has(code.language-typescript)::after { content: "TS";     color: rgba(96, 165, 250, 0.55); }
+pre:has(code.language-javascript)::after { content: "JS";     color: rgba(251, 191, 36, 0.55); }
+pre:has(code.language-css)::after        { content: "CSS";    color: rgba(96, 165, 250, 0.55); }
+pre:has(code.language-html)::after       { content: "HTML";   color: rgba(251, 113, 133, 0.55); }
+pre:has(code.language-markdown)::after   { content: "MD";     color: rgba(167, 167, 175, 0.55); }
+/* <pre> 내부 <code> 는 인라인 code 룰(line 533) 의 background/padding 을 모두 unset */
+pre code {
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  font-family: inherit !important;
+  display: block;
+  white-space: inherit;
+}
 .codeblock {
   margin: 8px 0;
   padding: 16px 20px;
@@ -1197,8 +1284,11 @@ ol.nums li::before {
   }
   .section-divider {
     margin: 0;
-    width: 210mm;
-    min-height: 297mm;
+    width: 100%;          /* @media print 의 body/.report 가 padding 0 + max-width:none 이라 100% = 페이지 폭 */
+    /* 세로 풀-블리드 — Chrome 인쇄 엔진은 height:297mm 만으론 페이지 끝까지 안 채우므로
+     * vh + min-height 이중 강제 (vh 는 print 시 page height 매핑). */
+    height: 100vh;
+    min-height: 100vh;
     padding: 38mm 28mm;
     border-radius: 0;
     box-sizing: border-box;

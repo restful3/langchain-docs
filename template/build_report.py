@@ -192,9 +192,12 @@ SHELL_TIER1 = """<!DOCTYPE html>
     .references li a {{ word-break: break-all; }}
     .report-section h3 {{ margin-top: 14pt; }}
     .report-section h4 {{ margin-top: 10pt; font-weight: 800; }}
-    .report-appendix ol.references {{ padding-left: 0 !important; }}
-    .report-appendix ol.references li {{ padding-left: 0 !important; }}
-    .report-appendix ol.references li::before {{ content: none !important; }}
+    .report-appendix ol.references,
+    .s-refs ol.references {{ padding-left: 0 !important; }}
+    .report-appendix ol.references li,
+    .s-refs ol.references li {{ padding-left: 0 !important; }}
+    .report-appendix ol.references li::before,
+    .s-refs ol.references li::before {{ content: none !important; }}
   </style>
 </head>
 <body>
@@ -235,6 +238,51 @@ def _filter_section_files(section_files: list[Path], sections_arg: str | None) -
         if m and m.group(1) in wanted:
             out.append(p)
     return out
+
+
+# ---------- SVG inlining (--inline-svgs) ----------
+
+_IMG_TAG_RE = re.compile(
+    r'<img\s+[^>]*src="(?P<path>(?:figs|images|img)/[^"]+\.svg)"[^>]*/?>',
+)
+
+
+def inline_svgs_in_html(html: str, src_dir: Path, monochrome: bool) -> tuple[str, int, int]:
+    """`<img src="figs/foo.svg">` 등 외부 SVG 참조를 인라인 `<svg>...</svg>` 로 치환.
+
+    이점: (1) Syncthing/심볼릭 링크 환경에서도 정상 작동, (2) normalize_palette 가
+    SVG 색상까지 처리 가능 (monochrome 효과), (3) self-contained HTML.
+
+    src_dir: 콘텐츠 폴더 루트 (img src 의 상대 경로가 여기 기준으로 풀림).
+    monochrome: True 면 인라이닝 시점에 SVG 색상도 단색 강등.
+    반환: (new_html, inlined_count, color_replacement_count).
+    """
+    inlined = 0
+    color_count = 0
+
+    def repl(m: re.Match) -> str:
+        nonlocal inlined, color_count
+        rel_path = m.group("path")
+        svg_path = src_dir / rel_path
+        if not svg_path.exists():
+            return m.group(0)
+        text = svg_path.read_text(encoding="utf-8")
+        # XML 선언 제거 (인라인 시 불필요)
+        text = re.sub(r"<\?xml[^?]*\?>\s*", "", text)
+        # SVG width/height 속성 제거 + style 추가 — viewBox 비율 유지하며 컨테이너 폭 가득
+        text = re.sub(r'\s(width|height)="[^"]*"', "", text, count=2)
+        text = text.replace(
+            "<svg ",
+            '<svg style="width:100%;height:auto;display:block;margin:0.6rem auto;" ',
+            1,
+        )
+        if monochrome:
+            text, n = normalize_palette(text, mode="monochrome")
+            color_count += n
+        inlined += 1
+        return text
+
+    return _IMG_TAG_RE.sub(repl, html), inlined, color_count
 
 
 def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path | None]:
@@ -313,6 +361,11 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
         if part_tag == "부록":
             wrapped = wrap_section(html, number=num, title_override="부록",
                                    kicker_prefix="Appendix", keep_first_h2=True)
+        elif part_title:
+            # 섹션 디바이더가 풀-페이지 hero 로 part_title 을 이미 표시하므로,
+            # 본문에 같은 제목을 h2 로 또 박지 않는다 — kicker 만 prepend.
+            wrapped = wrap_section(html, number=num, title_override=part_title,
+                                   kicker_prefix="Section", keep_first_h2=True)
         else:
             wrapped = wrap_section(html, number=num, kicker_prefix="Section")
         body_chunks.append(wrapped)
@@ -321,8 +374,21 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
     if refs and not args.no_references:
         body_chunks.append(build_references_appendix(refs))
 
+    # 6b) SVG 인라이닝 (--inline-svgs) — 외부 figs/*.svg 참조를 본문 HTML 안으로.
+    if args.inline_svgs:
+        full_body = "\n".join(body_chunks)
+        full_body, n_svg, n_svg_color = inline_svgs_in_html(
+            full_body, src, monochrome=args.monochrome
+        )
+        body_chunks = [full_body]
+        print(f"  🖌️  SVG 인라이닝: {n_svg} 개 (단색 치환 {n_svg_color} 건)")
+
     # 7) 출력 — 사용자 콘텐츠의 비-페르소나 색상을 한 번 더 정규화.
-    article_class = "report continuous-mode" if args.continuous else "report"
+    article_class = "report"
+    if args.continuous:
+        article_class += " continuous-mode"
+    if args.show_divider:
+        article_class += " show-divider"
     full_html = SHELL_TIER1.format(
         doc_title=doc["doc_title"],
         article_class=article_class,
@@ -556,9 +622,22 @@ def main() -> None:
     ap.add_argument("--no-references", action="store_true", help="References 부록 스킵")
     ap.add_argument("--continuous", action="store_true",
                     help="섹션 디바이더 풀-페이지 풀기 + 자연 흐름 (build_local.py 의 hack 정식화)")
+    ap.add_argument("--show-divider", action="store_true",
+                    help="continuous-mode 에서도 섹션 디바이더를 풀-페이지 hero 로 표시 (단일 섹션 빌드용)")
+    ap.add_argument("--single-section", action="store_true",
+                    help="단일 섹션 빌드 — --no-cover --no-toc --continuous --show-divider 를 한 번에 적용")
+    ap.add_argument("--inline-svgs", action="store_true",
+                    help="외부 figs/*.svg 참조를 인라인 <svg> 로 치환 — Syncthing 환경 안전 + monochrome SVG 처리")
     ap.add_argument("--per-section", action="store_true",
                     help="섹션 별 개별 PDF 도 함께 생성")
     args = ap.parse_args()
+
+    # --single-section 메타 플래그: 단일 섹션 빌드 컨벤션을 한 번에 적용.
+    if args.single_section:
+        args.no_cover = True
+        args.no_toc = True
+        args.continuous = True
+        args.show_divider = True
 
     src = args.src.resolve()
     if not src.is_dir():
