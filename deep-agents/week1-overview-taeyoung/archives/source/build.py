@@ -5,14 +5,18 @@ template/build_report.py 가 다음 플래그를 기본 지원:
   --inline-svgs      : 외부 figs/*.svg 참조를 인라인 <svg> 로 치환 (Syncthing 안전)
   --monochrome       : SVG/배경 색상을 brand 단색 + 명도 단계로 강등
 
+폴더 레이아웃:
+  archives/source/  → .md, build.py, sections.yaml, figs/ (입력 일체)
+  content/          → textbook.pdf, slides.pdf (산출물)
+
 산출:
-    content/01_textbook.html
-    content/01_textbook.pdf
+    content/textbook.html
+    content/textbook.pdf
 
 사용:
-    python content/build.py             # HTML + PDF
-    python content/build.py --html-only # PDF 스킵
-    python content/build.py --no-monochrome  # 원본 다색 SVG 유지
+    python archives/source/build.py             # HTML + PDF
+    python archives/source/build.py --html-only # PDF 스킵
+    python archives/source/build.py --no-monochrome  # 원본 다색 SVG 유지
 """
 from __future__ import annotations
 
@@ -21,8 +25,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent       # .../week1-overview-taeyoung/content/
-PROJECT_ROOT = HERE.parents[2]               # .../langchain-docs/
+HERE = Path(__file__).resolve().parent           # .../week1-overview-taeyoung/archives/source/
+WEEK_ROOT = HERE.parents[1]                      # .../week1-overview-taeyoung/
+OUT_DIR = WEEK_ROOT / "content"                  # .../week1-overview-taeyoung/content/
+PROJECT_ROOT = HERE.parents[3]                   # .../langchain-docs/  (template/ 의 부모)
 
 
 def main() -> None:
@@ -34,14 +40,16 @@ def main() -> None:
     )
     args = ap.parse_args()
 
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
     cmd = [
         sys.executable, "-m", "template", "build", "report", str(HERE),
         "--single-section",
         "--inline-svgs",
         "--tier", "1",
         "--sections", "01",
-        "--out", str(HERE),
-        "--name", "01_textbook",
+        "--out", str(OUT_DIR),
+        "--name", "textbook",
         "--doc-title", "Deep Agents 첫 걸음 — Overview",
     ]
     if not args.no_monochrome:

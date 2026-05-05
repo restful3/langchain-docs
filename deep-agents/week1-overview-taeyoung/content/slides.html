@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko" class="theme-light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Agents 첫 걸음</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script>Chart.defaults.animation = false;</script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <link rel="stylesheet" href="../../../template/theme_slides.css">
+  <style id="brand-vars">:root{
+  --running-header-left: "AI Odyssey · Independent Research";
+  --running-header-right: "AI ODYSSEY";
+  --slide-section-monogram: "AIO";
+}</style>
+</head>
+<body>
+  <a href="#main-content" class="skip-to-content" style="position:absolute;left:-9999px;">Skip to content</a>
+  <div class="viz-menu">
+    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <div class="viz-menu-dropdown" id="vizMenuDropdown">
+      <button onclick="cycleTheme()"><span id="themeIcon">☀️</span><span id="themeLabel">Light</span></button>
+      <button onclick="downloadImage()"><span>📥</span><span>Download PNG</span></button>
+      <button onclick="window.print()"><span>🖨️</span><span>Print / PDF</span></button>
+    </div>
+  </div>
+  <div class="deck-progress"><div class="deck-progress__fill" id="progressFill"></div></div>
+  <main id="main-content" role="main">
+    <div class="deck">
+      <div class="stage">
+        <div class="slides" id="slidesContainer">
+<section class="slide slide--cover" aria-label="Cover">
+  <div class="cover-wordmark">
+    <span class="cover-wordmark__name">AI Odyssey</span>
+    <span class="cover-wordmark__sub">Deep Research</span>
+  </div>
+  <div class="cover-signature">YouTube · @AI_odysseys</div>
+  <div class="cover-hero">
+    <div class="cover-kicker animate-in">Research Deck</div>
+    <h1 class="animate-in delay-1">Deep Agents 첫 걸음</h1>
+    <p class="cover-subtitle animate-in delay-2">4주짜리 스터디의 공통 지도 한 장 — Overview · Quickstart · Customization</p>
+  </div>
+  <div class="cover-meta">
+    <div><strong>발표자</strong>송태영</div>
+    <div><strong>채널</strong>AI Odyssey</div>
+    <div><strong>일시</strong>2026년 5월 5일</div>
+  </div>
+</section>
+<section class="slide" aria-label="Vanilla 에이전트가 깨지는 세 지점">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">Vanilla 에이전트가 깨지는 세 지점</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">「LLM 한 번 + 도구 몇 개 + while 루프」 — 짧은 작업엔 충분하지만 단계가 많아지면 무너진다</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>깨지는 지점</th>
+<th>무엇이 일어나는가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>컨텍스트 오버플로</td>
+<td>검색 결과·문서·이력이 누적돼 컨텍스트 윈도우를 잡아먹는다</td>
+</tr>
+<tr>
+<td>계획의 부재</td>
+<td>모델이 &quot;다음 단계&quot; 를 매 턴 즉흥으로 결정 — 길을 잃는다</td>
+</tr>
+<tr>
+<td>위임 불가</td>
+<td>한 모델이 모든 컨텍스트를 들고 있어 무거운 하위 작업이 메인을 오염시킨다</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>5단계까지는 견디지만 50단계에서는 무너진다 — 외부화·명시화·격리할 자리가 없기 때문.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>01</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="같은 입력, 두 흐름">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">같은 입력, 두 흐름</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">Vanilla vs Deep Agent — 미들웨어 한 켜가 만드는 차이</p>
+  <div class="slide-body">
+<p><img src="figs/fig01_vanilla_vs_deep_agent.svg" alt="Vanilla vs Deep Agent" /></p>
+<blockquote>
+<p>미들웨어 체인이 매 turn (1) 계획 갱신, (2) 컨텍스트 오프로드, (3) 위임을 자동으로 끼워 넣는다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>02</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="폐쇄 시스템 셋이 같은 답을 발견">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">폐쇄 시스템 셋이 같은 답을 발견</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">Claude Code · OpenAI Deep Research · Manus — 출시 주체도 구현도 다른데 같은 패턴</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>시스템</th>
+<th>핵심 메커니즘</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Code (Anthropic)</td>
+<td>파일시스템 · 서브에이전트 · 컴팩션 — <em>&quot;give your agents a computer&quot;</em></td>
+</tr>
+<tr>
+<td>OpenAI Deep Research</td>
+<td>5단계: Clarify → Decompose → Search → Read → Synthesis. 한 작업당 검색 30~60회</td>
+</tr>
+<tr>
+<td>Manus</td>
+<td>CodeAct (Python 스크립트) + <code>todo.md</code> + 격리된 서브에이전트</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>셋 모두 <strong>계획 파일 + 가상 파일시스템 + 서브에이전트</strong> 라는 같은 세 축으로 수렴.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>03</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="네 축으로의 수렴">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">네 축으로의 수렴</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">Planning · Filesystem · Subagents · Detailed Prompt — 라이브러리화의 청사진</p>
+  <div class="slide-body">
+<p><img src="figs/fig02_three_systems_common_pattern.svg" alt="세 시스템의 공통 분모" /></p>
+<blockquote>
+<p>Harrison Chase 의 정리 — <em>&quot;Deep agents are agents that perform planning, use sub agents, have access to a file system, and have a detailed prompt.&quot;</em></p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>04</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="deepagents 의 스택 위치">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">deepagents 의 스택 위치</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">LangGraph 그대로 깔고 그 위에 미들웨어 한 켜 — 새 프레임워크가 아니다</p>
+  <div class="slide-body">
+<p><img src="figs/fig03_stack_position.svg" alt="deepagents 스택 위치" /></p>
+<blockquote>
+<p><code>create_deep_agent()</code> 의 반환은 LangGraph <code>CompiledStateGraph</code> — 기존 LangSmith · Platform · 체크포인터 · Store 가 그대로 재활용된다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>05</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="비서의 4가지 — 할 일·노트·인턴·일기장">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Capabilities</div>
+  </div>
+  <h1 class="slide-title animate-in">비서의 4가지 — 할 일·노트·인턴·일기장</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">잘 갖춰진 비서에게 4종의 도구를 쥐여 준다</p>
+  <div class="slide-body">
+<p><img src="figs/fig04_four_capabilities_metaphor.svg" alt="4대 능력 비유" /></p>
+<blockquote>
+<p>각 능력은 독립된 미들웨어 — 켜고 끄거나 다른 패턴으로 갈아 끼울 수 있다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>06</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="Planning — `write_todos` 의 no-op 트릭">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Planning</div>
+  </div>
+  <h1 class="slide-title animate-in">Planning — `write_todos` 의 no-op 트릭</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">모델이 자기 계획을 파일로 적어놓고 그 파일을 보며 일한다</p>
+  <div class="slide-body">
+<pre><code class="language-text">- [x] 1. langgraph 의 핵심 추상 4가지 정의
+- [x] 2. 각 추상이 LangChain 과 어떻게 다른지 정리
+- [ ] 3. 코드 예제로 StateGraph + Send 패턴 시연
+- [ ] 4. 보고서 초안 작성
+</code></pre>
+<ul class="bullets">
+<li><strong>호출 효과</strong> — state <code>todos</code> 슬롯에 텍스트만 박힘. 시스템 어디에도 물리적 변화 없음</li>
+<li><strong>다음 turn</strong> — 그 <code>todos</code> 가 시스템 프롬프트에 자동 재합성</li>
+<li><strong>결과</strong> — 매 turn 자기 계획을 다시 마주 보는 모델</li>
+</ul>
+<blockquote>
+<p>도구 자체는 <strong>no-op</strong> — 다음 turn 시스템 프롬프트에 todo 가 다시 들어가 모델이 계획을 잊지 않게 하는 컨텍스트 엔지니어링 트릭.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>07</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="Filesystem — 같은 도구, 다른 저장소">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Filesystem</div>
+  </div>
+  <h1 class="slide-title animate-in">Filesystem — 같은 도구, 다른 저장소</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">큰 검색 결과·중간 산출물을 모델 컨텍스트에서 빼서 가상 파일시스템에 적어둔다</p>
+  <div class="slide-body">
+<p><img src="figs/fig05_filesystem_backend_routing.svg" alt="Filesystem Backend 라우팅" /></p>
+<blockquote>
+<p>도구 4종 — <code>ls</code> · <code>read_file</code> · <code>write_file</code> · <code>edit_file</code>. <code>/memories/</code> prefix 는 Store 로, 나머지는 State 로 라우팅 — 모델 입장에선 추상이 일관된다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>08</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="Subagents — `task` 한 줄로 컨텍스트 격리">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Subagents</div>
+  </div>
+  <h1 class="slide-title animate-in">Subagents — `task` 한 줄로 컨텍스트 격리</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">무거운 하위 작업은 격리된 서브에이전트에 위임 — 메인 컨텍스트가 깨끗해진다</p>
+  <div class="slide-body">
+<p><img src="figs/fig06_subagent_isolation.svg" alt="Subagent 컨텍스트 격리" /></p>
+<blockquote>
+<p>격리되는 것은 둘 — (1) <strong>컨텍스트</strong> (서브에이전트 자체 메시지 히스토리), (2) <strong>권한</strong> (서브에이전트별 도구 풀).</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>09</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="장기 메모리 — Store 라우팅">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Memory</div>
+  </div>
+  <h1 class="slide-title animate-in">장기 메모리 — Store 라우팅</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">대화/스레드를 넘어 살아남는 기억은 LangGraph Store 가 맡는다</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>계층</th>
+<th>수명</th>
+<th>deepagents 매핑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Checkpointer</td>
+<td>한 thread (한 대화)</td>
+<td>단기 메모리</td>
+</tr>
+<tr>
+<td>Store</td>
+<td>모든 thread 가 공유</td>
+<td><strong>장기 메모리</strong></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">backend = CompositeBackend(prefix=&quot;/memories/&quot;, store=..., state=...)
+</code></pre>
+<blockquote>
+<p>모델은 같은 도구 (<code>write_file</code> · <code>read_file</code>) 로 단기·장기 메모리를 다룬다 — 차이는 <strong>경로뿐</strong>.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>10</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="Quickstart 핵심 5줄">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§3 · Quickstart</div>
+  </div>
+  <h1 class="slide-title animate-in">Quickstart 핵심 5줄</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">코어는 정말로 다섯 줄 — 빌트인 도구 9종이 자동으로 매달린다</p>
+  <div class="slide-body">
+<pre><code class="language-python">from langchain.chat_models import init_chat_model
+from deepagents import create_deep_agent
+from tavily import TavilyClient
+tavily = TavilyClient(api_key=os.environ[&quot;TAVILY_API_KEY&quot;])
+
+def internet_search(query: str, max_results: int = 5) -&gt; dict:
+    &quot;&quot;&quot;Run a web search&quot;&quot;&quot;
+    return tavily.search(query, max_results=max_results)
+
+agent = create_deep_agent(
+    model=init_chat_model(&quot;openai:gpt-4o-mini&quot;),
+    tools=[internet_search],
+    system_prompt=&quot;You are an expert researcher.&quot;,
+)
+</code></pre>
+<blockquote>
+<p>반환은 LangGraph <code>CompiledStateGraph</code> — <code>.invoke</code> / <code>.stream</code> / <code>.ainvoke</code> 모두 동작. 빌트인 9종 자동 매달림: <code>write_todos</code> · <code>ls</code> · <code>read_file</code> · <code>write_file</code> · <code>edit_file</code> · <code>glob</code> · <code>grep</code> · <code>task</code> · <code>execute</code> (sandbox 백엔드 필요).</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>11</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="`agent.invoke()` 백그라운드 5단계">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§3 · Invoke</div>
+  </div>
+  <h1 class="slide-title animate-in">`agent.invoke()` 백그라운드 5단계</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">한 줄 호출 뒤에서 일어나는 일 — todo → tool → file → task → synth</p>
+  <div class="slide-body">
+<p><img src="figs/fig07_invoke_five_phases.svg" alt="invoke 5단계 플로우" /></p>
+<blockquote>
+<p>다섯 단계가 한 turn 안에 모두 일어나는 것이 아니라, <strong>여러 turn 에 걸쳐</strong> 미들웨어 체인이 매번 같은 순서로 돈다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>12</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="미들웨어 체인 7층 — 모델은 모른다">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§3 · Middleware</div>
+  </div>
+  <h1 class="slide-title animate-in">미들웨어 체인 7층 — 모델은 모른다</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">모델은 도구가 거기 있다고 인식할 뿐, 미들웨어 자체는 보이지 않는다</p>
+  <div class="slide-body">
+<ol class="nums">
+<li><strong>TodoListMiddleware</strong> — 계획 갱신</li>
+<li><strong>SkillsMiddleware</strong> — <code>skills=</code> 인자가 있을 때</li>
+<li><strong>FilesystemMiddleware</strong> — 오프로드 / 로드</li>
+<li><strong>SubAgentMiddleware</strong> — 선언형 서브에이전트</li>
+<li><strong>SummarizationMiddleware</strong> — 필요 시 컨텍스트 압축</li>
+<li><strong>PatchToolCallsMiddleware</strong></li>
+<li><strong>AsyncSubAgentMiddleware</strong> — async 서브에이전트</li>
+</ol>
+<blockquote>
+<p>이 투명성이 deepagents 가 LangGraph 의 &quot;직접 짠 워크플로&quot; 와 다른 결정적 지점.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>13</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="Core Config 세 다이얼 + Features 셋">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§4 · Blueprint</div>
+  </div>
+  <h1 class="slide-title animate-in">Core Config 세 다이얼 + Features 셋</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">17개 파라미터 중 첫 90%는 model · system_prompt · tools 만 만진다</p>
+  <div class="slide-body">
+<p><img src="figs/fig08_blueprint_dials.svg" alt="create_deep_agent 청사진" /></p>
+<blockquote>
+<p>Features (<code>backend</code> · <code>subagents</code> · <code>interrupt_on</code>) 는 켜고 끄는 옵션 — 이 글에선 이름만 알아두고 디테일은 별도.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>14</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="Model 바꾸기 — 문자열 vs 객체">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§4 · Model</div>
+  </div>
+  <h1 class="slide-title animate-in">Model 바꾸기 — 문자열 vs 객체</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">길 1 은 빠르게, 길 2 는 정밀하게</p>
+  <div class="slide-body">
+<pre><code class="language-python"># 길 1 — provider:model 문자열 (디폴트 경로)
+model = init_chat_model(&quot;openai:gpt-4o-mini&quot;)
+agent = create_deep_agent(model=model)
+</code></pre>
+<pre><code class="language-python"># 길 2 — LangChain 객체 (Ollama / Bedrock / temperature 같은 디테일)
+model = init_chat_model(
+    model=&quot;llama3.1&quot;,
+    model_provider=&quot;ollama&quot;,
+    temperature=0,
+)
+agent = create_deep_agent(model=model)
+</code></pre>
+<blockquote>
+<p><code>OPENAI_BASE_URL</code> 만 갈아 끼우면 OpenAI · 사내 프록시 · Bedrock 호환 프록시 모두에서 동일 코드가 작동.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>15</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="시스템 프롬프트 3단 합성">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§4 · Prompt</div>
+  </div>
+  <h1 class="slide-title animate-in">시스템 프롬프트 3단 합성</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">사용자 한 장은 BASE 를 교체하지 않는다 — 그 앞 (USER 자리) 에 prepend 된다</p>
+  <div class="slide-body">
+<p><img src="figs/fig09_system_prompt_layers.svg" alt="시스템 프롬프트 3단 합성" /></p>
+<blockquote>
+<p><code>USER → BASE(또는 CUSTOM) → SUFFIX</code>. Understand → Act → Verify 워크플로와 모델별 SUFFIX 가 사용자 커스텀에 의해 지워지지 않는 이유.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>16</span> / 17</span>
+  </div>
+</section>
+<section class="slide" aria-label="결정 표 — `create_agent` / LangGraph / `create_deep_agent`">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§5 · When</div>
+  </div>
+  <h1 class="slide-title animate-in">결정 표 — `create_agent` / LangGraph / `create_deep_agent`</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">&quot;단계 5+ · 컨텍스트 윈도우 절반+ · 위임 가능&quot; 셋이 동시에 참이면 deep agent</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>상황</th>
+<th>추천</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>짧은 Q&amp;A, 단일 도구 호출</td>
+<td><code>create_agent</code></td>
+<td>미들웨어 오버헤드 없이 가볍게</td>
+</tr>
+<tr>
+<td>복잡한 다단계 + 큰 컨텍스트 + 위임</td>
+<td><code>create_deep_agent</code></td>
+<td>4대 능력 자동 ON, BASE 프롬프트 검증됨</td>
+</tr>
+<tr>
+<td>흐름 결정적이고 노드 통제 필요</td>
+<td>LangGraph workflow</td>
+<td>StateGraph 로 명시 모델링</td>
+</tr>
+<tr>
+<td>짧은 작업 + 도구 정책 까다로움</td>
+<td><code>create_agent</code> + 미들웨어 직접 조립</td>
+<td><code>create_deep_agent</code> 의 부분집합</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>셋 중 하나만 참이면 다른 길을 검토 — deep agent 는 만능이 아니다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>17</span> / 17</span>
+  </div>
+</section>
+<section class="slide slide--closing" aria-label="감사합니다">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">Thank you</div>
+  </div>
+  <div class="slide-body" style="justify-content:flex-start;">
+    <div class="cover-kicker animate-in">Q&A</div>
+    <h1 class="animate-in delay-1">감사합니다</h1>
+    <p class="closing-sub animate-in delay-2">지도 한 장, 같이 들고 갑니다</p>
+<div class="closing-contact">
+  <div>
+    <strong>발표자</strong>
+    <span>송태영 · Deep Agents 첫 걸음</span>
+  </div>
+  <div>
+    <strong>다룬 주제</strong>
+    <span>Why · 4대 능력 · Quickstart<br/>청사진 · 결정</span>
+  </div>
+  <div>
+    <strong>자료</strong>
+    <span>scripts/01\~04 · figs/01\~09<br/>99_references.md</span>
+  </div>
+</div>
+
+  </div>
+</section>
+        </div>
+      </div>
+    </div>
+    <nav class="slide-nav" aria-label="Slide navigation">
+      <button onclick="prevSlide()" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="slide-counter"><span id="slideCur">1</span> / <span id="slideTotal">19</span></span>
+      <button onclick="nextSlide()" aria-label="Next slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </nav>
+  </main>
+  <script src="../../../template/deck.js"></script>
+</body>
+</html>
