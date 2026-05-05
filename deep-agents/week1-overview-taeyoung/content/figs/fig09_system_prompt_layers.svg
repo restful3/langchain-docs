@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 380" width="620" height="380">
+  <rect x="0" y="0" width="620" height="380" fill="#FAFAF9"/>
+
+  <!-- 박스 좌우 마진 50/50 (canvas 620, USER 메시지/SUFFIX/최종 box 520w) -->
+
+  <!-- 1. USER 메시지 -->
+  <rect x="50" y="30" width="520" height="50" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="310" y="52" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">USER 메시지</text>
+  <text x="310" y="68" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">매 turn 입력</text>
+
+  <!-- USER → 분기 fork -->
+  <path d="M 310 80 L 310 95" stroke="#6B6B72" stroke-width="1.5" fill="none"/>
+  <path d="M 310 95 L 185 113" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 310 95 L 435 113" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- 2a. 기본 (BASE_AGENT_PROMPT) -->
+  <rect x="50" y="115" width="250" height="90" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="175" y="138" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">기본 (사용자 미지정)</text>
+  <text x="175" y="158" text-anchor="middle" font-family="monospace" font-size="11" fill="#0F2C59">BASE_AGENT_PROMPT</text>
+  <text x="175" y="178" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">Claude Code 영감 · ~42줄</text>
+  <text x="175" y="194" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">Understand → Act → Verify</text>
+
+  <!-- 2b. 커스텀 (system_prompt) -->
+  <rect x="320" y="115" width="250" height="90" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="445" y="138" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">커스텀 (사용자 지정)</text>
+  <text x="445" y="158" text-anchor="middle" font-family="monospace" font-size="11" fill="#0F2C59">system_prompt=...</text>
+  <text x="445" y="178" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">도메인 한 장으로 BASE 교체</text>
+  <text x="445" y="194" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">SUFFIX 는 그대로 유지</text>
+
+  <!-- OR 라벨 -->
+  <text x="310" y="163" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#6B6B72">OR</text>
+
+  <!-- 분기 → SUFFIX -->
+  <path d="M 175 205 L 260 235" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 445 205 L 360 235" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- 3. SUFFIX -->
+  <rect x="50" y="240" width="520" height="80" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="310" y="262" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">SUFFIX (모델별 자동 부착)</text>
+  <text x="310" y="284" text-anchor="middle" font-family="monospace" font-size="10" fill="#0F2C59">&lt;use_parallel_tool_calls&gt; · &lt;investigate_before_answering&gt; · &lt;tool_result_reflection&gt;</text>
+  <text x="310" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">Sonnet 4.6 기준 — 모델 식별자에 따라 자동 분기</text>
+
+  <!-- SUFFIX → 최종 -->
+  <path d="M 310 320 L 310 335" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- 4. 최종 (inverse) -->
+  <rect x="50" y="338" width="520" height="36" rx="6" fill="#0F2C59"/>
+  <text x="310" y="361" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF">최종 시스템 프롬프트 → 모델로 전송</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6.5" refY="2.5" orient="auto">
+      <path d="M 0 0 L 6.5 2.5 L 0 5 z" fill="#6B6B72"/>
+    </marker>
+  </defs>
+</svg>
