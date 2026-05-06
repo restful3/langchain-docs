@@ -58,19 +58,19 @@
 
 ## 🔗 주차별 GitHub 번역 문서 매핑 테이블
 
-| 주차 | 발제자 | 핵심 주제 | 참고해야 할 마크다운 문서 |
-| :--- | :--- | :--- | :--- |
-| **1주차** | **태영** | Overview, Quickstart, Customization, Models | `01-overview_ko.md`<br>`02-quickstart_ko.md`<br>`03-customization_ko.md` |
-| **1주차** | **종훈S** | Context engineering, Memory, Skills | `04-harness_ko.md`<br>`08-long-term-memory_ko.md` |
-| **1주차** | **종훈L** | Backends, Sandboxes, Permissions | `05-backends_ko.md` |
-| **2주차** | **종훈S** | Quickstart 및 CLI 기본 구동 실습 | `02-quickstart_ko.md`<br>`10-cli_ko.md` |
-| **2주차** | **재익** | Memory와 Skills 적용 실습 | `04-harness_ko.md`<br>`08-long-term-memory_ko.md` |
-| **2주차** | **태영** | 샌드박스와 권한(Permissions) 제어 실습 | `05-backends_ko.md` |
-| **3주차** | **보현** | Subagents, Async subagents, HITL | `06-subagents_ko.md`<br>`07-human-in-the-loop_ko.md` |
-| **3주차** | **수경** | 배포(Deploy), Production, Streaming | `10-cli_ko.md` (Deploy 파트)<br>`09-middleware_ko.md` |
-| **3주차** | **세훈** | Protocols (MCP, A2A, ACP), Frontend | `09-middleware_ko.md`<br>`10-cli_ko.md` (MCP 파트) |
-| **4주차** | **11번?** | Subagent 위임과 HITL (승인) 시스템 실습 | `06-subagents_ko.md`<br>`07-human-in-the-loop_ko.md` |
-| **4주차** | **9번?** | MCP 연결 및 CLI 배포 실습 | `10-cli_ko.md` |
+| 주차 | 구분 | 발제자 | 핵심 주제 | 참고해야 할 마크다운 문서 |
+| :--- | :--- | :--- | :--- | :--- |
+| **1주차** | 이론 | **태영** | Overview, Quickstart, Customization, Models | `01-overview_ko.md`<br>`02-quickstart_ko.md`<br>`03-customization_ko.md` |
+| **1주차** | 이론 | **종훈S** | Context engineering, Memory, Skills | `04-harness_ko.md`<br>`08-long-term-memory_ko.md` |
+| **1주차** | 이론 | **종훈L** | Backends, Sandboxes, Permissions | `05-backends_ko.md` |
+| **2주차** | 실습 | **종훈S** | Quickstart 및 CLI 기본 구동 실습 | `02-quickstart_ko.md`<br>`10-cli_ko.md` |
+| **2주차** | 실습 | **재익** | Memory와 Skills 적용 실습 | `04-harness_ko.md`<br>`08-long-term-memory_ko.md` |
+| **2주차** | 실습 | **태영** | 샌드박스와 권한(Permissions) 제어 실습 | `05-backends_ko.md` |
+| **3주차** | 이론 | **보현** | Subagents, Async subagents, HITL | `06-subagents_ko.md`<br>`07-human-in-the-loop_ko.md` |
+| **3주차** | 이론 | **수경** | 배포(Deploy), Production, Streaming | `10-cli_ko.md` (Deploy 파트)<br>`09-middleware_ko.md` |
+| **3주차** | 이론 | **세훈** | Protocols (MCP, A2A, ACP), Frontend | `09-middleware_ko.md`<br>`10-cli_ko.md` (MCP 파트) |
+| **4주차** | 실습 | **11번?** | Subagent 위임과 HITL (승인) 시스템 실습 | `06-subagents_ko.md`<br>`07-human-in-the-loop_ko.md` |
+| **4주차** | 실습 | **9번?** | MCP 연결 및 CLI 배포 실습 | `10-cli_ko.md` |
 
 
 

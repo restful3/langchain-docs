@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" width="720" height="320">
+  <rect x="0" y="0" width="720" height="320" fill="#FAFAF9"/>
+
+  <!-- 그룹 헤더 -->
+  <text x="120" y="35" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">CORE CONFIG · 필수</text>
+  <text x="600" y="35" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">FEATURES · 선택</text>
+
+  <!-- ============ 좌측 Core Config 그룹 ============ -->
+  <!-- model -->
+  <rect x="40" y="55" width="160" height="60" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="60" y="78" font-family="monospace" font-size="12" font-weight="bold" fill="#0F2C59">model</text>
+  <text x="60" y="98" font-family="sans-serif" font-size="10" fill="#6B6B72">claude-sonnet-4-6 (기본)</text>
+
+  <!-- system_prompt -->
+  <rect x="40" y="125" width="160" height="60" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="60" y="148" font-family="monospace" font-size="12" font-weight="bold" fill="#0F2C59">system_prompt</text>
+  <text x="60" y="168" font-family="sans-serif" font-size="10" fill="#6B6B72">BASE 위에 합성</text>
+
+  <!-- tools -->
+  <rect x="40" y="195" width="160" height="60" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="60" y="218" font-family="monospace" font-size="12" font-weight="bold" fill="#0F2C59">tools</text>
+  <text x="60" y="238" font-family="sans-serif" font-size="10" fill="#6B6B72">빌트인 9 + 사용자</text>
+
+  <!-- 좌측 → 가운데 화살표 -->
+  <path d="M 200 85 L 285 158" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)" opacity="0.6"/>
+  <path d="M 200 155 L 285 162" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)" opacity="0.6"/>
+  <path d="M 200 225 L 285 165" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)" opacity="0.6"/>
+
+  <!-- ============ 가운데: create_deep_agent (inverse, 강조) ============ -->
+  <rect x="290" y="115" width="140" height="90" rx="8" fill="#0F2C59"/>
+  <text x="360" y="148" text-anchor="middle" font-family="monospace" font-size="13" font-weight="bold" fill="#FFFFFF">create_deep_agent</text>
+  <text x="360" y="170" text-anchor="middle" font-family="sans-serif" font-size="11" fill="rgba(255,255,255,0.85)">17 파라미터</text>
+  <text x="360" y="188" text-anchor="middle" font-family="sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">→ CompiledStateGraph</text>
+
+  <!-- 가운데 → 우측 화살표 -->
+  <path d="M 435 158 L 520 85" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)" opacity="0.6"/>
+  <path d="M 435 162 L 520 155" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)" opacity="0.6"/>
+  <path d="M 435 165 L 520 225" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)" opacity="0.6"/>
+
+  <!-- ============ 우측 Features 그룹 ============ -->
+  <!-- backend -->
+  <rect x="520" y="55" width="160" height="60" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="540" y="78" font-family="monospace" font-size="12" font-weight="bold" fill="#0F2C59">backend</text>
+  <text x="540" y="98" font-family="sans-serif" font-size="10" fill="#6B6B72">State / Store / Composite</text>
+
+  <!-- subagents -->
+  <rect x="520" y="125" width="160" height="60" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="540" y="148" font-family="monospace" font-size="12" font-weight="bold" fill="#0F2C59">subagents</text>
+  <text x="540" y="168" font-family="sans-serif" font-size="10" fill="#6B6B72">위임 대상 정의</text>
+
+  <!-- interrupt_on -->
+  <rect x="520" y="195" width="160" height="60" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="540" y="218" font-family="monospace" font-size="12" font-weight="bold" fill="#0F2C59">interrupt_on</text>
+  <text x="540" y="238" font-family="sans-serif" font-size="10" fill="#6B6B72">HITL 트리거</text>
+
+  <!-- 하단 캡션 -->
+  <text x="360" y="290" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">왼쪽 3개를 합성하여 LangGraph 체인을 빌드 · 오른쪽 3개로 행동을 확장</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6.5" refY="2.5" orient="auto">
+      <path d="M 0 0 L 6.5 2.5 L 0 5 z" fill="#6B6B72"/>
+    </marker>
+  </defs>
+</svg>

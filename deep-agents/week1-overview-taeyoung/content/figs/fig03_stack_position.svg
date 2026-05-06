@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 360" width="740" height="360">
+  <rect x="0" y="0" width="740" height="360" fill="#FAFAF9"/>
+
+  <!-- 그룹 헤더 -->
+  <text x="280" y="22" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">RUNTIME STACK</text>
+  <text x="640" y="22" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">CROSS-CUTTING</text>
+
+  <!-- ============ 좌측 4층 스택 ============ -->
+  <!-- 1. 사용자 코드 -->
+  <rect x="20" y="35" width="540" height="60" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="35" y="58" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">사용자 코드</text>
+  <text x="158" y="58" font-family="sans-serif" font-size="11" fill="#6B6B72">research_instructions, tools, ...</text>
+  <text x="35" y="80" font-family="monospace" font-size="11" fill="#0F2C59">create_deep_agent(model=, tools=, system_prompt=)</text>
+
+  <!-- 2. deepagents (강조) -->
+  <rect x="20" y="105" width="540" height="90" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="35" y="128" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">deepagents</text>
+  <text x="125" y="128" font-family="sans-serif" font-size="10" fill="#6B6B72">— 본 라이브러리</text>
+  <text x="35" y="150" font-family="sans-serif" font-size="11" fill="#0F2C59">TodoListMiddleware · FilesystemMiddleware · SubagentMiddleware</text>
+  <text x="35" y="168" font-family="sans-serif" font-size="11" fill="#0F2C59">BASE_AGENT_PROMPT (Claude Code 영감)</text>
+  <text x="35" y="186" font-family="monospace" font-size="11" fill="#0F2C59">create_deep_agent() → CompiledStateGraph</text>
+
+  <!-- 3. LangChain -->
+  <rect x="20" y="205" width="540" height="60" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="35" y="228" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">LangChain</text>
+  <text x="121" y="228" font-family="sans-serif" font-size="10" fill="#6B6B72">— 모델/도구 인터페이스</text>
+  <text x="35" y="250" font-family="sans-serif" font-size="11" fill="#0F2C59">ChatModel · Runnable · 도구 호출 표준</text>
+
+  <!-- 4. LangGraph -->
+  <rect x="20" y="275" width="540" height="60" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="35" y="298" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">LangGraph</text>
+  <text x="121" y="298" font-family="sans-serif" font-size="10" fill="#6B6B72">— 실행 그래프 런타임</text>
+  <text x="35" y="320" font-family="sans-serif" font-size="11" fill="#0F2C59">StateGraph · 체크포인터 · Store</text>
+
+  <!-- ============ 우측: LangSmith ============ -->
+  <rect x="580" y="35" width="140" height="300" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="650" y="65" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">LangSmith</text>
+  <text x="650" y="83" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">관측·평가·배포</text>
+
+  <!-- 분리선 -->
+  <line x1="600" y1="100" x2="700" y2="100" stroke="#0F2C59" stroke-width="0.8" opacity="0.4"/>
+
+  <text x="650" y="130" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#0F2C59">관측성 (trace)</text>
+  <text x="650" y="150" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#0F2C59">평가 (eval)</text>
+  <text x="650" y="170" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#0F2C59">데이터셋</text>
+
+  <line x1="600" y1="190" x2="700" y2="190" stroke="#0F2C59" stroke-width="0.8" opacity="0.4"/>
+
+  <text x="650" y="215" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#0F2C59">LangGraph</text>
+  <text x="650" y="232" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#0F2C59">Platform</text>
+  <text x="650" y="252" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">(서빙 · HITL)</text>
+
+  <line x1="600" y1="275" x2="700" y2="275" stroke="#0F2C59" stroke-width="0.8" opacity="0.4"/>
+
+  <text x="650" y="298" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">스택 전체를</text>
+  <text x="650" y="313" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">횡단 관통</text>
+
+  <!-- 좌측 → 우측 화살표 (스택 전체 → LangSmith) -->
+  <path d="M 560 65 L 580 80" stroke="#6B6B72" stroke-width="1" fill="none" opacity="0.5" marker-end="url(#arrow)"/>
+  <path d="M 560 150 L 580 165" stroke="#6B6B72" stroke-width="1" fill="none" opacity="0.5" marker-end="url(#arrow)"/>
+  <path d="M 560 235 L 580 220" stroke="#6B6B72" stroke-width="1" fill="none" opacity="0.5" marker-end="url(#arrow)"/>
+  <path d="M 560 305 L 580 280" stroke="#6B6B72" stroke-width="1" fill="none" opacity="0.5" marker-end="url(#arrow)"/>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6.5" refY="2.5" orient="auto">
+      <path d="M 0 0 L 6.5 2.5 L 0 5 z" fill="#6B6B72"/>
+    </marker>
+  </defs>
+</svg>

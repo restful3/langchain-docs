@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360">
+  <rect x="0" y="0" width="720" height="360" fill="#FAFAF9"/>
+
+  <!-- 섹션 헤더 -->
+  <text x="180" y="35" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">VANILLA AGENT</text>
+  <text x="540" y="35" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">DEEP AGENT</text>
+
+  <!-- 가운데 분리선 -->
+  <line x1="360" y1="20" x2="360" y2="345" stroke="#6B6B72" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+
+  <!-- ============ 좌측: Vanilla Agent ============ -->
+  <!-- User Query -->
+  <rect x="120" y="55" width="120" height="40" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="180" y="80" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">User Query</text>
+
+  <path d="M 180 95 L 180 122" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- LLM ↔ Tool 한 행 -->
+  <rect x="80" y="125" width="90" height="50" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="125" y="155" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">LLM</text>
+
+  <rect x="190" y="125" width="100" height="50" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="240" y="155" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">Tool</text>
+
+  <path d="M 170 150 L 190 150" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)" marker-start="url(#arrowBack)"/>
+
+  <path d="M 180 175 L 180 202" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Response (inverse) -->
+  <rect x="120" y="205" width="120" height="40" rx="6" fill="#0F2C59"/>
+  <text x="180" y="230" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF">Response</text>
+
+  <!-- Vanilla 한계 캡션 -->
+  <rect x="80" y="270" width="210" height="62" rx="6" fill="rgba(15,44,89,0.06)" stroke="#6B6B72" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <text x="185" y="289" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#6B6B72">한계</text>
+  <text x="185" y="306" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">계획 없음 · 컨텍스트 없음</text>
+  <text x="185" y="320" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">위임 없음 · 메모리 없음</text>
+
+  <!-- ============ 우측: Deep Agent ============ -->
+  <!-- User Query -->
+  <rect x="480" y="55" width="120" height="40" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="540" y="80" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">User Query</text>
+
+  <path d="M 540 95 L 540 117" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- 미들웨어 체인 (강조 박스) -->
+  <rect x="400" y="120" width="280" height="68" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="540" y="141" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">미들웨어 체인 (LangGraph)</text>
+  <text x="540" y="160" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#0F2C59">TodoList · Filesystem · Subagent · Summarization</text>
+  <text x="540" y="177" text-anchor="middle" font-family="monospace" font-size="10" fill="#0F2C59">+ BASE_AGENT_PROMPT</text>
+
+  <path d="M 540 188 L 540 210" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- LLM ↔ 9 빌트인 도구 (대칭 폭 130/130) -->
+  <rect x="400" y="213" width="130" height="56" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="465" y="246" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">LLM</text>
+
+  <rect x="550" y="213" width="130" height="56" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="615" y="234" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0F2C59">9 빌트인 도구</text>
+  <text x="615" y="252" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">+ 사용자 도구</text>
+
+  <path d="M 530 241 L 550 241" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)" marker-start="url(#arrowBack)"/>
+
+  <path d="M 540 269 L 540 291" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Response (inverse) -->
+  <rect x="480" y="294" width="120" height="40" rx="6" fill="#0F2C59"/>
+  <text x="540" y="319" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF">Response</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6.5" refY="2.5" orient="auto">
+      <path d="M 0 0 L 6.5 2.5 L 0 5 z" fill="#6B6B72"/>
+    </marker>
+    <marker id="arrowBack" markerWidth="8" markerHeight="8" refX="1.5" refY="2.5" orient="auto">
+      <path d="M 6.5 0 L 0 2.5 L 6.5 5 z" fill="#6B6B72"/>
+    </marker>
+  </defs>
+</svg>

@@ -2,7 +2,7 @@
 title: Deep Agents 첫 걸음
 subtitle: Overview · Quickstart · Customization — 1주차 발제
 author: 송태영
-version: v1 · 2026-05-05
+version: v2 · 2026-05-05
 date: 2026년 5월 5일
 ---
 
@@ -92,13 +92,15 @@ date: 2026년 5월 5일
 > 도구 자체는 **no-op** — 다음 turn 시스템 프롬프트에 todo 가 다시 들어가 모델이 계획을 잊지 않게 하는 컨텍스트 엔지니어링 트릭.
 
 <!-- slide: tag="§2 · Filesystem" -->
-# Filesystem — 같은 도구, 다른 저장소
+# Filesystem — 같은 도구
 
-> 큰 검색 결과·중간 산출물을 모델 컨텍스트에서 빼서 가상 파일시스템에 적어둔다
+> 모델은 도구만 알고, Backend 가 저장소를 결정
 
 ![Filesystem Backend 라우팅](figs/fig05_filesystem_backend_routing.svg)
 
-> 도구 4종 — `ls` · `read_file` · `write_file` · `edit_file`. `/memories/` prefix 는 Store 로, 나머지는 State 로 라우팅 — 모델 입장에선 추상이 일관된다.
+- `StateBackend` — 한 thread (디폴트, 임시)
+- `StoreBackend` — 모든 thread (영속, 장기 메모리)
+- `CompositeBackend` — prefix 라우팅 (`/memories/` → Store)
 
 <!-- slide: tag="§2 · Subagents" -->
 # Subagents — `task` 한 줄로 컨텍스트 격리
@@ -107,23 +109,34 @@ date: 2026년 5월 5일
 
 ![Subagent 컨텍스트 격리](figs/fig06_subagent_isolation.svg)
 
-> 격리되는 것은 둘 — (1) **컨텍스트** (서브에이전트 자체 메시지 히스토리), (2) **권한** (서브에이전트별 도구 풀).
+- **컨텍스트 격리** — 서브에이전트 자체 메시지 히스토리. 30회 검색의 turn 기록이 메인에 안 들어옴
+- **권한 격리** — `permissions=` 로 서브에이전트별 도구 풀. 메인은 셸 못 만지고 코딩 서브에이전트만 `execute` 권한 가지게 만들 수 있음
+
+> 위임 결정이 잘못돼도 셸 명령이 메인 컨텍스트로 돌아오지 않는다 — 보안·감사 측면의 분리.
 
 <!-- slide: tag="§2 · Memory" -->
-# 장기 메모리 — Store 라우팅
+# 장기 메모리 — thread 를 넘어 살아남는 파일
 
-> 대화/스레드를 넘어 살아남는 기억은 LangGraph Store 가 맡는다
-
-| 계층 | 수명 | deepagents 매핑 |
-|---|---|---|
-| Checkpointer | 한 thread (한 대화) | 단기 메모리 |
-| Store | 모든 thread 가 공유 | **장기 메모리** |
+> Checkpointer 는 한 thread, Store 는 모든 thread — `/memories/` prefix 가 후자로 라우팅
 
 ```python
-backend = CompositeBackend(prefix="/memories/", store=..., state=...)
+# Thread 1 — /memories/user.txt 에 사용자 이름 저장
+config_1 = {"configurable": {"thread_id": "thread-1"}}
+agent.invoke(
+    {"messages": [("user", "Save my name 'Alice' to /memories/user.txt")]},
+    config_1,
+)
+
+# Thread 2 — 다른 thread 인데도 같은 파일이 보인다
+config_2 = {"configurable": {"thread_id": "thread-2"}}
+agent.invoke(
+    {"messages": [("user", "What is my name?")]},
+    config_2,
+)
+# → 'Alice' 회신 (StateBackend 만이었으면 빈 파일시스템)
 ```
 
-> 모델은 같은 도구 (`write_file` · `read_file`) 로 단기·장기 메모리를 다룬다 — 차이는 **경로뿐**.
+> 두 호출의 `thread_id` 가 다른데도 두 번째가 첫 번째의 `/memories/user.txt` 를 읽는다 — `CompositeBackend` 가 그 prefix 만 Store 로 라우팅하기 때문.
 
 <!-- slide: tag="§3 · Quickstart" -->
 # Quickstart 핵심 5줄
@@ -156,7 +169,14 @@ agent = create_deep_agent(
 
 ![invoke 5단계 플로우](figs/fig07_invoke_five_phases.svg)
 
-> 다섯 단계가 한 turn 안에 모두 일어나는 것이 아니라, **여러 turn 에 걸쳐** 미들웨어 체인이 매번 같은 순서로 돈다.
+```text
+result["messages"][-1].content  # (1페이지 리포트)
+result["files"]                 # ['research/langgraph_overview.md',
+                                #  'research/langchain_overview.md', ...]
+result["todos"]                 # [{'content': '...', 'status': 'completed'}, ...]
+```
+
+> 세 슬롯이 모두 채워진 모습이 4대 능력 발동의 흔적 — `files`(FilesystemMiddleware), `todos`(TodoListMiddleware), `messages`(최종 응답).
 
 <!-- slide: tag="§3 · Middleware" -->
 # 미들웨어 체인 7층 — 모델은 모른다
@@ -174,13 +194,15 @@ agent = create_deep_agent(
 > 이 투명성이 deepagents 가 LangGraph 의 "직접 짠 워크플로" 와 다른 결정적 지점.
 
 <!-- slide: tag="§4 · Blueprint" -->
-# Core Config 세 다이얼 + Features 셋
+# 청사진 — Core + Features
 
-> 17개 파라미터 중 첫 90%는 model · system_prompt · tools 만 만진다
+> 17개 파라미터를 세 묶음으로 — 첫 90%는 Core 셋만
 
 ![create_deep_agent 청사진](figs/fig08_blueprint_dials.svg)
 
-> Features (`backend` · `subagents` · `interrupt_on`) 는 켜고 끄는 옵션 — 이 글에선 이름만 알아두고 디테일은 별도.
+- **Core** (3) — `model`, `system_prompt`, `tools` (가장 자주)
+- **Features** (5) — `backend`, `subagents`, `interrupt_on`, … (영속·위임)
+- **Advanced** (9) — `middleware`, `skills`, `response_format`, … (정밀 제어)
 
 <!-- slide: tag="§4 · Model" -->
 # Model 바꾸기 — 문자열 vs 객체
@@ -212,7 +234,9 @@ agent = create_deep_agent(model=model)
 
 ![시스템 프롬프트 3단 합성](figs/fig09_system_prompt_layers.svg)
 
-> `USER → BASE(또는 CUSTOM) → SUFFIX`. Understand → Act → Verify 워크플로와 모델별 SUFFIX 가 사용자 커스텀에 의해 지워지지 않는 이유.
+> **BASE 의 핵심 지침**: *"NEVER add unnecessary preamble"* · **Understand → Act → Verify** 3단 워크플로
+
+> `USER → BASE(또는 CUSTOM) → SUFFIX`. 사용자 한 장은 USER 자리에 prepend — BASE 와 모델별 SUFFIX 가 살아남는다.
 
 <!-- slide: tag="§5 · When" -->
 # 결정 표 — `create_agent` / LangGraph / `create_deep_agent`

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 320" width="740" height="320">
+  <rect x="0" y="0" width="740" height="320" fill="#FAFAF9"/>
+
+  <!-- 상단 라벨 -->
+  <text x="370" y="22" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">3 시스템 (출처)</text>
+
+  <!-- 상단: 3 시스템 -->
+  <rect x="30" y="35" width="200" height="100" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="130" y="60" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">Claude Code</text>
+  <text x="130" y="80" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">Anthropic · 코드 어시스턴트</text>
+  <text x="130" y="105" text-anchor="middle" font-family="sans-serif" font-size="11" font-style="italic" fill="#0F2C59">"give your agents</text>
+  <text x="130" y="121" text-anchor="middle" font-family="sans-serif" font-size="11" font-style="italic" fill="#0F2C59">a computer"</text>
+
+  <rect x="270" y="35" width="200" height="100" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="370" y="60" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">Deep Research</text>
+  <text x="370" y="80" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">OpenAI · 자율 리서치</text>
+  <text x="370" y="105" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#0F2C59">Clarify → Decompose</text>
+  <text x="370" y="121" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#0F2C59">→ Search → Read → Synthesize</text>
+
+  <rect x="510" y="35" width="200" height="100" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="610" y="60" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0F2C59">Manus</text>
+  <text x="610" y="80" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">CodeAct · 멀티에이전트</text>
+  <text x="610" y="105" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#0F2C59">Analyze → Plan → Execute</text>
+  <text x="610" y="121" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#0F2C59">→ Observe (todo.md)</text>
+
+  <!-- 화살표 → 공통 분모 -->
+  <path d="M 130 137 L 130 168" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 370 137 L 370 168" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 610 137 L 610 168" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- 가운데 라벨 (변환 표시) -->
+  <text x="370" y="195" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0F2C59">공통 분모 → deepagents 4대 능력</text>
+
+  <!-- 하단: 4대 능력 (canvas 740 에서 4박스×160w + 3갭×20 = 700, 좌우 마진 20/20) -->
+  <rect x="20" y="210" width="160" height="90" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="100" y="234" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">Planning</text>
+  <text x="100" y="254" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">계획 수립</text>
+  <text x="100" y="278" text-anchor="middle" font-family="monospace" font-size="11" fill="#0F2C59">write_todos</text>
+
+  <rect x="200" y="210" width="160" height="90" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="280" y="234" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">Filesystem</text>
+  <text x="280" y="254" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">노트 · 가상 FS</text>
+  <text x="280" y="278" text-anchor="middle" font-family="monospace" font-size="10" fill="#0F2C59">ls / read / write / edit</text>
+
+  <rect x="380" y="210" width="160" height="90" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="460" y="234" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">Subagents</text>
+  <text x="460" y="254" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">위임 · 격리</text>
+  <text x="460" y="278" text-anchor="middle" font-family="monospace" font-size="11" fill="#0F2C59">task</text>
+
+  <rect x="560" y="210" width="160" height="90" rx="6" fill="rgba(15,44,89,0.06)" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="640" y="234" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0F2C59">Detailed prompt</text>
+  <text x="640" y="254" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">상세 시스템 프롬프트</text>
+  <text x="640" y="278" text-anchor="middle" font-family="monospace" font-size="10" fill="#0F2C59">BASE_AGENT_PROMPT</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6.5" refY="2.5" orient="auto">
+      <path d="M 0 0 L 6.5 2.5 L 0 5 z" fill="#6B6B72"/>
+    </marker>
+  </defs>
+</svg>
