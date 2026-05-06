@@ -1677,4 +1677,7 @@ code {
   .slide--section {
     box-shadow: 8px 0 0 0 #0A0A0A, -8px 0 0 0 #0A0A0A, inset 0 0 0 2px #0A0A0A !important;
   }
+  /* PDF 합성 레이어 아티팩트 방지: box-shadow + overflow:hidden + 의사요소/그라데이션 헤더
+   * 조합이 카드/표 뒤에 어두운 띠를 남기는 현상을 차단한다 (theme_report.css 와 동일 패턴). */
+  .cmp-table, .codeblock { box-shadow: none !important; }
 }

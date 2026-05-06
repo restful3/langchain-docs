@@ -1317,6 +1317,9 @@ pre code {
   /* 동그란 번호 배지 뒤에 분홍 사각형이 찍히는 현상도 box-shadow 가 원인 */
   ol.nums li::before,
   .num-flow__step::before { box-shadow: none !important; }
+  /* 코드 블록도 동일 조합(box-shadow + overflow:hidden + ::before gradient bar)으로
+   * PDF 에서 카드 뒤에 색번짐/음영이 남는다. 그림자만 제거하면 충분. */
+  pre, .codeblock { box-shadow: none !important; }
 }
 
 /* =========================================================================

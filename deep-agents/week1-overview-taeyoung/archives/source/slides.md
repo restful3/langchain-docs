@@ -53,7 +53,7 @@ date: 2026년 5월 5일
 
 ![세 시스템의 공통 분모](figs/fig02_three_systems_common_pattern.svg)
 
-> Harrison Chase 의 정리 — *"Deep agents are agents that perform planning, use sub agents, have access to a file system, and have a detailed prompt."*
+> Harrison Chase 의 정리 — *"Deep agent 란 계획(planning)을 수행하고, 서브에이전트(sub agents)를 사용하며, 파일시스템(file system)에 접근할 수 있고, 잘 다듬어진 프롬프트(detailed prompt)를 가진 에이전트다."*
 
 <!-- slide: tag="§1 · Why" -->
 # deepagents 의 스택 위치
@@ -71,7 +71,7 @@ date: 2026년 5월 5일
 
 ![4대 능력 비유](figs/fig04_four_capabilities_metaphor.svg)
 
-> 각 능력은 독립된 미들웨어 — 켜고 끄거나 다른 패턴으로 갈아 끼울 수 있다.
+> 각 능력은 독립된 미들웨어 — 부분 사용·확장이 자연스럽고, `backend=` / `subagents=` / `middleware=` 로 조정한다.
 
 <!-- slide: tag="§2 · Planning" -->
 # Planning — `write_todos` 의 no-op 트릭
@@ -109,10 +109,11 @@ date: 2026년 5월 5일
 
 ![Subagent 컨텍스트 격리](figs/fig06_subagent_isolation.svg)
 
-- **컨텍스트 격리** — 서브에이전트 자체 메시지 히스토리. 30회 검색의 turn 기록이 메인에 안 들어옴
-- **권한 격리** — `permissions=` 로 서브에이전트별 도구 풀. 메인은 셸 못 만지고 코딩 서브에이전트만 `execute` 권한 가지게 만들 수 있음
+- **컨텍스트 격리** — 자체 메시지 히스토리, 30회 검색의 turn 기록이 메인에 안 들어옴
+- **도구 풀 격리** — `tools=` 필드로 메인보다 좁은 도구 풀 (예: 코딩 서브만 `execute`)
+- **경로 규칙 격리** — `permissions=` 로 filesystem 도구의 read/write 경로 분리
 
-> 위임 결정이 잘못돼도 셸 명령이 메인 컨텍스트로 돌아오지 않는다 — 보안·감사 측면의 분리.
+> 위임 결정이 잘못돼도 셸 도구가 메인 컨텍스트로 돌아오지 않는다 — 보안·감사 측면의 분리.
 
 <!-- slide: tag="§2 · Memory" -->
 # 장기 메모리 — thread 를 넘어 살아남는 파일
@@ -234,7 +235,7 @@ agent = create_deep_agent(model=model)
 
 ![시스템 프롬프트 3단 합성](figs/fig09_system_prompt_layers.svg)
 
-> **BASE 의 핵심 지침**: *"NEVER add unnecessary preamble"* · **Understand → Act → Verify** 3단 워크플로
+> **BASE 의 핵심 지침**: *"NEVER add unnecessary preamble"* (불필요한 서두는 절대 붙이지 말 것) · **Understand → Act → Verify** 3단 워크플로
 
 > `USER → BASE(또는 CUSTOM) → SUFFIX`. 사용자 한 장은 USER 자리에 prepend — BASE 와 모델별 SUFFIX 가 살아남는다.
 
@@ -268,6 +269,6 @@ agent = create_deep_agent(model=model)
   </div>
   <div>
     <strong>자료</strong>
-    <span>scripts/01\~04 · figs/01\~09<br/>99_references.md</span>
+    <span>scripts/01~04 · figs/01~09<br/>99_references.md</span>
   </div>
 </div>
