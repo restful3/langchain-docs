@@ -21,7 +21,9 @@
       "Read(//home/restful3/workspace/langchain-docs/langchain/src/part02_fundamentals/**)",
       "Read(//media/restful3/data/workspace/langchain-docs/langchain/src/part02_fundamentals/**)",
       "Read(//home/restful3/workspace/langchain-docs/langchain/**)",
-      "Read(//media/restful3/data/workspace/langchain-docs/langchain/**)"
+      "Read(//media/restful3/data/workspace/langchain-docs/langchain/**)",
+      "Bash(python -m template build slides deep-agents/week1-overview-taeyoung/archives/source/slides.md --out deep-agents/week1-overview-taeyoung/content --monochrome)",
+      "Bash(pdftoppm -r 150 -f 9 -l 9 /media/restful3/data/workspace/langchain-docs/deep-agents/week1-overview-taeyoung/content/slides.pdf /tmp/slide08_v3 -png)"
     ],
     "additionalDirectories": [
       "/home/restful3/workspace/langchain-docs/langchain/reviews/part02_fundamentals",
@@ -31,7 +33,9 @@
       "/home/restful3/workspace/langchain-docs/langchain/reviews",
       "/media/restful3/data/workspace/langchain-docs/langchain/reviews",
       "/home/restful3/workspace/langchain-docs/langchain",
-      "/media/restful3/data/workspace/langchain-docs/langchain"
+      "/media/restful3/data/workspace/langchain-docs/langchain",
+      "/home/restful3/workspace/langchain-docs/deep-agents/week1-overview-taeyoung/scripts",
+      "/media/restful3/data/workspace/langchain-docs/deep-agents/week1-overview-taeyoung/scripts"
     ]
   }
 }

@@ -53,7 +53,7 @@ date: 2026년 5월 5일
 
 ![세 시스템의 공통 분모](figs/fig02_three_systems_common_pattern.svg)
 
-> Harrison Chase 의 정리 — *"Deep agent 란 계획(planning)을 수행하고, 서브에이전트(sub agents)를 사용하며, 파일시스템(file system)에 접근할 수 있고, 잘 다듬어진 프롬프트(detailed prompt)를 가진 에이전트다."*
+> **Harrison Chase 의 정리** — *"Deep agent 란 계획(planning)을 수행하고, 서브에이전트(sub agents)를 사용하며, 파일시스템(file system)에 접근할 수 있고, 잘 다듬어진 프롬프트(detailed prompt)를 가진 에이전트다."*
 
 <!-- slide: tag="§1 · Why" -->
 # deepagents 의 스택 위치
@@ -94,13 +94,19 @@ date: 2026년 5월 5일
 <!-- slide: tag="§2 · Filesystem" -->
 # Filesystem — 같은 도구
 
-> 모델은 도구만 알고, Backend 가 저장소를 결정
+> 한 벌의 파일 도구는 그대로 두고, 경로 prefix 만으로 임시 state 와 영속 Store 가 갈린다 — 모델은 분기를 모른다
+
+<div style="max-width: 60%; margin: 0 auto;">
 
 ![Filesystem Backend 라우팅](figs/fig05_filesystem_backend_routing.svg)
+
+</div>
 
 - `StateBackend` — 한 thread (디폴트, 임시)
 - `StoreBackend` — 모든 thread (영속, 장기 메모리)
 - `CompositeBackend` — prefix 라우팅 (`/memories/` → Store)
+
+> **추상의 분리** — 도구 시그니처는 모델용으로 고정, 저장소 정책은 backend 한 줄로 결정 — Unix mount table 과 같은 발상.
 
 <!-- slide: tag="§2 · Subagents" -->
 # Subagents — `task` 한 줄로 컨텍스트 격리
@@ -168,16 +174,9 @@ agent = create_deep_agent(
 
 > 한 줄 호출 뒤에서 일어나는 일 — todo → tool → file → task → synth
 
-![invoke 5단계 플로우](figs/fig07_invoke_five_phases.svg)
+<img src="figs/fig07_invoke_five_phases.svg" alt="invoke 5단계 플로우" style="width: 100%; max-width: 100%; max-height: 470px;" />
 
-```text
-result["messages"][-1].content  # (1페이지 리포트)
-result["files"]                 # ['research/langgraph_overview.md',
-                                #  'research/langchain_overview.md', ...]
-result["todos"]                 # [{'content': '...', 'status': 'completed'}, ...]
-```
-
-> 세 슬롯이 모두 채워진 모습이 4대 능력 발동의 흔적 — `files`(FilesystemMiddleware), `todos`(TodoListMiddleware), `messages`(최종 응답).
+> 세 슬롯이 모두 채워진 모습이 4대 능력 발동의 흔적 — `result["files"]`(FilesystemMiddleware), `result["todos"]`(TodoListMiddleware), `result["messages"]`(최종 응답).
 
 <!-- slide: tag="§3 · Middleware" -->
 # 미들웨어 체인 7층 — 모델은 모른다
@@ -235,12 +234,10 @@ agent = create_deep_agent(model=model)
 
 ![시스템 프롬프트 3단 합성](figs/fig09_system_prompt_layers.svg)
 
-> **BASE 의 핵심 지침**: *"NEVER add unnecessary preamble"* (불필요한 서두는 절대 붙이지 말 것) · **Understand → Act → Verify** 3단 워크플로
-
-> `USER → BASE(또는 CUSTOM) → SUFFIX`. 사용자 한 장은 USER 자리에 prepend — BASE 와 모델별 SUFFIX 가 살아남는다.
+> **BASE 의 핵심 지침**: *"NEVER add unnecessary preamble"* (불필요한 서두는 절대 붙이지 말 것) · **Understand → Act → Verify** 3단 워크플로 `USER → BASE(또는 CUSTOM) → SUFFIX`. 사용자 한 장은 USER 자리에 prepend — BASE 와 모델별 SUFFIX 가 살아남는다.
 
 <!-- slide: tag="§5 · When" -->
-# 결정 표 — `create_agent` / LangGraph / `create_deep_agent`
+# Deep agent 는 언제? — 세 갈래길의 결정
 
 > "단계 5+ · 컨텍스트 윈도우 절반+ · 위임 가능" 셋이 동시에 참이면 deep agent
 
