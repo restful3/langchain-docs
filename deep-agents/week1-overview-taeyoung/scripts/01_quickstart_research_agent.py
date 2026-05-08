@@ -54,12 +54,12 @@ def internet_search(
     )
 
 
-research_instructions = """You are an expert researcher. Your job is to conduct thorough research and then write a polished report.
-You have access to an internet search tool as your primary means of gathering information.
+research_instructions = """당신은 전문 리서처다. 당신의 임무는 철저한 조사를 수행한 뒤 깔끔한 보고서를 작성하는 것이다.
+주된 정보 수집 수단으로 인터넷 검색 도구를 사용할 수 있다.
 
 ## `internet_search`
 
-Use this to run an internet search for a given query. You can specify the max number of results to return, the topic, and whether raw content should be included.
+주어진 쿼리로 인터넷 검색을 실행할 때 사용한다. 반환할 결과의 최대 개수, 토픽, raw content 포함 여부를 지정할 수 있다.
 """
 
 agent = create_deep_agent(

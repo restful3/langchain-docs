@@ -86,7 +86,7 @@
 </tbody>
 </table>
 <blockquote>
-<p>5단계까지는 견디지만 50단계에서는 무너진다 — 외부화·명시화·격리할 자리가 없기 때문.</p>
+<p>같은 한 원인 — 단일 컨텍스트 슬롯 — 이 셋을 동시에 무너뜨린다. 5단계는 견뎌도 50단계에서는 깨진다.</p>
 </blockquote>
 
   </div>
@@ -207,7 +207,7 @@
   <div class="slide-body">
 <p><img src="figs/fig04_four_capabilities_metaphor.svg" alt="4대 능력 비유" /></p>
 <blockquote>
-<p>각 능력은 독립된 미들웨어 — 부분 사용·확장이 자연스럽고, <code>backend=</code> / <code>subagents=</code> / <code>middleware=</code> 로 조정한다.</p>
+<p>앞 셋은 독립된 미들웨어, 일기장은 <code>FilesystemMiddleware</code> + Store + <code>/memories/</code> 라우팅 — <code>backend=</code> / <code>subagents=</code> / <code>middleware=</code> 로 조정한다.</p>
 </blockquote>
 
   </div>
@@ -340,9 +340,11 @@ agent.invoke(
   <div class="slide-title-rule"></div>
   <p class="slide-subtitle animate-in delay-1">코어는 정말로 다섯 줄 — 빌트인 도구 9종이 자동으로 매달린다</p>
   <div class="slide-body">
-<pre><code class="language-python">from langchain.chat_models import init_chat_model
+<pre><code class="language-python">import os
+from langchain.chat_models import init_chat_model
 from deepagents import create_deep_agent
 from tavily import TavilyClient
+
 tavily = TavilyClient(api_key=os.environ[&quot;TAVILY_API_KEY&quot;])
 
 def internet_search(query: str, max_results: int = 5) -&gt; dict:
@@ -376,7 +378,7 @@ agent = create_deep_agent(
   <div class="slide-body">
 <img src="figs/fig07_invoke_five_phases.svg" alt="invoke 5단계 플로우" style="width: 100%; max-width: 100%; max-height: 470px;" />
 <blockquote>
-<p>세 슬롯이 모두 채워진 모습이 4대 능력 발동의 흔적 — <code>result[&quot;files&quot;]</code>(FilesystemMiddleware), <code>result[&quot;todos&quot;]</code>(TodoListMiddleware), <code>result[&quot;messages&quot;]</code>(최종 응답).</p>
+<p>작업형 질문이면 세 슬롯이 모두 채워진다 — <code>result[&quot;files&quot;]</code>(FilesystemMiddleware), <code>result[&quot;todos&quot;]</code>(TodoListMiddleware), <code>result[&quot;messages&quot;]</code>(최종 응답). 단순 Q&amp;A 에서는 <code>todos</code> 가 비어 있을 수 있다.</p>
 </blockquote>
 
   </div>
@@ -422,10 +424,12 @@ agent = create_deep_agent(
   <div class="slide-title-rule"></div>
   <p class="slide-subtitle animate-in delay-1">17개 파라미터를 세 묶음으로 — 첫 90%는 Core 셋만</p>
   <div class="slide-body">
+<div style="max-width: 48%; margin: 0 auto;">
 <p><img src="figs/fig08_blueprint_dials.svg" alt="create_deep_agent 청사진" /></p>
+</div>
 <ul class="bullets">
 <li><strong>Core</strong> (3) — <code>model</code>, <code>system_prompt</code>, <code>tools</code> (가장 자주)</li>
-<li><strong>Features</strong> (5) — <code>backend</code>, <code>subagents</code>, <code>interrupt_on</code>, … (영속·위임)</li>
+<li><strong>Features</strong> (5) — <code>backend</code>(영속 라우팅) · <code>subagents</code>(위임) · <code>interrupt_on</code>(HITL) · <code>permissions</code>(권한) · <code>memory</code>(AGENTS.md 로딩)</li>
 <li><strong>Advanced</strong> (9) — <code>middleware</code>, <code>skills</code>, <code>response_format</code>, … (정밀 제어)</li>
 </ul>
 
@@ -475,7 +479,9 @@ agent = create_deep_agent(model=model)
   <div class="slide-title-rule"></div>
   <p class="slide-subtitle animate-in delay-1">사용자 한 장은 BASE 를 교체하지 않는다 — 그 앞 (USER 자리) 에 prepend 된다</p>
   <div class="slide-body">
+<div style="max-width: 62%; margin: 0 auto;">
 <p><img src="figs/fig09_system_prompt_layers.svg" alt="시스템 프롬프트 3단 합성" /></p>
+</div>
 <blockquote>
 <p><strong>BASE 의 핵심 지침</strong>: <em>&quot;NEVER add unnecessary preamble&quot;</em> (불필요한 서두는 절대 붙이지 말 것) · <strong>Understand → Act → Verify</strong> 3단 워크플로 <code>USER → BASE(또는 CUSTOM) → SUFFIX</code>. 사용자 한 장은 USER 자리에 prepend — BASE 와 모델별 SUFFIX 가 살아남는다.</p>
 </blockquote>

@@ -13,6 +13,7 @@
 | 교과서 (PDF) | [content/textbook.pdf](content/textbook.pdf) | 18p A4 — 발표 전후 단독 학습용 |
 | 슬라이드 (PDF) | [content/slides.pdf](content/slides.pdf) | 17장 — 발표장 보조 |
 | Walkthrough 노트북 | [scripts/walkthrough.ipynb](scripts/walkthrough.ipynb) | 4개 데모를 한 자리에서 실행 |
+| 단독 실행 스크립트 5종 | [scripts/](scripts/) (`01`\~`05`) | 노트북과 동일 데모를 CLI 한 줄로 — 자세한 셋업·트러블슈팅은 [scripts/README.md](scripts/README.md) |
 
 발표 시각자료는 [content/figs/](content/figs/) 의 SVG 9개 (노트북이 직접 참조).
 
@@ -50,12 +51,17 @@ week1-overview-taeyoung/
 │   ├── slides.pdf              ★ 최종
 │   └── figs/                   SVG 9개 (노트북에서 참조)
 ├── scripts/
-│   ├── walkthrough.ipynb       ★ 최종
+│   ├── walkthrough.ipynb       ★ 최종 (라이브 데모)
+│   ├── 01_quickstart_research_agent.py
+│   ├── 02_model_string_swap.py
+│   ├── 03_model_object_ollama.py
+│   ├── 04_custom_system_prompt.py
+│   ├── 05_persistent_memory.py
+│   ├── README.md               셋업·실행·트러블슈팅
 │   └── requirements.txt
 └── archives/                   중간 산출물·소스
     ├── meta/                   BRAINSTORM · PLAN · STATUS · DESIGN · NEXT_SESSION_PROMPT
     ├── source/                 PDF 빌드 소스 (md/html/build.py/sections.yaml/99_references) + 옛 통합본
-    ├── scripts_py/             노트북에 흡수된 4종 .py 스크립트 + 옛 README
     ├── original_docs/          공식 원문 6개 (Overview/Quickstart/Customization, 한·영)
     └── research/               Phase 2 보강자료 (7건 + INDEX + RAG 합성)
 ```

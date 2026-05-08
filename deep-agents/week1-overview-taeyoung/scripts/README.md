@@ -1,6 +1,6 @@
 # 실행 스크립트 — 1주차 발표
 
-> 교안 [`content/01_textbook.md`](../content/01_textbook.md) 의 코드 블록은 모두 이 폴더의 실제 파일에서 가져온다.
+> 교안 [`archives/source/01_textbook.md`](../archives/source/01_textbook.md) 의 코드 블록은 모두 이 폴더의 실제 파일에서 가져온다.
 
 ---
 
@@ -12,6 +12,7 @@
 | `02_model_string_swap.py` | `init_chat_model("openai:<model>")` 한 줄로 모델 교체 | §4.3 | `OPENAI_API_KEY` |
 | `03_model_object_ollama.py` | LangChain 모델 객체(ChatOllama) 패턴 | §4.3 | (Ollama 로컬) |
 | `04_custom_system_prompt.py` | 커스텀 `system_prompt` 한 장 합성 | §4.4 | `OPENAI_API_KEY` |
+| `05_persistent_memory.py` | `CompositeBackend` 로 cross-thread `/memories/` 영속화 | §2.4 (코드.4) | `OPENAI_API_KEY` |
 
 ---
 
@@ -67,6 +68,9 @@ python scripts/03_model_object_ollama.py
 
 # 커스텀 system_prompt
 python scripts/04_custom_system_prompt.py
+
+# cross-thread 영속 메모리 — /memories/user.txt
+python scripts/05_persistent_memory.py
 ```
 
 > 각 스크립트는 `find_dotenv()` 로 상위 디렉토리의 `.env` 를 찾으므로,
@@ -95,7 +99,7 @@ python scripts/04_custom_system_prompt.py
             create_deep_agent(model=...)
 ```
 
-`02`, `04` 는 `01` 과 동일한 결정 흐름을 따른다. `03` 만 Ollama 로 분기한다.
+`02`, `04`, `05` 는 `01` 과 동일한 결정 흐름을 따른다 (`05` 는 추가로 `InMemoryStore` + `MemorySaver` 를 붙인다). `03` 만 Ollama 로 분기한다.
 
 ---
 

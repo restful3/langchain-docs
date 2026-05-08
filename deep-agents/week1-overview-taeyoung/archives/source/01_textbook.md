@@ -207,13 +207,17 @@ API 레퍼런스는 서브에이전트를 세 형식(`SubAgent` 선언형 / `Com
 **코드.3**: 디폴트 `general-purpose` 와 사용자 정의 서브에이전트 — 도구·모델 격리
 
 ```python
-# 디폴트 — 추가 정의 없이 task 도구가 자동으로 켜진다
+# 디폴트 — SubAgentMiddleware 가 자동 포함되어
+#   (1) 메인에 `task` 도구를 주입하고
+#   (2) "general-purpose" 서브에이전트를 메인과 동일한 도구·모델로 등록한다.
+# 따라서 코드에 general-purpose 가 안 보여도 항상 존재한다.
 agent_default = create_deep_agent(
     model="claude-sonnet-4-6",
     tools=[internet_search],
 )
-# 메인이 task("research-question", ...) 을 호출하면
-# general-purpose 서브에이전트(메인과 동일 도구·동일 모델)가 응답
+# 메인이 task(subagent_type="general-purpose", ...) 을 호출하면
+# 메인과 동일 도구·동일 모델의 격리된 인스턴스가 응답한다.
+# (agent_default 에는 general-purpose 외 후보가 없다.)
 
 # 사용자 정의 — 도메인 격리 + 권한/모델 별도
 research_subagent = {
@@ -227,6 +231,8 @@ agent_custom = create_deep_agent(
     model="claude-sonnet-4-6",
     subagents=[research_subagent],
 )
+# 메인이 task(subagent_type="research-agent", ...) 을 호출하면
+# research_subagent 정의(gpt-4o, internet_search 만)대로 실행된다.
 ```
 
 권한 격리의 실용 시나리오 — 메인은 셸을 못 만지지만 코딩 서브에이전트만 `execute` 도구를 가지게 만들면, 메인이 위임 결정을 잘못해도 셸 명령이 메인 컨텍스트로 돌아오지 않는다. 이 패턴이 곧 Claude Code 의 sub-agents[^2], Manus 의 multi-agent 구조[^4] 의 추상화이며, 보안·감사 측면에서도 의미가 있다.
@@ -293,6 +299,8 @@ response = agent.invoke(
 ```
 
 두 `agent.invoke()` 가 **다른 thread_id** 인데도 두 번째 호출이 첫 번째에서 저장한 파일을 읽는다는 점이 핵심이다. `StateBackend` 만 있으면 두 번째 호출은 빈 파일시스템을 본다 — `CompositeBackend` 가 `/memories/` 만 `StoreBackend` 로 라우팅하기 때문에 그 prefix 의 파일만 thread 를 넘어 살아남는다. 깊이는 「컨텍스트·메모리·스킬」 주제의 별도 글에 미룬다.
+
+(전체 실행 형태는 `scripts/05_persistent_memory.py` 와 sync.)
 
 #### §2.5. 그 외 — `execute` (5번째 빌트인 도구)
 
@@ -385,12 +393,12 @@ extra = {"base_url": OPENAI_BASE_URL} if OPENAI_BASE_URL else {}
 model = init_chat_model(f"openai:{MODEL_NAME}", **extra)
 
 
-research_instructions = """You are an expert researcher. Your job is to conduct thorough research and then write a polished report.
-You have access to an internet search tool as your primary means of gathering information.
+research_instructions = """당신은 전문 리서처다. 당신의 임무는 철저한 조사를 수행한 뒤 깔끔한 보고서를 작성하는 것이다.
+주된 정보 수집 수단으로 인터넷 검색 도구를 사용할 수 있다.
 
 ## `internet_search`
 
-Use this to run an internet search for a given query. You can specify the max number of results to return, the topic, and whether raw content should be included.
+주어진 쿼리로 인터넷 검색을 실행할 때 사용한다. 반환할 결과의 최대 개수, 토픽, raw content 포함 여부를 지정할 수 있다.
 """
 
 agent = create_deep_agent(
@@ -783,7 +791,7 @@ agent = create_deep_agent(
 
 ### 부록 B. 실행 스크립트 안내
 
-**표.8**: `scripts/` 4종 — 교안 매핑
+**표.8**: `scripts/` 5종 — 교안 매핑
 
 | 파일 | 보이는 패턴 | 교안 매핑 |
 |---|---|---|
@@ -791,6 +799,7 @@ agent = create_deep_agent(
 | `scripts/02_model_string_swap.py` | `init_chat_model("openai:<model>")` 한 줄 | §4.3 길 1 |
 | `scripts/03_model_object_ollama.py` | LangChain 모델 객체 (ChatOllama) 패턴 | §4.3 길 2 |
 | `scripts/04_custom_system_prompt.py` | 커스텀 system_prompt 한 장 합성 | §4.4 |
+| `scripts/05_persistent_memory.py` | `CompositeBackend` 로 cross-thread `/memories/` 영속화 | §2.4 (코드.4) |
 
 셋업·실행은 `scripts/README.md` 참조. 환경변수 컨벤션:
 

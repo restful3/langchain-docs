@@ -22,7 +22,7 @@ date: 2026년 5월 5일
 | 계획의 부재 | 모델이 "다음 단계" 를 매 턴 즉흥으로 결정 — 길을 잃는다 |
 | 위임 불가 | 한 모델이 모든 컨텍스트를 들고 있어 무거운 하위 작업이 메인을 오염시킨다 |
 
-> 5단계까지는 견디지만 50단계에서는 무너진다 — 외부화·명시화·격리할 자리가 없기 때문.
+> 같은 한 원인 — 단일 컨텍스트 슬롯 — 이 셋을 동시에 무너뜨린다. 5단계는 견뎌도 50단계에서는 깨진다.
 
 <!-- slide: tag="§1 · Why" -->
 # 같은 입력, 두 흐름
@@ -71,7 +71,7 @@ date: 2026년 5월 5일
 
 ![4대 능력 비유](figs/fig04_four_capabilities_metaphor.svg)
 
-> 각 능력은 독립된 미들웨어 — 부분 사용·확장이 자연스럽고, `backend=` / `subagents=` / `middleware=` 로 조정한다.
+> 앞 셋은 독립된 미들웨어, 일기장은 `FilesystemMiddleware` + Store + `/memories/` 라우팅 — `backend=` / `subagents=` / `middleware=` 로 조정한다.
 
 <!-- slide: tag="§2 · Planning" -->
 # Planning — `write_todos` 의 no-op 트릭
@@ -151,9 +151,11 @@ agent.invoke(
 > 코어는 정말로 다섯 줄 — 빌트인 도구 9종이 자동으로 매달린다
 
 ```python
+import os
 from langchain.chat_models import init_chat_model
 from deepagents import create_deep_agent
 from tavily import TavilyClient
+
 tavily = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
 
 def internet_search(query: str, max_results: int = 5) -> dict:
@@ -176,7 +178,7 @@ agent = create_deep_agent(
 
 <img src="figs/fig07_invoke_five_phases.svg" alt="invoke 5단계 플로우" style="width: 100%; max-width: 100%; max-height: 470px;" />
 
-> 세 슬롯이 모두 채워진 모습이 4대 능력 발동의 흔적 — `result["files"]`(FilesystemMiddleware), `result["todos"]`(TodoListMiddleware), `result["messages"]`(최종 응답).
+> 작업형 질문이면 세 슬롯이 모두 채워진다 — `result["files"]`(FilesystemMiddleware), `result["todos"]`(TodoListMiddleware), `result["messages"]`(최종 응답). 단순 Q&A 에서는 `todos` 가 비어 있을 수 있다.
 
 <!-- slide: tag="§3 · Middleware" -->
 # 미들웨어 체인 7층 — 모델은 모른다
@@ -198,10 +200,14 @@ agent = create_deep_agent(
 
 > 17개 파라미터를 세 묶음으로 — 첫 90%는 Core 셋만
 
+<div style="max-width: 48%; margin: 0 auto;">
+
 ![create_deep_agent 청사진](figs/fig08_blueprint_dials.svg)
 
+</div>
+
 - **Core** (3) — `model`, `system_prompt`, `tools` (가장 자주)
-- **Features** (5) — `backend`, `subagents`, `interrupt_on`, … (영속·위임)
+- **Features** (5) — `backend`(영속 라우팅) · `subagents`(위임) · `interrupt_on`(HITL) · `permissions`(권한) · `memory`(AGENTS.md 로딩)
 - **Advanced** (9) — `middleware`, `skills`, `response_format`, … (정밀 제어)
 
 <!-- slide: tag="§4 · Model" -->
@@ -232,7 +238,11 @@ agent = create_deep_agent(model=model)
 
 > 사용자 한 장은 BASE 를 교체하지 않는다 — 그 앞 (USER 자리) 에 prepend 된다
 
+<div style="max-width: 62%; margin: 0 auto;">
+
 ![시스템 프롬프트 3단 합성](figs/fig09_system_prompt_layers.svg)
+
+</div>
 
 > **BASE 의 핵심 지침**: *"NEVER add unnecessary preamble"* (불필요한 서두는 절대 붙이지 말 것) · **Understand → Act → Verify** 3단 워크플로 `USER → BASE(또는 CUSTOM) → SUFFIX`. 사용자 한 장은 USER 자리에 prepend — BASE 와 모델별 SUFFIX 가 살아남는다.
 
