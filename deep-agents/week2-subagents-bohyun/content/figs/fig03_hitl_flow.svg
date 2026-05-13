@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#f8fafc"/>
+  <g font-family="Arial" text-anchor="middle">
+    <rect x="60" y="160" width="150" height="80" rx="10" fill="#0f766e"/><text x="135" y="208" font-size="22" fill="white">Agent</text>
+    <polygon points="320,130 410,200 320,270 230,200" fill="#f59e0b"/><text x="320" y="194" font-size="20" fill="#111827">Interrupt?</text><text x="320" y="220" font-size="16" fill="#111827">도구별 정책</text>
+    <rect x="500" y="70" width="160" height="80" rx="10" fill="#2563eb"/><text x="580" y="118" font-size="22" fill="white">Execute</text>
+    <rect x="500" y="250" width="160" height="80" rx="10" fill="#7c3aed"/><text x="580" y="298" font-size="22" fill="white">Human</text>
+    <rect x="740" y="250" width="160" height="80" rx="10" fill="#475569"/><text x="820" y="282" font-size="18" fill="white">approve</text><text x="820" y="306" font-size="18" fill="white">edit / reject</text>
+  </g>
+  <g stroke="#334155" stroke-width="4" fill="none" marker-end="url(#a)">
+    <path d="M210 200 H230"/><path d="M410 185 C455 160 470 125 500 110"/><path d="M410 215 C455 235 470 270 500 290"/><path d="M660 290 H740"/><path d="M820 250 C810 190 700 155 660 120"/>
+  </g>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+</svg>

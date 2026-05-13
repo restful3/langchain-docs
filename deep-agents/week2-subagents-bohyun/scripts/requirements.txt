@@ -1,0 +1,7 @@
+# 2주차 Deep Agent 발표 — 실행 스크립트 의존성
+# Python 3.10+ 권장
+deepagents>=0.1.0
+langchain>=0.3.0
+langchain-openai>=0.3.0
+langgraph>=0.2.0
+python-dotenv>=1.0.0

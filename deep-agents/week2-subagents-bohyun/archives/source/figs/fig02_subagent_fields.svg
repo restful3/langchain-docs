@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#f8fafc"/>
+  <text x="480" y="55" text-anchor="middle" font-family="Arial" font-size="30" fill="#0f172a">SubAgent Dictionary</text>
+  <g font-family="Arial" font-size="20">
+    <rect x="90" y="95" width="360" height="70" rx="10" fill="#0f766e"/><text x="120" y="138" fill="white">name: 고유 식별자</text>
+    <rect x="510" y="95" width="360" height="70" rx="10" fill="#0f766e"/><text x="540" y="138" fill="white">description: 라우팅 힌트</text>
+    <rect x="90" y="190" width="360" height="70" rx="10" fill="#2563eb"/><text x="120" y="233" fill="white">system_prompt: 작업 지침</text>
+    <rect x="510" y="190" width="360" height="70" rx="10" fill="#2563eb"/><text x="540" y="233" fill="white">tools: 사용 가능한 도구</text>
+    <rect x="90" y="300" width="220" height="55" rx="10" fill="#64748b"/><text x="120" y="335" fill="white">model</text>
+    <rect x="370" y="300" width="220" height="55" rx="10" fill="#64748b"/><text x="400" y="335" fill="white">middleware</text>
+    <rect x="650" y="300" width="220" height="55" rx="10" fill="#64748b"/><text x="680" y="335" fill="white">interrupt_on</text>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#f8fafc"/>
+  <g font-family="Arial" text-anchor="middle">
+    <rect x="80" y="115" width="230" height="190" rx="14" fill="#16a34a"/><text x="195" y="180" font-size="30" fill="white">approve</text><text x="195" y="230" font-size="18" fill="white">원래 인자로 실행</text>
+    <rect x="365" y="115" width="230" height="190" rx="14" fill="#2563eb"/><text x="480" y="180" font-size="30" fill="white">edit</text><text x="480" y="230" font-size="18" fill="white">인자 수정 후 실행</text>
+    <rect x="650" y="115" width="230" height="190" rx="14" fill="#dc2626"/><text x="765" y="180" font-size="30" fill="white">reject</text><text x="765" y="230" font-size="18" fill="white">도구 호출 건너뜀</text>
+  </g>
+</svg>

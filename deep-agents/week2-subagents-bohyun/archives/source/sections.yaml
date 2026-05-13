@@ -1,0 +1,3 @@
+# 단일 섹션 — 디바이더에 표시될 라벨/제목/부제 매핑.
+sections:
+  "01_textbook.md": ["01", "섹션 01", "Subagents & HITL", "위임과 승인으로 안전한 Deep Agent 만들기"]
