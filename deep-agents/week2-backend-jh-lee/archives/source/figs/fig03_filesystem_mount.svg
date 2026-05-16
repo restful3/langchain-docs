@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360">
+  <rect x="0" y="0" width="720" height="360" fill="#FAFAF9"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6B6B72"/>
+    </marker>
+  </defs>
+
+  <!-- 헤더 -->
+  <text x="360" y="32" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#6B6B72">FILESYSTEMBACKEND — VIRTUAL_MODE PATH NORMALIZATION</text>
+
+  <!-- 좌측: virtual_mode=True -->
+  <text x="180" y="65" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0F2C59">virtual_mode = True</text>
+  <text x="180" y="80" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B6B72">sandbox — root_dir 안으로 정규화</text>
+
+  <!-- 에이전트 시각 -->
+  <rect x="60" y="100" width="240" height="55" rx="6" fill="#0F2C59"/>
+  <text x="180" y="120" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#FFFFFF">에이전트가 보는 경로</text>
+  <text x="180" y="142" text-anchor="middle" font-family="monospace" font-size="13" fill="#FFFFFF">/report.md</text>
+
+  <!-- 화살표 -->
+  <path d="M 180 165 L 180 195" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="195" y="183" text-anchor="start" font-family="monospace" font-size="9" fill="#6B6B72">root_dir prepended</text>
+
+  <!-- 호스트 결과 -->
+  <rect x="40" y="200" width="280" height="65" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="180" y="222" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#6B6B72">호스트 디스크 실제 경로</text>
+  <text x="180" y="244" text-anchor="middle" font-family="monospace" font-size="11" fill="#0F2C59">&lt;root_dir&gt;/report.md</text>
+  <text x="180" y="258" text-anchor="middle" font-family="monospace" font-size="9" fill="#6B6B72">/tmp/sb/report.md (예)</text>
+
+  <!-- 보안 박스 -->
+  <rect x="40" y="280" width="280" height="60" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <text x="55" y="298" text-anchor="start" font-family="sans-serif" font-size="10" font-weight="bold" fill="#6B6B72">보안 특성</text>
+  <text x="55" y="313" text-anchor="start" font-family="sans-serif" font-size="9" fill="#0F2C59">• root_dir 밖 접근 차단</text>
+  <text x="55" y="326" text-anchor="start" font-family="sans-serif" font-size="9" fill="#0F2C59">• symlink traversal 방지</text>
+  <text x="55" y="338" text-anchor="start" font-family="sans-serif" font-size="9" fill="#0F2C59">• ripgrep 사용 가능</text>
+
+  <!-- 중앙 분리선 -->
+  <line x1="360" y1="55" x2="360" y2="350" stroke="#6B6B72" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+
+  <!-- 우측: virtual_mode=False -->
+  <text x="540" y="65" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0F2C59">virtual_mode = False</text>
+  <text x="540" y="80" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B6B72">raw — 호스트 절대경로 그대로</text>
+
+  <!-- 에이전트 시각 -->
+  <rect x="420" y="100" width="240" height="55" rx="6" fill="#0F2C59"/>
+  <text x="540" y="120" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#FFFFFF">에이전트가 보는 경로</text>
+  <text x="540" y="142" text-anchor="middle" font-family="monospace" font-size="11" fill="#FFFFFF">/Users/jh/report.md</text>
+
+  <!-- 화살표 (1:1) -->
+  <path d="M 540 165 L 540 195" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="555" y="183" text-anchor="start" font-family="monospace" font-size="9" fill="#6B6B72">identity (no rewrite)</text>
+
+  <!-- 호스트 결과 -->
+  <rect x="400" y="200" width="280" height="65" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="540" y="222" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#6B6B72">호스트 디스크 실제 경로</text>
+  <text x="540" y="244" text-anchor="middle" font-family="monospace" font-size="11" fill="#0F2C59">/Users/jh/report.md</text>
+  <text x="540" y="258" text-anchor="middle" font-family="monospace" font-size="9" fill="#6B6B72">(에이전트 경로와 동일)</text>
+
+  <!-- 위험 박스 -->
+  <rect x="400" y="280" width="280" height="60" rx="6" fill="#FFFFFF" stroke="#6B6B72" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <text x="415" y="298" text-anchor="start" font-family="sans-serif" font-size="10" font-weight="bold" fill="#6B6B72">주의</text>
+  <text x="415" y="313" text-anchor="start" font-family="sans-serif" font-size="9" fill="#0F2C59">• 호스트 어디든 접근 가능</text>
+  <text x="415" y="326" text-anchor="start" font-family="sans-serif" font-size="9" fill="#0F2C59">• 운영에선 비권장</text>
+  <text x="415" y="338" text-anchor="start" font-family="sans-serif" font-size="9" fill="#0F2C59">• CI sandbox 같은 격리 환경 한정</text>
+</svg>

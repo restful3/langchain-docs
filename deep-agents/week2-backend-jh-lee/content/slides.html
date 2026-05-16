@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ko" class="theme-light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Agents — Backends 심층</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script>Chart.defaults.animation = false;</script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <link rel="stylesheet" href="../../../template/theme_slides.css">
+  <style id="brand-vars">:root{
+  --running-header-left: "AI Odyssey · Independent Research";
+  --running-header-right: "AI ODYSSEY";
+  --slide-section-monogram: "AIO";
+}</style>
+<style id="week2-overrides">
+/* slide padding 축소 — 위아래 38px, 좌우 24px 절감 */
+.slide                              { padding: 40px 60px 50px 60px !important; }
+.slide-header                       { margin-bottom: 14px !important; }
+.slide-title-rule                   { margin: 6px 0 10px 0 !important; }
+.slide-subtitle                     { margin-bottom: 12px !important; font-size: 0.95em !important; }
+.slide-body                         { font-size: 0.96em; }
+/* 미디어·코드·표 강제 축소 */
+.slide img, .slide svg              { max-height: 230px; height: auto; width: auto; object-fit: contain; }
+.slide pre code                     { font-size: 0.78em; line-height: 1.3; }
+.slide table                        { font-size: 0.83em; }
+.slide table th, .slide table td    { padding: 4px 10px; }
+.slide blockquote                   { margin-top: 6px; margin-bottom: 6px; }
+.slide .slide-body p img + ul,
+.slide .slide-body p svg + ul       { margin-top: 4px; }
+.slide .slide-body ul.bullets li    { margin-bottom: 3px; }
+.slide-footer                       { margin-top: 8px !important; }
+</style>
+</head>
+<body>
+  <a href="#main-content" class="skip-to-content" style="position:absolute;left:-9999px;">Skip to content</a>
+  <div class="viz-menu">
+    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <div class="viz-menu-dropdown" id="vizMenuDropdown">
+      <button onclick="cycleTheme()"><span id="themeIcon">☀️</span><span id="themeLabel">Light</span></button>
+      <button onclick="downloadImage()"><span>📥</span><span>Download PNG</span></button>
+      <button onclick="window.print()"><span>🖨️</span><span>Print / PDF</span></button>
+    </div>
+  </div>
+  <div class="deck-progress"><div class="deck-progress__fill" id="progressFill"></div></div>
+  <main id="main-content" role="main">
+    <div class="deck">
+      <div class="stage">
+        <div class="slides" id="slidesContainer">
+<section class="slide slide--cover" aria-label="Cover">
+  <div class="cover-wordmark">
+    <span class="cover-wordmark__name">AI Odyssey</span>
+    <span class="cover-wordmark__sub">Deep Research</span>
+  </div>
+  <div class="cover-signature">YouTube · @AI_odysseys</div>
+  <div class="cover-hero">
+    <div class="cover-kicker animate-in">Research Deck</div>
+    <h1 class="animate-in delay-1">Deep Agents — Backends 심층</h1>
+    <p class="cover-subtitle animate-in delay-2">같은 에이전트 코드, 다른 저장 매체 — 한 줄 인자로 데모에서 운영까지</p>
+  </div>
+  <div class="cover-meta">
+    <div><strong>발표자</strong>jh-lee (이종훈)</div>
+    <div><strong>채널</strong>AI Odyssey</div>
+    <div><strong>일시</strong>2026년 5월 22일</div>
+  </div>
+</section>
+<section class="slide" aria-label="한 줄로 정리">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§0 · Message</div>
+  </div>
+  <h1 class="slide-title animate-in">한 줄로 정리</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">백엔드 = 라우팅 가능한 가상 파일시스템 표면</p>
+  <div class="slide-body">
+<ul class="bullets">
+<li><strong>도구는 6개로 고정</strong> — <code>ls</code> / <code>read_file</code> / <code>write_file</code> / <code>edit_file</code> / <code>glob</code> / <code>grep</code></li>
+<li><strong>그 아래는 가변</strong> — State (휘발) · Filesystem (디스크) · Store (영속) · Composite (라우팅) · 사용자 정의 (S3/Postgres/Box…)</li>
+<li><strong>사용자 코드는 한 글자도 안 바뀐다</strong> — <code>create_deep_agent(backend=…)</code> 한 인자만 교체</li>
+<li><strong>dev → staging → prod 이동이 한 줄</strong> — ephemeral 데모와 멀티 테넌트 운영이 같은 에이전트 코드를 공유</li>
+</ul>
+<blockquote>
+<p>&quot;도구는 그대로, 매체만 갈아 끼운다&quot; — 본 발표 전체의 시작점이자 도착점.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>01</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="1주차 데모의 한계">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">1주차 데모의 한계</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1"><code>create_deep_agent()</code> 한 호출의 깔끔함은 단일 thread + 휘발성 두 가정 위에 서 있다</p>
+  <div class="slide-body">
+<ul class="bullets">
+<li><strong>노트북을 끄면 사라진다</strong> — thread state 위에만 살아 있음</li>
+<li><strong>새 thread 면 다시 빈 책상</strong> — 사용자 A·B 가 같은 에이전트를 쓰면 메모리가 섞임</li>
+<li><strong>권한 표현 불가</strong> — &quot;이 폴더는 못 읽음&quot; / &quot;쓰기 시 감사 로그&quot; — state 안에 그런 자리 없음</li>
+<li><strong>외부 자료는 사각지대</strong> — 이미 S3·Postgres 에 있는 사내 자료는 <code>read_file</code> 로 닿지 않음</li>
+</ul>
+<blockquote>
+<p>데모는 충분히 깔끔. 그 깔끔함을 자기 도메인에 옮기려는 순간 5개 요구가 한꺼번에 등장.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>02</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="운영으로 옮길 때 부딪치는 다섯 요구">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">운영으로 옮길 때 부딪치는 다섯 요구</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">영속 · 멀티 테넌트 · 권한 · 외부 저장소 · 혼합 표면 — 단일 백엔드로 못 푼다</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>요구</th>
+<th>무엇이 깨지는가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>영속</td>
+<td>어제 노트가 오늘도 있어야 — state 만으로는 안 됨</td>
+</tr>
+<tr>
+<td>멀티 테넌트</td>
+<td>A·B 메모리 격리 — namespace 필요</td>
+</tr>
+<tr>
+<td>권한·감사</td>
+<td>경로별 deny / 쓰기 감사 — state 표현 없음</td>
+</tr>
+<tr>
+<td>외부 저장소</td>
+<td>S3/Postgres/사내 시스템을 가상 FS 처럼</td>
+</tr>
+<tr>
+<td>혼합 표면</td>
+<td>휘발 + 영속 + 디스크를 한 에이전트가</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>다섯을 동시에 만족하려면 백엔드를 <em>선택 가능한 한 켜</em> 로 분리해야 함 — deepagents 의 답.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>03</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="4종 한 장 비교">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Compare</div>
+  </div>
+  <h1 class="slide-title animate-in">4종 한 장 비교</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">lifecycle × persistence × scope — 같은 인터페이스, 다른 저장 매체</p>
+  <div class="slide-body">
+<p><img src="figs/fig01_four_backends_overview.svg" alt="4종 백엔드 한 장 비교" /></p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th></th>
+<th>State</th>
+<th>Filesystem</th>
+<th>Store</th>
+<th>Composite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>생애</td>
+<td>휘발</td>
+<td>영속(디스크)</td>
+<td>영속(store)</td>
+<td>합성</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td>thread</td>
+<td>디스크</td>
+<td>멀티 thread</td>
+<td>라우팅</td>
+</tr>
+<tr>
+<td>케이스</td>
+<td>scratch</td>
+<td>sandbox</td>
+<td>장기 메모리</td>
+<td>혼합</td>
+</tr>
+</tbody>
+</table>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>04</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="Backend Protocol — 한 장으로">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Protocol</div>
+  </div>
+  <h1 class="slide-title animate-in">Backend Protocol — 한 장으로</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">자기 백엔드를 만든다는 건 6개 메서드를 채운다는 뜻</p>
+  <div class="slide-body">
+<pre><code class="language-python">class BackendProtocol(Protocol):
+    def ls(self, path: str) -&gt; LsResult: ...          # L342
+    def read(self, file_path, offset, limit) -&gt; ...   # L370
+    def write(self, file_path, content) -&gt; ...        # L509
+    def edit(self, file_path, old, new, replace_all): # L535
+    def glob(self, pattern, path) -&gt; GlobResult: ...  # L468
+    def grep(self, pattern, path, glob) -&gt; ...        # L400
+</code></pre>
+<ul class="bullets">
+<li><strong>도구 6개 ↔ 메서드 6개</strong> — 1:1 대응</li>
+<li><strong><code>runtime_checkable</code> Protocol</strong> — 상속 없어도 시그니처만 맞으면 동작</li>
+<li><strong>info-form 변종</strong> (<code>ls_info</code>/<code>glob_info</code>/<code>grep_raw</code>) — Composite 라우팅·메타데이터용</li>
+</ul>
+<blockquote>
+<p>라인 번호는 <code>archives/original_docs/deepagents_backends/protocol.py</code> (852L) 기준.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>05</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="StateBackend — thread-scoped 휘발">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§3 · State</div>
+  </div>
+  <h1 class="slide-title animate-in">StateBackend — thread-scoped 휘발</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">가장 단순한 백엔드. 같은 thread 안에서만 파일이 산다. 디폴트.</p>
+  <div class="slide-body">
+<p><img src="figs/fig02_state_lifecycle.svg" alt="StateBackend lifecycle" /></p>
+<ul class="bullets">
+<li><strong>저장 위치</strong> — LangGraph state 채널 (<code>files: {path: content}</code>)</li>
+<li><strong>thread 끝 → 휘발</strong> — 단 checkpointer 가 켜져 있으면 thread 자체는 며칠 생존</li>
+<li><strong>베스트 케이스</strong> — 큰 도구 출력 scratch · 자동 eviction</li>
+</ul>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>06</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="Demo 1 — StateBackend">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§3 · State Demo</div>
+  </div>
+  <h1 class="slide-title animate-in">Demo 1 — StateBackend</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1"><code>archives/scripts_py/01_state_backend.py</code> (78L) — 같은 thread 잔존 / 다른 thread 부재</p>
+  <div class="slide-body">
+<pre><code class="language-python"># L41-46
+agent = create_deep_agent(
+    model=model,
+    system_prompt=system_prompt,
+    backend=(lambda rt: StateBackend(rt)),
+    checkpointer=InMemorySaver(),
+)
+</code></pre>
+<ul class="bullets">
+<li><strong>Turn 1</strong> — <code>thread_id=demo-thread-1</code> 에서 노트 작성</li>
+<li><strong>Turn 2</strong> — 같은 thread 에서 read → 노트 있음</li>
+<li><strong>Turn 3</strong> — <code>thread_id=demo-thread-2</code> 로 변경 후 read → 노트 없음</li>
+</ul>
+<blockquote>
+<p>factory 형태(lambda)로 전달하는 이유 — <code>StateBackend</code> 가 LangGraph runtime 핸들에 의존하기 때문.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>07</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="FilesystemBackend — 디스크 + virtual_mode">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§4 · Filesystem</div>
+  </div>
+  <h1 class="slide-title animate-in">FilesystemBackend — 디스크 + virtual_mode</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">호스트의 한 디렉토리를 sandbox 로. <code>virtual_mode</code> 한 플래그가 표면을 바꾼다.</p>
+  <div class="slide-body">
+<p><img src="figs/fig03_filesystem_mount.svg" alt="FilesystemBackend mount" /></p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th></th>
+<th><code>virtual_mode=False</code></th>
+<th><code>virtual_mode=True</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>보는 경로</td>
+<td>호스트 절대경로</td>
+<td>sandbox 내 <code>/</code> 시작</td>
+</tr>
+<tr>
+<td>격리·symlink</td>
+<td>약함 / 호스트 정책</td>
+<td>강함 / 안전 resolution</td>
+</tr>
+<tr>
+<td>시연</td>
+<td>디렉토리 일치</td>
+<td>sandbox 한눈에</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>운영 기본 <code>virtual_mode=True</code> — ripgrep + symlink traversal 방지 자동.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>08</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="Demo 2 — FilesystemBackend">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§4 · Filesystem Demo</div>
+  </div>
+  <h1 class="slide-title animate-in">Demo 2 — FilesystemBackend</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1"><code>archives/scripts_py/02_filesystem_backend.py</code> (81L) — 두 모드 디스크 결과 비교</p>
+  <div class="slide-body">
+<pre><code class="language-python"># L43-49
+def build_agent(root_dir: str, virtual_mode: bool):
+    return create_deep_agent(
+        model=model,
+        system_prompt=system_prompt,
+        backend=FilesystemBackend(root_dir=root_dir, virtual_mode=virtual_mode),
+    )
+</code></pre>
+<ul class="bullets">
+<li><strong>virtual_mode=True</strong> + <code>write_file('/report.md')</code> → 호스트 <code>&lt;tmp&gt;/report.md</code></li>
+<li><strong>virtual_mode=False</strong> + 호스트 절대경로 그대로 → 그 위치에 그대로</li>
+<li>호스트 디스크를 직접 들여다보며 두 결과 비교</li>
+</ul>
+<blockquote>
+<p>같은 에이전트 코드, 모드 한 플래그 차이로 호스트 디스크 결과가 갈린다 — 결정권은 사용자에게.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>09</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="StoreBackend — 영속 (thread-cross)">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§5 · Store</div>
+  </div>
+  <h1 class="slide-title animate-in">StoreBackend — 영속 (thread-cross)</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">LangGraph <code>BaseStore</code> 위에 얹은 한 켜. thread 가 끝나도 같은 파일을 본다.</p>
+  <div class="slide-body">
+<p><img src="figs/fig04_store_namespace.svg" alt="StoreBackend namespace" /></p>
+<ul class="bullets">
+<li><strong>BaseStore</strong> = namespace + key + value 3축 영속 (InMemory / Postgres / Redis)</li>
+<li><strong>tuple namespace</strong> + 의미 기반 검색 (<code>index={&quot;embed&quot;:..., &quot;fields&quot;:[...]}</code>)</li>
+<li><strong>LangSmith Deployment</strong> 시 자동 프로비저닝</li>
+</ul>
+<blockquote>
+<p><em>checkpointer 는 thread 내, store 는 thread 간</em> — LangGraph 영속의 두 축.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>10</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="Demo 3 — StoreBackend">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§5 · Store Demo</div>
+  </div>
+  <h1 class="slide-title animate-in">Demo 3 — StoreBackend</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1"><code>archives/scripts_py/03_store_backend.py</code> (79L) — 다른 thread 에서 같은 노트가 읽힌다</p>
+  <div class="slide-body">
+<pre><code class="language-python"># L41-50
+store = InMemoryStore()
+checkpointer = InMemorySaver()
+agent = create_deep_agent(
+    model=model,
+    system_prompt=system_prompt,
+    backend=(lambda rt: StoreBackend(rt)),
+    store=store,
+    checkpointer=checkpointer,
+)
+</code></pre>
+<ul class="bullets">
+<li><strong>session-A</strong> 에서 <code>/memories/release.md</code> 작성</li>
+<li><strong>session-B</strong> (다른 thread) 에서 같은 파일 read → 같은 내용</li>
+<li><code>store=</code> 와 <code>backend=</code> 두 인자가 분리 — Composite 부분 공유 가능</li>
+</ul>
+<blockquote>
+<p>운영 환경에선 InMemoryStore → PostgresStore 한 줄 교체로 진짜 영속.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>11</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="CompositeBackend — 라우팅 규칙">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§6 · Composite</div>
+  </div>
+  <h1 class="slide-title animate-in">CompositeBackend — 라우팅 규칙</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">한 에이전트, 세 매체 — 경로 prefix 가 결정한다</p>
+  <div class="slide-body">
+<p><img src="figs/fig05_composite_routing.svg" alt="CompositeBackend routing" /></p>
+<pre><code class="language-python">CompositeBackend(default=StateBackend(rt),
+    routes={&quot;/memories/&quot;: StoreBackend(rt),
+            &quot;/shared/&quot;:   FilesystemBackend(root_dir=...)})
+</code></pre>
+<ul class="bullets">
+<li><strong>longer prefix wins</strong> · <code>ls/glob/grep</code> 결과 합쳐 반환 (prefix 보존)</li>
+<li><strong>부분 마이그레이션</strong> — 한 경로씩 점진 운영화</li>
+</ul>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>12</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="Demo 4 — CompositeBackend">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§6 · Composite Demo</div>
+  </div>
+  <h1 class="slide-title animate-in">Demo 4 — CompositeBackend</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1"><code>archives/scripts_py/04_composite_backend.py</code> (107L) — 3개 규칙 동시 운영</p>
+  <div class="slide-body">
+<pre><code class="language-python"># L62-68
+composite = lambda rt: CompositeBackend(
+    default=StateBackend(rt),
+    routes={
+        &quot;/memories/&quot;: StoreBackend(rt),
+        &quot;/shared/&quot;:   FilesystemBackend(root_dir=root, virtual_mode=True),
+    },
+)
+</code></pre>
+<ul class="bullets">
+<li><code>/memories/note.md</code> → Store (영속)</li>
+<li><code>/shared/draft.md</code> → Filesystem (호스트 디스크)</li>
+<li><code>/tmp/scratch.md</code> → default=State (휘발)</li>
+<li>L95-100 호스트 디스크 직접 확인 → <code>/shared/*</code> 만 떨어졌음</li>
+</ul>
+<blockquote>
+<p>세 영속성·세 scope 이 한 가상 FS 안에 공존. 사용자 코드는 한 인자.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>13</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="직접 만들기 — 왜?">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§7 · Virtual FS</div>
+  </div>
+  <h1 class="slide-title animate-in">직접 만들기 — 왜?</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">빌트인 4종으로 안 풀리는 외부 저장소 — <code>BackendProtocol</code> 6개를 채우면 끝</p>
+  <div class="slide-body">
+<ul class="bullets">
+<li><strong>이미 S3 에 자료</strong> — 사내 위키·PDF·로그 → <code>read_file('/docs/wiki.md')</code> 로 닿게</li>
+<li><strong>이미 Postgres 에 자료</strong> — <code>documents</code> 테이블을 가상 FS 로 노출</li>
+<li><strong>사내 SDK 시스템</strong> — Box·Confluence·Notion 등을 한 인터페이스 뒤로</li>
+</ul>
+<blockquote>
+<p>커뮤니티가 이미 시작: <code>DiTo97/deepagents-backends</code> (S3+Postgres) · <code>box-community/deepagents-filesystem-example</code>.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>14</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="S3 스타일 — 6개 메서드만 채우기">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§7 · S3 Pattern</div>
+  </div>
+  <h1 class="slide-title animate-in">S3 스타일 — 6개 메서드만 채우기</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">원문 §&quot;Use a virtual filesystem&quot; L173-210 outline + DiTo97 production 패키지</p>
+  <div class="slide-body">
+<pre><code class="language-python">class S3Backend(BackendProtocol):
+    def __init__(self, bucket, prefix=&quot;&quot;):
+        self.bucket, self.prefix = bucket, prefix.rstrip(&quot;/&quot;)
+
+    def _key(self, path):  # /foo/bar.md → &lt;prefix&gt;/foo/bar.md
+        return f&quot;{self.prefix}{path}&quot;
+
+    def ls_info(self, path):      # 서버사이드 listing
+    def read(self, path, ...):    # GetObject
+    def write(self, path, ...):   # PutObject (create-only)
+    def edit(self, path, ...):    # Read → replace → Write
+    def glob_info(self, ...):     # key 목록에 glob
+    def grep_raw(self, ...):      # 서버사이드 grep 또는 read+스캔
+</code></pre>
+<ul class="bullets">
+<li><strong>경로 ↔ 키 매핑</strong> 결정이 핵심</li>
+<li><strong><code>files_update=None</code></strong> — 외부 영속은 state 업데이트 안 함</li>
+<li><strong>production</strong>: boto3 client 캐싱·retry·pool·MinIO 호환은 <code>DiTo97/deepagents-backends</code> 에서 fork</li>
+</ul>
+<blockquote>
+<p>바닥부터 짤지, 패키지 fork 후 커스터마이즈할지 — 보통 후자가 훨씬 빠르다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>15</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="Policy hooks — 두 레이어">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§8 · Policy Layers</div>
+  </div>
+  <h1 class="slide-title animate-in">Policy hooks — 두 레이어</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">정책 거는 자리는 두 군데, 다른 일을 한다</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th></th>
+<th>백엔드 서브클래싱</th>
+<th>미들웨어</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>가로채는 시점</td>
+<td>도구 → 백엔드 메서드 직전</td>
+<td>LLM 호출 / 도구 wrap</td>
+</tr>
+<tr>
+<td>알 수 있는 정보</td>
+<td>경로·내용·작업 종류</td>
+<td>메시지·도구 호출·결과 전체</td>
+</tr>
+<tr>
+<td>잘 맞는 정책</td>
+<td>경로별 deny, 쓰기 감사</td>
+<td>PII redaction, rate limit, HITL</td>
+</tr>
+<tr>
+<td>영향 범위</td>
+<td>한 백엔드 한정</td>
+<td>에이전트 전체</td>
+</tr>
+</tbody>
+</table>
+<ul class="bullets">
+<li><strong>데이터 위치가 핵심</strong> → 백엔드 레이어</li>
+<li><strong>내용·맥락이 핵심</strong> → 미들웨어 레이어</li>
+<li>합쳐 쓰면 가장 안전 (예: GuardedBackend + PIIMiddleware)</li>
+</ul>
+<blockquote>
+<p>헷갈리지 말 것 — <em>어떻게</em> 다룰지(미들웨어) vs <em>어디에</em> 둘지(백엔드). 둘은 직교한다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>16</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="`GuardedBackend` — 한 클래스 패턴">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§8 · GuardedBackend</div>
+  </div>
+  <h1 class="slide-title animate-in">`GuardedBackend` — 한 클래스 패턴</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1"><code>FilesystemBackend</code> 서브클래싱으로 경로별 권한·감사·redaction</p>
+  <div class="slide-body">
+<pre><code class="language-python">class GuardedBackend(FilesystemBackend):
+    def __init__(self, *, deny_prefixes, **kwargs):
+        super().__init__(**kwargs)
+        self.deny_prefixes = [p if p.endswith(&quot;/&quot;) else p+&quot;/&quot; for p in deny_prefixes]
+
+    def write(self, file_path, content):
+        if any(file_path.startswith(p) for p in self.deny_prefixes):
+            return WriteResult(error=f&quot;Writes not allowed under {file_path}&quot;)
+        return super().write(file_path, content)
+    # edit 도 같은 패턴
+</code></pre>
+<ul class="bullets">
+<li><strong>같은 패턴으로 가능</strong> — 감사 로깅 / 읽기 redaction / 쓰기 우선순위</li>
+<li><strong>미들웨어 보완</strong> — <code>PIIMiddleware</code> · <code>ModelCallLimitMiddleware</code> · <code>HumanInTheLoopMiddleware</code> 가 LangChain prebuilt 카탈로그에 16종 존재</li>
+</ul>
+<blockquote>
+<p>정책을 한 줄에 — <em>어디에</em> 거는지가 <em>무엇</em> 보다 먼저 결정된다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>17</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="선택 가이드 — 시나리오 → 백엔드">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§9 · Guide</div>
+  </div>
+  <h1 class="slide-title animate-in">선택 가이드 — 시나리오 → 백엔드</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">운영 요구사항 한 줄 → 추천 조합 한 줄</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>시나리오</th>
+<th>추천 조합</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>로컬 데모 / 단일 thread</td>
+<td>StateBackend (기본)</td>
+</tr>
+<tr>
+<td>CI sandbox · 컨테이너 격리</td>
+<td>FilesystemBackend (<code>virtual_mode=True</code>)</td>
+</tr>
+<tr>
+<td>장기 메모리 (멀티 thread)</td>
+<td>StoreBackend + InMemoryStore (dev) / Postgres (prod)</td>
+</tr>
+<tr>
+<td>LangSmith Deployment</td>
+<td>StoreBackend (자동 프로비저닝)</td>
+</tr>
+<tr>
+<td>스크래치 + 메모리 혼합</td>
+<td>Composite (default=State, <code>/memories/</code>→Store)</td>
+</tr>
+<tr>
+<td>사내 S3 자료 활용</td>
+<td>Composite + 커스텀 S3Backend</td>
+</tr>
+<tr>
+<td>감사·deny + PII 마스킹</td>
+<td>Composite + GuardedBackend + PIIMiddleware</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>결정 흐름 4단: <strong>(1) 영속 필요? (2) 매체? (3) 여러 매체 한 에이전트? (4) 정책 필요?</strong></p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>18</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="다음 발제로의 다리">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§10 · Bridge</div>
+  </div>
+  <h1 class="slide-title animate-in">다음 발제로의 다리</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">백엔드(2주차)는 <em>어디에</em> 살아남는지를, 다음은 <em>누가 어떻게</em> 만지는지를 다룬다</p>
+  <div class="slide-body">
+<ul class="bullets">
+<li><strong>04-harness (3주차?)</strong> — sandbox / local_shell / langsmith 백엔드의 실행 모델</li>
+<li><strong>06-subagents (4주차?)</strong> — 격리된 워커별 자기만의 컨텍스트·파일시스템 뷰</li>
+<li>셋이 합쳐 에이전트의 <em>운영체제 표면</em></li>
+</ul>
+<blockquote>
+<p>&quot;백엔드는 파일이 어디 있는지. harness 는 언제 어떻게 만지는지. subagents 는 누가 만지는지.&quot;</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>19</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="Q&A">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    
+  </div>
+  <h1 class="slide-title animate-in">Q&A</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">질문 / 운영 사례 공유 / 정책 디자인 토론</p>
+  <div class="slide-body">
+<ul class="bullets">
+<li>본 발표 자료: <code>deep-agents/week2-backend-jh-lee/</code></li>
+<li>데모 실행: <code>python archives/scripts_py/0[1-4]_*.py</code> (Ollama gemma4:31b 필요)</li>
+<li>원문: <code>archives/original_docs/05-backends.md</code></li>
+<li>보강자료: <code>archives/research/INDEX.md</code> (5건)</li>
+</ul>
+<blockquote>
+<p>끝까지 들어주신 분께 — 다음 주는 harness 또는 subagents 둘 중 사용자가 정하는 대로.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>20</span> / 19</span>
+  </div>
+</section>
+<section class="slide" aria-label="(백업) Backend Protocol — 풀 시그니처">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    
+  </div>
+  <h1 class="slide-title animate-in">(백업) Backend Protocol — 풀 시그니처</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">시간이 남을 때만 — <code>protocol.py</code> 852L 핵심 메서드</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>메서드</th>
+<th>시그니처</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ls</code></td>
+<td><code>ls(path) -&gt; LsResult</code></td>
+</tr>
+<tr>
+<td><code>read</code></td>
+<td><code>read(file_path, offset=0, limit=2000) -&gt; ReadResult</code></td>
+</tr>
+<tr>
+<td><code>write</code></td>
+<td><code>write(file_path, content) -&gt; WriteResult</code></td>
+</tr>
+<tr>
+<td><code>edit</code></td>
+<td><code>edit(file_path, old, new, replace_all=False) -&gt; EditResult</code></td>
+</tr>
+<tr>
+<td><code>glob</code></td>
+<td><code>glob(pattern, path=&quot;/&quot;) -&gt; GlobResult</code></td>
+</tr>
+<tr>
+<td><code>grep</code></td>
+<td><code>grep(pattern, path=None, glob=None) -&gt; GrepResult</code></td>
+</tr>
+<tr>
+<td><code>ls_info</code> / <code>glob_info</code></td>
+<td><code>-&gt; list[FileInfo]</code> (Composite 메타 라우팅)</td>
+</tr>
+<tr>
+<td><code>grep_raw</code></td>
+<td><code>-&gt; list[GrepMatch] | str</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>info-form 셋 = Composite 가 메타데이터(path/size/modified_at) 합칠 때 사용.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>21</span> / 19</span>
+  </div>
+</section>
+        </div>
+      </div>
+    </div>
+    <nav class="slide-nav" aria-label="Slide navigation">
+      <button onclick="prevSlide()" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="slide-counter"><span id="slideCur">1</span> / <span id="slideTotal">22</span></span>
+      <button onclick="nextSlide()" aria-label="Next slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </nav>
+  </main>
+  <script src="../../../template/deck.js"></script>
+</body>
+</html>

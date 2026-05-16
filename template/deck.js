@@ -17,15 +17,19 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ===== Theme =====
-var savedTheme = localStorage.getItem('aio-deck-theme');
-var currentTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+// localStorage 가 file:// 또는 private browsing 에서 SecurityError 던지면
+// 그 이후 모든 var 선언·핸들러 등록이 막혀 슬라이드 네비게이션 자체가 안 됨.
+var savedTheme = null;
+try { savedTheme = localStorage.getItem('aio-deck-theme'); } catch (e) {}
+// 기본은 light. 시스템 다크 모드 자동 추적은 끔 (메뉴 버튼으로 명시 토글만 인정).
+var currentTheme = savedTheme || 'light';
 function applyTheme(t) {
   document.documentElement.className = 'theme-' + t;
   var icon = document.getElementById('themeIcon');
   var label = document.getElementById('themeLabel');
   if (icon) icon.textContent = t === 'dark' ? '🌙' : '☀️';
   if (label) label.textContent = t === 'dark' ? 'Dark' : 'Light';
-  localStorage.setItem('aio-deck-theme', t);
+  try { localStorage.setItem('aio-deck-theme', t); } catch (e) {}
   currentTheme = t;
   if (typeof onThemeChange === 'function') onThemeChange();
 }
@@ -236,4 +240,3 @@ async function downloadImage() {
   nav.style.display = '';
   prog.style.display = '';
 }
-치환 2 건

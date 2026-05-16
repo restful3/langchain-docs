@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360">
+  <rect x="0" y="0" width="720" height="360" fill="#FAFAF9"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6B6B72"/>
+    </marker>
+  </defs>
+
+  <!-- 헤더 -->
+  <text x="360" y="32" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#6B6B72">COMPOSITEBACKEND — PREFIX-BASED ROUTING</text>
+
+  <!-- 입력: 도구 호출 -->
+  <rect x="270" y="55" width="180" height="42" rx="6" fill="#0F2C59"/>
+  <text x="360" y="75" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#FFFFFF">도구 호출</text>
+  <text x="360" y="90" text-anchor="middle" font-family="monospace" font-size="11" fill="#FFFFFF">write_file(path, content)</text>
+
+  <!-- 화살표 -->
+  <path d="M 360 100 L 360 125" stroke="#6B6B72" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- CompositeBackend 라우터 다이아몬드 -->
+  <polygon points="360,130 470,180 360,230 250,180" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.8"/>
+  <text x="360" y="170" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0F2C59">CompositeBackend</text>
+  <text x="360" y="187" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">path prefix 검사</text>
+  <text x="360" y="201" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B6B72">(longer prefix wins)</text>
+
+  <!-- 분기 화살표 3개 -->
+  <!-- 좌: /memories/* → Store -->
+  <path d="M 270 180 Q 175 200 130 235" stroke="#6B6B72" stroke-width="1.3" fill="none" marker-end="url(#arrow)"/>
+  <text x="160" y="190" text-anchor="middle" font-family="monospace" font-size="10" fill="#0F2C59">/memories/*</text>
+
+  <!-- 중: /shared/* → Filesystem -->
+  <path d="M 360 230 L 360 250" stroke="#6B6B72" stroke-width="1.3" fill="none" marker-end="url(#arrow)"/>
+  <text x="375" y="245" text-anchor="start" font-family="monospace" font-size="10" fill="#0F2C59">/shared/*</text>
+
+  <!-- 우: default → State -->
+  <path d="M 450 180 Q 545 200 590 235" stroke="#6B6B72" stroke-width="1.3" fill="none" marker-end="url(#arrow)"/>
+  <text x="555" y="190" text-anchor="middle" font-family="monospace" font-size="10" fill="#0F2C59">default (그 외)</text>
+
+  <!-- 3개 백엔드 -->
+  <rect x="50" y="245" width="160" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="130" y="265" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0F2C59">StoreBackend</text>
+  <text x="130" y="282" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B6B72">영속 · thread-cross</text>
+  <text x="130" y="295" text-anchor="middle" font-family="monospace" font-size="9" fill="#6B6B72">/memories/note.md</text>
+
+  <rect x="280" y="255" width="160" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="360" y="275" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0F2C59">FilesystemBackend</text>
+  <text x="360" y="292" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B6B72">영속 · 호스트 디스크</text>
+  <text x="360" y="305" text-anchor="middle" font-family="monospace" font-size="9" fill="#6B6B72">&lt;root_dir&gt;/draft.md</text>
+
+  <rect x="510" y="245" width="160" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.5"/>
+  <text x="590" y="265" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#0F2C59">StateBackend</text>
+  <text x="590" y="282" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B6B72">휘발 · thread-scoped</text>
+  <text x="590" y="295" text-anchor="middle" font-family="monospace" font-size="9" fill="#6B6B72">/tmp/scratch.md</text>
+
+  <!-- 푸터 캡션 -->
+  <text x="360" y="335" text-anchor="middle" font-family="sans-serif" font-size="10" font-style="italic" fill="#6B6B72">ls / glob / grep 은 모든 백엔드 결과를 합쳐 반환 — 원본 prefix 보존</text>
+  <text x="360" y="350" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B6B72">한 에이전트가 세 영속성·세 scope 을 동시에 본다</text>
+</svg>

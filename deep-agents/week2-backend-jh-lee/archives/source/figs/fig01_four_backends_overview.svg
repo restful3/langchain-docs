@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360">
+  <rect x="0" y="0" width="720" height="360" fill="#FAFAF9"/>
+
+  <!-- 헤더 -->
+  <text x="360" y="32" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#6B6B72">4 BACKENDS — LIFECYCLE × PERSISTENCE × SCOPE</text>
+
+  <!-- 컬럼 헤더 (4 백엔드) -->
+  <rect x="40" y="55" width="150" height="40" rx="6" fill="#0F2C59"/>
+  <text x="115" y="80" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF">StateBackend</text>
+
+  <rect x="200" y="55" width="150" height="40" rx="6" fill="#0F2C59"/>
+  <text x="275" y="78" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF">FilesystemBackend</text>
+
+  <rect x="360" y="55" width="150" height="40" rx="6" fill="#0F2C59"/>
+  <text x="435" y="80" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF">StoreBackend</text>
+
+  <rect x="520" y="55" width="150" height="40" rx="6" fill="#0F2C59"/>
+  <text x="595" y="80" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF">CompositeBackend</text>
+
+  <!-- 행 라벨 (좌측) -->
+  <text x="20" y="135" text-anchor="start" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">LIFECYCLE</text>
+  <text x="20" y="215" text-anchor="start" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">PERSISTENCE</text>
+  <text x="20" y="295" text-anchor="start" font-family="sans-serif" font-size="11" font-weight="bold" fill="#6B6B72">SCOPE</text>
+
+  <!-- 행 분리 점선 -->
+  <line x1="40" y1="105" x2="670" y2="105" stroke="#6B6B72" stroke-width="0.5" stroke-dasharray="2,3" opacity="0.4"/>
+  <line x1="40" y1="185" x2="670" y2="185" stroke="#6B6B72" stroke-width="0.5" stroke-dasharray="2,3" opacity="0.4"/>
+  <line x1="40" y1="260" x2="670" y2="260" stroke="#6B6B72" stroke-width="0.5" stroke-dasharray="2,3" opacity="0.4"/>
+
+  <!-- ROW 1: LIFECYCLE -->
+  <rect x="40" y="115" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="115" y="138" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">휘발</text>
+  <text x="115" y="155" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">thread 끝 → 삭제</text>
+
+  <rect x="200" y="115" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="275" y="138" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">영속 (디스크)</text>
+  <text x="275" y="155" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">파일 시스템 그대로</text>
+
+  <rect x="360" y="115" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="435" y="138" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">영속 (store)</text>
+  <text x="435" y="155" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">BaseStore 백엔드</text>
+
+  <rect x="520" y="115" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="595" y="138" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">합성</text>
+  <text x="595" y="155" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">라우팅 표 따름</text>
+
+  <!-- ROW 2: PERSISTENCE -->
+  <rect x="40" y="195" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="115" y="218" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">checkpoint 동행</text>
+  <text x="115" y="235" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">thread 살아있는 한</text>
+
+  <rect x="200" y="195" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="275" y="218" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">디스크 영구</text>
+  <text x="275" y="235" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">root_dir 보존</text>
+
+  <rect x="360" y="195" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="435" y="218" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">thread-cross</text>
+  <text x="435" y="235" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">namespace 격리</text>
+
+  <rect x="520" y="195" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="595" y="218" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">경로별 상속</text>
+  <text x="595" y="235" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">하위 백엔드 따름</text>
+
+  <!-- ROW 3: SCOPE -->
+  <rect x="40" y="270" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="115" y="293" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">단일 thread</text>
+  <text x="115" y="310" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">scratch / eviction</text>
+
+  <rect x="200" y="270" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="275" y="293" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">호스트 디스크</text>
+  <text x="275" y="310" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">virtual_mode 격리</text>
+
+  <rect x="360" y="270" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="435" y="293" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">멀티 thread</text>
+  <text x="435" y="310" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">장기 메모리</text>
+
+  <rect x="520" y="270" width="150" height="55" rx="6" fill="#FFFFFF" stroke="#0F2C59" stroke-width="1.2"/>
+  <text x="595" y="293" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#0F2C59">라우팅 표</text>
+  <text x="595" y="310" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72">prefix 기반</text>
+
+  <!-- 푸터 캡션 -->
+  <text x="360" y="350" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B6B72" font-style="italic">같은 6개 도구(ls·read_file·write_file·edit_file·glob·grep) — 다른 저장 매체</text>
+</svg>
