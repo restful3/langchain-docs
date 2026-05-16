@@ -1,0 +1,9 @@
+# 2주차 Deep Agent 백엔드 발표 — 실행 스크립트 의존성
+# Python 3.10+ 권장
+# LLM: Ollama gemma4:31b 로컬 구동 가정 (별도 `ollama pull gemma4:31b` 필요)
+deepagents>=0.1.0
+langchain>=0.3.0
+langchain-ollama>=0.2.0
+langgraph>=0.2.0
+langgraph-checkpoint>=2.0.0
+python-dotenv>=1.0.0
