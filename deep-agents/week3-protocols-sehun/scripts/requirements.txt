@@ -1,0 +1,23 @@
+# 3주차 에이전트 프로토콜 실습 — 실행 스크립트 의존성
+# Python 3.10+ 권장
+
+# 공통
+python-dotenv>=1.0.0
+langchain>=0.3.0
+langgraph>=0.2.0
+
+# MCP (scripts/mcp)
+langchain-mcp-adapters>=0.1.0
+fastmcp>=0.2.0
+# create_agent 에서 Anthropic 모델 사용 시
+langchain-anthropic>=0.2.0
+
+# ACP (scripts/acp)
+deepagents-acp>=0.1.0
+deepagents>=0.1.0
+langgraph-checkpoint>=2.0.0
+
+# A2A (scripts/a2a)
+langgraph-api>=0.4.21
+openai>=1.0.0
+aiohttp>=3.9.0
