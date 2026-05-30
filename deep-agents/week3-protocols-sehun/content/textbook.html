@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ko" class="theme-light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protocols & Coding Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script>Chart.defaults.animation = false;</script>
+  <link rel="stylesheet" href="/Users/sehun/work/langchain-docs/template/theme_report.css">
+  <style id="brand-vars">:root{
+  --running-header-left: "AI Odyssey · Independent Research";
+  --running-header-right: "AI ODYSSEY";
+  --slide-section-monogram: "AIO";
+}</style>
+  <style>
+    sup.ref-cite a {
+      color: var(--brand-primary);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 8pt;
+      padding: 0 2px;
+    }
+    sup.ref-cite a:hover { text-decoration: underline; }
+    .references li a { word-break: break-all; }
+    .report-section h3 { margin-top: 14pt; }
+    .report-section h4 { margin-top: 10pt; font-weight: 800; }
+    .report-appendix ol.references,
+    .s-refs ol.references { padding-left: 0 !important; }
+    .report-appendix ol.references li,
+    .s-refs ol.references li { padding-left: 0 !important; }
+    .report-appendix ol.references li::before,
+    .s-refs ol.references li::before { content: none !important; }
+  </style>
+</head>
+<body>
+  <article class="report continuous-mode show-divider">
+
+    <aside class="section-divider" aria-hidden="true">
+      <div class="section-divider__tag">섹션 01</div>
+      <h2 class="section-divider__title">Protocols & Coding Agent</h2>
+      <p class="section-divider__subtitle">MCP·A2A·ACP, 그리고 Zed에서 시작되는 코딩 에이전트</p>
+      <div class="section-divider__rule"></div>
+      <div class="section-divider__num">01</div>
+    </aside>
+    
+<section class="report-section s1 page-break">
+<div class="report-section__kicker">Section 01 · Protocols & Coding Agent</div>
+<h3 id="0.-3주차-목표와-큰-그림">§0. 3주차 목표와 큰 그림</h3>
+<p>1주차에서는 Deep Agents의 전체 지도를 그렸고, 2주차에서는 서브에이전트와 Human-in-the-loop으로 메인 에이전트의 컨텍스트와 안전을 다뤘다. 3주차는 같은 에이전트가 <strong>자기 프로세스 바깥</strong>과 어떻게 대화하는지를 본다. 외부 도구, 다른 에이전트, 그리고 사람의 코딩 에디터.</p>
+<p>이 글의 한 줄 요약은 다음과 같다.</p>
+<blockquote>
+<p><strong>MCP는 도구를, A2A는 에이전트를, ACP는 에디터를 표준 인터페이스로 묶는다. 그리고 Deep Agents Code는 그 위에서 동작하는 LangChain의 코딩 에이전트다.</strong></p>
+</blockquote>
+<p>세 프로토콜은 한자리에 두면 헷갈리지만, 누가 누구와 말하는지를 먼저 정리하면 명확해진다.</p>
+<p><svg style="width:100%;height:auto;display:block;margin:0.6rem auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440">
+  <rect width="960" height="440" fill="#f8fafc"/>
+  <rect x="380" y="170" width="200" height="100" rx="12" fill="#0f766e"/>
+  <text x="480" y="210" text-anchor="middle" font-family="Arial" font-size="22" fill="white">Agent</text>
+  <text x="480" y="240" text-anchor="middle" font-family="Arial" font-size="14" fill="white">(Deep Agent · LangChain)</text>
+  <rect x="50" y="170" width="200" height="100" rx="12" fill="#2563eb"/>
+  <text x="150" y="205" text-anchor="middle" font-family="Arial" font-size="22" fill="white">Tools / Resources</text>
+  <text x="150" y="235" text-anchor="middle" font-family="Arial" font-size="14" fill="white">MCP Server</text>
+  <text x="150" y="252" text-anchor="middle" font-family="Arial" font-size="14" fill="white">(DB · API · 파일)</text>
+  <path d="M250 220 H380" stroke="#6B6B72" stroke-width="4" marker-end="url(#a)"/>
+  <text x="315" y="208" text-anchor="middle" font-family="Arial" font-size="16" fill="#091f40" font-weight="bold">MCP</text>
+  <rect x="710" y="170" width="200" height="100" rx="12" fill="#7c3aed"/>
+  <text x="810" y="205" text-anchor="middle" font-family="Arial" font-size="22" fill="white">Other Agent</text>
+  <text x="810" y="235" text-anchor="middle" font-family="Arial" font-size="14" fill="white">A2A Endpoint</text>
+  <text x="810" y="252" text-anchor="middle" font-family="Arial" font-size="14" fill="white">(LangSmith Deployment)</text>
+  <path d="M580 220 H710" stroke="#6B6B72" stroke-width="4" marker-end="url(#a)"/>
+  <text x="645" y="208" text-anchor="middle" font-family="Arial" font-size="16" fill="#091f40" font-weight="bold">A2A</text>
+  <rect x="380" y="30" width="200" height="80" rx="12" fill="#e11d48"/>
+  <text x="480" y="62" text-anchor="middle" font-family="Arial" font-size="22" fill="white">Code Editor</text>
+  <text x="480" y="88" text-anchor="middle" font-family="Arial" font-size="14" fill="white">Zed · VS Code · Neovim</text>
+  <path d="M480 110 V170" stroke="#6B6B72" stroke-width="4" marker-end="url(#a)"/>
+  <text x="500" y="145" font-family="Arial" font-size="16" fill="#091f40" font-weight="bold">ACP</text>
+  <rect x="380" y="330" width="200" height="80" rx="12" fill="#6B6B72"/>
+  <text x="480" y="362" text-anchor="middle" font-family="Arial" font-size="20" fill="white">Human</text>
+  <text x="480" y="388" text-anchor="middle" font-family="Arial" font-size="14" fill="white">(터미널 · UI · 승인)</text>
+  <path d="M480 270 V330" stroke="#6B6B72" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#a)"/>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6B6B72"/></marker></defs>
+</svg>
+</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>프로토콜</th>
+<th>누가 ↔ 누가</th>
+<th>한 줄 정의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MCP</strong></td>
+<td>에이전트 ↔ 도구·리소스·프롬프트 서버</td>
+<td>모델에 도구·컨텍스트를 표준 방식으로 제공</td>
+</tr>
+<tr>
+<td><strong>A2A</strong></td>
+<td>에이전트 ↔ 다른 에이전트</td>
+<td>에이전트 간 대화·작업 위임을 위한 표준 메시지 채널</td>
+</tr>
+<tr>
+<td><strong>ACP</strong></td>
+<td>에이전트 ↔ 코딩 에디터(IDE)</td>
+<td>에디터가 외부 코딩 에이전트와 통신하는 표준</td>
+</tr>
+</tbody>
+</table>
+<p>발표는 이 순서를 그대로 따라간다. 먼저 MCP로 도구 연결의 기본기를 잡고, A2A로 에이전트 간 호출을 확장한 뒤, ACP로 에디터 통합까지 간다. 마지막으로 Zed 사례를 보고, LangChain이 그 위에 얹은 코딩 에이전트(<code>dcode</code>)로 마무리한다.</p>
+<hr />
+<h3 id="1.-mcp-도구리소스프롬프트의-표준화">§1. MCP — 도구·리소스·프롬프트의 표준화</h3>
+<h4 id="1.1-왜-mcp인가">§1.1 왜 MCP인가</h4>
+<p>모델 자체는 도구를 직접 호출할 수 없다. 호출 형식이 모델마다 달랐고, 같은 도구를 여러 에이전트에 연결하려면 매번 어댑터를 다시 짰다. <strong>Model Context Protocol(MCP)</strong> 은 이 어댑터 코드를 <strong>표준 클라이언트–서버 프로토콜</strong>로 끌어올린다<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langchain/mcp" target="_blank" rel="noopener">[1]</a></sup><sup class="ref-cite"><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">[10]</a></sup>.</p>
+<p>MCP 서버는 세 가지를 노출한다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>항목</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tools</strong></td>
+<td>모델이 호출할 수 있는 함수 (DB 쿼리, API 호출 등)</td>
+</tr>
+<tr>
+<td><strong>Resources</strong></td>
+<td>모델이 읽을 수 있는 데이터 (파일, 레코드, API 응답)</td>
+</tr>
+<tr>
+<td><strong>Prompts</strong></td>
+<td>재사용 가능한 프롬프트 템플릿</td>
+</tr>
+</tbody>
+</table>
+<p>LangChain은 <code>langchain-mcp-adapters</code> 라이브러리로 MCP 서버의 Tool을 LangChain Tool로 변환한다. 즉 한 번 MCP 서버를 만들어두면, LangChain Agent든 Deep Agent든 Claude Desktop이든 같은 정의를 쓴다.</p>
+<h4 id="1.2-빠른-시작">§1.2 빠른 시작</h4>
+<p>설치는 한 줄이다.</p>
+<pre><code class="language-bash">pip install langchain-mcp-adapters
+</code></pre>
+<p><code>MultiServerMCPClient</code> 가 여러 MCP 서버를 한꺼번에 다룬다. <strong>기본은 stateless</strong> — 도구 호출마다 새 세션을 열고 닫는다.</p>
+<pre><code class="language-python">from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain.agents import create_agent
+
+client = MultiServerMCPClient({
+    &quot;math&quot;: {
+        &quot;transport&quot;: &quot;stdio&quot;,
+        &quot;command&quot;: &quot;python&quot;,
+        &quot;args&quot;: [&quot;/abs/path/to/math_server.py&quot;],
+    },
+    &quot;weather&quot;: {
+        &quot;transport&quot;: &quot;http&quot;,
+        &quot;url&quot;: &quot;http://localhost:8000/mcp&quot;,
+    },
+})
+
+tools = await client.get_tools()
+agent = create_agent(&quot;claude-sonnet-4-6&quot;, tools)
+</code></pre>
+<p><svg style="width:100%;height:auto;display:block;margin:0.6rem auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#f8fafc"/>
+  <rect x="60" y="140" width="220" height="140" rx="12" fill="#0f766e"/>
+  <text x="170" y="190" text-anchor="middle" font-family="Arial" font-size="22" fill="white">LangChain Agent</text>
+  <text x="170" y="222" text-anchor="middle" font-family="Arial" font-size="14" fill="white">create_agent(...)</text>
+  <text x="170" y="244" text-anchor="middle" font-family="Arial" font-size="14" fill="white">tools = await client.get_tools()</text>
+  <rect x="370" y="160" width="220" height="100" rx="12" fill="#2563eb"/>
+  <text x="480" y="195" text-anchor="middle" font-family="Arial" font-size="20" fill="white">MultiServerMCPClient</text>
+  <text x="480" y="222" text-anchor="middle" font-family="Arial" font-size="13" fill="white">stdio · http · sse</text>
+  <text x="480" y="240" text-anchor="middle" font-family="Arial" font-size="13" fill="white">interceptors · auth</text>
+  <path d="M280 210 H370" stroke="#6B6B72" stroke-width="3" marker-end="url(#a)"/>
+  <rect x="680" y="40" width="220" height="80" rx="10" fill="#7c3aed"/>
+  <text x="790" y="72" text-anchor="middle" font-family="Arial" font-size="18" fill="white">math (stdio)</text>
+  <text x="790" y="98" text-anchor="middle" font-family="Arial" font-size="12" fill="white">subprocess · 로컬</text>
+  <rect x="680" y="180" width="220" height="80" rx="10" fill="#7c3aed"/>
+  <text x="790" y="212" text-anchor="middle" font-family="Arial" font-size="18" fill="white">weather (http)</text>
+  <text x="790" y="238" text-anchor="middle" font-family="Arial" font-size="12" fill="white">localhost:8000/mcp</text>
+  <rect x="680" y="320" width="220" height="80" rx="10" fill="#7c3aed"/>
+  <text x="790" y="352" text-anchor="middle" font-family="Arial" font-size="18" fill="white">github (http+auth)</text>
+  <text x="790" y="378" text-anchor="middle" font-family="Arial" font-size="12" fill="white">Bearer 토큰</text>
+  <path d="M590 200 C640 200 640 80 680 80" stroke="#6B6B72" stroke-width="3" fill="none" marker-end="url(#a)"/>
+  <path d="M590 210 H680" stroke="#6B6B72" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M590 230 C640 230 640 360 680 360" stroke="#6B6B72" stroke-width="3" fill="none" marker-end="url(#a)"/>
+  <text x="935" y="220" text-anchor="middle" font-family="Arial" font-size="14" fill="#091f40" font-weight="bold">MCP</text>
+  <text x="935" y="240" text-anchor="middle" font-family="Arial" font-size="12" fill="#091f40">Tools</text>
+  <text x="935" y="256" text-anchor="middle" font-family="Arial" font-size="12" fill="#091f40">Resources</text>
+  <text x="935" y="272" text-anchor="middle" font-family="Arial" font-size="12" fill="#091f40">Prompts</text>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6B6B72"/></marker></defs>
+</svg>
+</p>
+<h4 id="1.3-전송-stdio-vs-http">§1.3 전송 — stdio vs HTTP</h4>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>전송</th>
+<th>언제 쓰나</th>
+<th>특성</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stdio</code></td>
+<td>로컬 도구·서버를 서브프로세스로 띄울 때</td>
+<td>본질적으로 stateful, 단순</td>
+</tr>
+<tr>
+<td><code>http</code> (Streamable HTTP)</td>
+<td>원격 MCP 서버</td>
+<td>헤더로 인증, 멀티 클라이언트 가능</td>
+</tr>
+<tr>
+<td><code>sse</code></td>
+<td>구버전 호환</td>
+<td>MCP 사양에서는 deprecated</td>
+</tr>
+</tbody>
+</table>
+<p>stdio는 클라이언트 수명 동안 서브프로세스가 살아 있다. 그러나 <code>MultiServerMCPClient</code>는 명시적 세션 관리가 없으면 각 도구 호출마다 새 세션을 만든다. 진짜로 세션을 이어가려면 <code>client.session()</code>을 직접 연다.</p>
+<pre><code class="language-python">async with client.session(&quot;math&quot;) as session:
+    tools = await load_mcp_tools(session)
+    agent = create_agent(&quot;claude-sonnet-4-6&quot;, tools)
+</code></pre>
+<h4 id="1.4-인증과-인터셉터">§1.4 인증과 인터셉터</h4>
+<p>원격 MCP에는 Bearer 토큰을 헤더로 넘기는 게 가장 흔하다.</p>
+<pre><code class="language-python">client = MultiServerMCPClient({
+    &quot;weather&quot;: {
+        &quot;transport&quot;: &quot;http&quot;,
+        &quot;url&quot;: &quot;http://localhost:8000/mcp&quot;,
+        &quot;headers&quot;: {&quot;Authorization&quot;: &quot;Bearer YOUR_TOKEN&quot;},
+    }
+})
+</code></pre>
+<p>더 정교한 흐름이 필요하면 <code>httpx.Auth</code>를 구현해 <code>auth=</code> 로 넘기거나, MCP SDK 의 OAuth 흐름을 쓴다.</p>
+<p>진짜 강력한 기능은 <strong>Tool 인터셉터</strong>다. MCP 서버는 별도 프로세스이므로 LangGraph 런타임(스토어, 상태, 사용자 컨텍스트)에 닿을 수 없다. 인터셉터는 그 간극을 메우는 미들웨어다.</p>
+<pre><code class="language-python">from langchain_mcp_adapters.interceptors import MCPToolCallRequest
+
+async def inject_user_context(request: MCPToolCallRequest, handler):
+    runtime = request.runtime
+    modified = request.override(
+        args={**request.args, &quot;user_id&quot;: runtime.context.user_id}
+    )
+    return await handler(modified)
+
+client = MultiServerMCPClient({...}, tool_interceptors=[inject_user_context])
+</code></pre>
+<p>인터셉터는 <strong>양파 순서</strong>로 합성된다. 리스트의 첫 번째가 가장 바깥쪽 레이어 — 인증 → 속도 제한 → 로깅 → 실제 호출.</p>
+<blockquote>
+<p><strong>요점.</strong> MCP는 도구 호출의 와이어 프로토콜이다. 한 번 MCP 서버로 노출하면 어느 에이전트에서도 같은 도구를 쓸 수 있고, LangChain 측은 인터셉터로 런타임 맥락을 주입한다.</p>
+</blockquote>
+<hr />
+<h3 id="2.-a2a-에이전트-간-통신-표준">§2. A2A — 에이전트 간 통신 표준</h3>
+<h4 id="2.1-왜-a2a인가">§2.1 왜 A2A인가</h4>
+<p>MCP가 &quot;에이전트 → 도구&quot;의 표준이라면, <strong>Agent-to-Agent(A2A)</strong> 는 &quot;에이전트 → 에이전트&quot;의 표준이다<sup class="ref-cite"><a href="https://docs.langchain.com/langsmith/server-a2a" target="_blank" rel="noopener">[2]</a></sup><sup class="ref-cite"><a href="https://google.github.io/A2A" target="_blank" rel="noopener">[9]</a></sup>. Google이 제안하고 여러 벤더가 채택한 프로토콜로, 한 에이전트가 다른 에이전트를 마치 외부 서비스처럼 호출할 수 있게 한다.</p>
+<p>LangSmith Deployment(= LangGraph 서버)는 <code>langgraph-api&gt;=0.4.21</code> 부터 A2A를 <strong>기본 활성</strong>으로 노출한다. 즉 별도 코드 없이도 배포된 그래프가 A2A 엔드포인트를 갖는다 — 단, 그래프 상태에 <code>messages</code> 키가 있어야 한다(A2A의 text part 스펙 때문).</p>
+<p><svg style="width:100%;height:auto;display:block;margin:0.6rem auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440">
+  <rect width="960" height="440" fill="#f8fafc"/>
+  <rect x="60" y="160" width="240" height="120" rx="12" fill="#0f766e"/>
+  <text x="180" y="200" text-anchor="middle" font-family="Arial" font-size="22" fill="white">Caller Agent</text>
+  <text x="180" y="230" text-anchor="middle" font-family="Arial" font-size="14" fill="white">message/send</text>
+  <text x="180" y="252" text-anchor="middle" font-family="Arial" font-size="14" fill="white">message/stream</text>
+  <rect x="640" y="160" width="240" height="120" rx="12" fill="#7c3aed"/>
+  <text x="760" y="195" text-anchor="middle" font-family="Arial" font-size="22" fill="white">Callee Agent</text>
+  <text x="760" y="225" text-anchor="middle" font-family="Arial" font-size="13" fill="white">LangSmith Deployment</text>
+  <text x="760" y="245" text-anchor="middle" font-family="Arial" font-size="13" fill="white">(messages 키 보유)</text>
+  <text x="760" y="262" text-anchor="middle" font-family="Arial" font-size="13" fill="white">/.well-known/agent-card.json</text>
+  <path d="M300 200 H640" stroke="#6B6B72" stroke-width="3" marker-end="url(#a)"/>
+  <text x="470" y="186" text-anchor="middle" font-family="Arial" font-size="14" fill="#091f40">POST /a2a/{assistant_id}</text>
+  <text x="470" y="220" text-anchor="middle" font-family="Arial" font-size="13" fill="#6B6B72">{contextId, taskId, message}</text>
+  <path d="M640 250 H300" stroke="#0f766e" stroke-width="3" marker-end="url(#b)"/>
+  <text x="470" y="278" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f766e">{contextId, taskId, response parts}</text>
+  <rect x="320" y="350" width="320" height="60" rx="10" fill="#6B6B72"/>
+  <text x="480" y="385" text-anchor="middle" font-family="Arial" font-size="14" fill="white">LangSmith: contextId → thread_id 매핑</text>
+  <path d="M480 280 V350" stroke="#6B6B72" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#c)"/>
+  <rect x="40" y="40" width="280" height="60" rx="10" fill="#e11d48"/>
+  <text x="180" y="65" text-anchor="middle" font-family="Arial" font-size="14" fill="white">Step 1. GET /.well-known/agent-card.json</text>
+  <text x="180" y="85" text-anchor="middle" font-family="Arial" font-size="12" fill="white">→ skills · I/O modes · A2A URL 광고</text>
+  <path d="M180 100 V160" stroke="#e11d48" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#d)"/>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6B6B72"/></marker>
+    <marker id="b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#0f766e"/></marker>
+    <marker id="c" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6B6B72"/></marker>
+    <marker id="d" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#e11d48"/></marker>
+  </defs>
+</svg>
+</p>
+<h4 id="2.2-노출되는-엔드포인트">§2.2 노출되는 엔드포인트</h4>
+<p>배포된 에이전트마다 두 엔드포인트가 자동으로 열린다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>메소드</th>
+<th>경로</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/.well-known/agent-card.json?assistant_id={id}</code></td>
+<td>Agent Card — 이름·설명·스킬·입출력 모드 광고</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/a2a/{assistant_id}</code></td>
+<td>JSON-RPC 본체</td>
+</tr>
+</tbody>
+</table>
+<p>Agent Card 는 클라이언트가 &quot;이 에이전트가 무엇을 할 수 있는지&quot; 미리 파악하기 위한 디스커버리 문서다. JSON-RPC 본체는 다음 세 메소드를 받는다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>RPC 메소드</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>message/send</code></td>
+<td>메시지 보내고 완료 응답 받음</td>
+</tr>
+<tr>
+<td><code>message/stream</code></td>
+<td>SSE 로 토큰·이벤트 스트림 수신</td>
+</tr>
+<tr>
+<td><code>tasks/get</code></td>
+<td>이전에 만든 task 상태·결과 조회</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2.3-대화-이어가기-contextid-taskid">§2.3 대화 이어가기 — contextId · taskId</h4>
+<p>A2A 는 두 식별자로 대화의 연속성을 유지한다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>식별자</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>contextId</code></td>
+<td>대화 스레드(세션) — 같은 contextId 메시지는 같은 thread 로 묶임</td>
+</tr>
+<tr>
+<td><code>taskId</code></td>
+<td>단일 요청 식별자</td>
+</tr>
+</tbody>
+</table>
+<p><strong>첫 호출에는 둘 다 비워서 보낸다.</strong> 서버가 값을 생성해 응답에 넣어 돌려준다. 이후 호출은 반드시 그 값을 그대로 다시 넘겨야 같은 스레드로 이어진다. LangSmith는 <code>contextId</code> 를 자동으로 <code>thread_id</code> 로 매핑해 트레이스에 한 묶음으로 보여준다.</p>
+<h4 id="2.4-끄고-켜기">§2.4 끄고 켜기</h4>
+<p>기본은 활성. 끄려면 <code>langgraph.json</code> 에 한 줄 추가한다.</p>
+<pre><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://langgra.ph/schema.json&quot;,
+  &quot;http&quot;: { &quot;disable_a2a&quot;: true }
+}
+</code></pre>
+<h4 id="2.5-mcp-와-a2a-가-같이-산다">§2.5 MCP 와 A2A 가 같이 산다</h4>
+<p>MCP 서버는 &quot;도구&quot;이고 A2A 엔드포인트는 &quot;에이전트&quot;다. 한 에이전트가 다음을 동시에 한다는 게 자연스러운 그림이다.</p>
+<ol class="nums">
+<li>자기 도구는 MCP 로 받아쓴다 (<code>langchain-mcp-adapters</code>).</li>
+<li>자기 자신을 A2A 로 노출해 상위 오케스트레이터가 호출하게 둔다.</li>
+<li>같이 일해야 할 다른 에이전트에는 A2A 클라이언트로 접근한다.</li>
+</ol>
+<blockquote>
+<p><strong>요점.</strong> A2A 는 LangSmith 에 배포된 그래프가 자동으로 얻는 표준 인터페이스다. <code>messages</code> 키만 갖추면, 다른 에이전트가 우리 에이전트를 외부 서비스처럼 호출할 수 있다.</p>
+</blockquote>
+<hr />
+<h3 id="3.-acp-에이전트와-코딩-에디터의-표준-통신">§3. ACP — 에이전트와 코딩 에디터의 표준 통신</h3>
+<h4 id="3.1-왜-또-다른-프로토콜인가">§3.1 왜 또 다른 프로토콜인가</h4>
+<p>MCP 와 A2A 가 있는데 왜 또 하나? 답은 <strong>타깃이 다르다</strong><sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/deepagents/acp" target="_blank" rel="noopener">[3]</a></sup><sup class="ref-cite"><a href="https://agentclientprotocol.com/overview/introduction" target="_blank" rel="noopener">[6]</a></sup><sup class="ref-cite"><a href="https://agentclientprotocol.com/protocol/overview" target="_blank" rel="noopener">[7]</a></sup>.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>프로토콜</th>
+<th>타깃 상대</th>
+<th>목적</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MCP</td>
+<td>도구 서버</td>
+<td>모델에 도구·자원·프롬프트 공급</td>
+</tr>
+<tr>
+<td>A2A</td>
+<td>다른 에이전트</td>
+<td>에이전트 간 작업 위임</td>
+</tr>
+<tr>
+<td><strong>ACP</strong></td>
+<td><strong>코딩 에디터(IDE)</strong></td>
+<td><strong>에디터가 외부 코딩 에이전트를 사용</strong></td>
+</tr>
+</tbody>
+</table>
+<p>LSP(Language Server Protocol) 가 &quot;언어 지능을 모놀리식 IDE 에서 풀어냈듯&quot;, ACP 는 &quot;코딩 에이전트를 모놀리식 IDE 에서 풀어내는&quot; 것을 목표로 한다<sup class="ref-cite"><a href="https://zed.dev/blog/bring-your-own-agent-to-zed" target="_blank" rel="noopener">[5]</a></sup>. 즉 <strong>에디터를 바꾸지 않고 에이전트를 갈아끼우는</strong> 게 ACP 의 존재 이유다.</p>
+<p>ACP 는 LSP 의 정신을, MCP 의 JSON 스키마를 빌려와서 코딩 UX 에 필요한 타입(diff, 권한 요청, 파일 읽기·쓰기)을 추가한다.</p>
+<h4 id="3.2-와이어-프로토콜-json-rpc-over-stdio">§3.2 와이어 프로토콜 — JSON-RPC over stdio</h4>
+<p>ACP 의 기본 배포 모델은 단순하다.</p>
+<ul class="bullets">
+<li><strong>로컬 모델</strong>: 에디터가 에이전트를 <strong>서브프로세스</strong>로 띄우고 <strong>stdin/stdout</strong> 위에서 <strong>JSON-RPC 2.0</strong> 으로 대화한다.</li>
+<li><strong>원격 모델</strong>: HTTP/WebSocket 위에서도 동작 가능(WIP).</li>
+</ul>
+<p>JSON-RPC 답게 메시지는 두 종류다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>종류</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Methods</strong></td>
+<td>요청-응답 쌍</td>
+</tr>
+<tr>
+<td><strong>Notifications</strong></td>
+<td>일방향 알림 (응답 없음)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="3.3-라이프사이클-5단계로-요약">§3.3 라이프사이클 — 5단계로 요약</h4>
+<p><svg style="width:100%;height:auto;display:block;margin:0.6rem auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500">
+  <rect width="960" height="500" fill="#f8fafc"/>
+  <rect x="50" y="50" width="220" height="400" rx="14" fill="#e11d48"/>
+  <text x="160" y="90" text-anchor="middle" font-family="Arial" font-size="22" fill="white" font-weight="bold">Zed</text>
+  <text x="160" y="112" text-anchor="middle" font-family="Arial" font-size="14" fill="white">(Client / Editor)</text>
+  <text x="160" y="142" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- 채팅 패널 UI</text>
+  <text x="160" y="162" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- 다중버퍼 diff</text>
+  <text x="160" y="182" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- LSP 인텔리전스</text>
+  <text x="160" y="202" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- 권한 모달</text>
+  <text x="160" y="232" text-anchor="middle" font-family="Arial" font-size="13" fill="white">settings.json</text>
+  <text x="160" y="252" text-anchor="middle" font-family="Arial" font-size="13" fill="white">agent_servers.</text>
+  <text x="160" y="270" text-anchor="middle" font-family="Arial" font-size="13" fill="white">DeepAgents.command</text>
+  <rect x="690" y="50" width="220" height="400" rx="14" fill="#0f766e"/>
+  <text x="800" y="90" text-anchor="middle" font-family="Arial" font-size="22" fill="white" font-weight="bold">Deep Agent</text>
+  <text x="800" y="112" text-anchor="middle" font-family="Arial" font-size="14" fill="white">(ACP Server, subprocess)</text>
+  <text x="800" y="142" text-anchor="middle" font-family="Arial" font-size="13" fill="white">deepagents-acp</text>
+  <text x="800" y="162" text-anchor="middle" font-family="Arial" font-size="13" fill="white">AgentServerACP(agent)</text>
+  <text x="800" y="190" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- subagents</text>
+  <text x="800" y="210" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- MCP tools</text>
+  <text x="800" y="230" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- checkpointer</text>
+  <text x="800" y="260" text-anchor="middle" font-family="Arial" font-size="13" fill="white">run_agent(server)</text>
+  <text x="800" y="278" text-anchor="middle" font-family="Arial" font-size="13" fill="white">⮕ stdin/stdout 루프</text>
+  <path d="M270 100 H690" stroke="#6B6B72" stroke-width="3" marker-end="url(#a)"/>
+  <text x="480" y="92" text-anchor="middle" font-family="Arial" font-size="13" fill="#091f40">1. initialize (캐퍼빌리티 협상)</text>
+  <path d="M270 150 H690" stroke="#6B6B72" stroke-width="3" marker-end="url(#a)"/>
+  <text x="480" y="142" text-anchor="middle" font-family="Arial" font-size="13" fill="#091f40">2. session/new</text>
+  <path d="M270 200 H690" stroke="#6B6B72" stroke-width="3" marker-end="url(#a)"/>
+  <text x="480" y="192" text-anchor="middle" font-family="Arial" font-size="13" fill="#091f40">3. session/prompt</text>
+  <path d="M690 250 H270" stroke="#0f766e" stroke-width="3" marker-end="url(#b)"/>
+  <text x="480" y="242" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f766e">4. session/update (메시지 청크 · tool call)</text>
+  <path d="M690 300 H270" stroke="#0f766e" stroke-width="3" marker-end="url(#b)"/>
+  <text x="480" y="292" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f766e">5. fs/read_text_file · fs/write_text_file</text>
+  <path d="M690 350 H270" stroke="#0f766e" stroke-width="3" marker-end="url(#b)"/>
+  <text x="480" y="342" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f766e">6. session/request_permission</text>
+  <path d="M270 400 H690" stroke="#6B6B72" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#a)"/>
+  <text x="480" y="392" text-anchor="middle" font-family="Arial" font-size="13" fill="#091f40">7. session/cancel (필요 시)</text>
+  <text x="480" y="438" text-anchor="middle" font-family="Arial" font-size="14" fill="#6B6B72" font-style="italic">JSON-RPC 2.0 over stdio · 모든 경로는 절대경로 · 키는 camelCase</text>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6B6B72"/></marker>
+    <marker id="b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#0f766e"/></marker>
+  </defs>
+</svg>
+</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>#</th>
+<th>메소드</th>
+<th>방향</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>initialize</code></td>
+<td>Client → Agent</td>
+<td>프로토콜 버전·capabilities 교환</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>authenticate</code></td>
+<td>Client → Agent</td>
+<td>(선택) 인증 흐름</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>session/new</code></td>
+<td>Client → Agent</td>
+<td>새 대화 세션 생성</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>session/prompt</code></td>
+<td>Client → Agent</td>
+<td>사용자 프롬프트 전송</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>session/update</code></td>
+<td>Agent → Client</td>
+<td>메시지 청크·도구 호출·플랜 진행 알림</td>
+</tr>
+</tbody>
+</table>
+<p>세션을 재개하려면 <code>session/load</code>, 진행 중인 작업을 중단하려면 <code>session/cancel</code> 을 쓴다.</p>
+<h4 id="3.4-도구-호출과-권한-에디터가-게이트키퍼">§3.4 도구 호출과 권한 — 에디터가 게이트키퍼</h4>
+<p>ACP 에서 핵심은 &quot;에이전트가 자기 호스트의 파일을 만지지 않고, <strong>에디터에 부탁</strong>한다&quot; 는 설계다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>메소드</th>
+<th>방향</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fs/read_text_file</code></td>
+<td>Agent → Client</td>
+<td>파일 내용 요청 (절대경로)</td>
+</tr>
+<tr>
+<td><code>fs/write_text_file</code></td>
+<td>Agent → Client</td>
+<td>파일 수정 요청</td>
+</tr>
+<tr>
+<td><code>session/request_permission</code></td>
+<td>Agent → Client</td>
+<td>도구 호출 사용자 승인 요청</td>
+</tr>
+<tr>
+<td><code>terminal/*</code></td>
+<td>Agent → Client</td>
+<td>(capability) 터미널 생성·실행</td>
+</tr>
+</tbody>
+</table>
+<p>이 구조 덕에 에디터가 항상 <strong>게이트키퍼</strong> 역할을 한다. 에이전트가 <code>rm -rf</code> 같은 위험한 명령을 직접 실행할 수 없고, 사용자가 보는 UI 에서 승인이 떨어진 뒤에야 동작한다. 이는 2주차에서 본 Deep Agents 의 HITL 사상과 그대로 맞물린다.</p>
+<h4 id="3.5-capabilities-기능-협상">§3.5 Capabilities — 기능 협상</h4>
+<p><code>initialize</code> 단계에서 양쪽이 자기 능력을 광고한다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>캐퍼빌리티</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>loadSession</code></td>
+<td><code>session/load</code> 지원</td>
+</tr>
+<tr>
+<td><code>fs.readTextFile</code> / <code>fs.writeTextFile</code></td>
+<td>파일 작업 가능</td>
+</tr>
+<tr>
+<td><code>terminal</code></td>
+<td>터미널 명령 실행 가능</td>
+</tr>
+<tr>
+<td><code>auth.logout</code></td>
+<td>로그아웃 메소드 지원</td>
+</tr>
+</tbody>
+</table>
+<p>규칙 두 가지만 기억하자. <strong>키는 camelCase</strong>, <strong>파일 경로는 항상 절대경로</strong>.</p>
+<h4 id="3.6-deep-agents-의-acp-어댑터">§3.6 Deep Agents 의 ACP 어댑터</h4>
+<p>LangChain 측에서는 <code>deepagents-acp</code> 패키지가 Deep Agent 를 ACP 서버로 감싸준다.</p>
+<pre><code class="language-bash">pip install deepagents-acp
+</code></pre>
+<pre><code class="language-python">import asyncio
+from acp import run_agent
+from deepagents import create_deep_agent
+from langgraph.checkpoint.memory import MemorySaver
+from deepagents_acp.server import AgentServerACP
+
+
+async def main() -&gt; None:
+    agent = create_deep_agent(
+        model=&quot;google_genai:gemini-3.5-flash&quot;,
+        system_prompt=&quot;You are a helpful coding assistant&quot;,
+        checkpointer=MemorySaver(),
+    )
+    server = AgentServerACP(agent)
+    await run_agent(server)
+
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+</code></pre>
+<p><code>run_agent(server)</code> 가 stdin 을 읽고 stdout 에 응답을 적는 ACP 루프를 돌린다. 이게 우리가 Zed 같은 에디터에 등록할 &quot;에이전트 실행파일&quot; 이다.</p>
+<blockquote>
+<p><strong>요점.</strong> ACP 는 &quot;에디터 ↔ 에이전트&quot; 사이의 LSP 다. JSON-RPC over stdio 로 시작·세션·프롬프트·도구·권한을 표준화하고, 에디터를 게이트키퍼로 두어 코딩 작업의 안전성을 보장한다.</p>
+</blockquote>
+<hr />
+<h3 id="4.-zed-acp-코딩-에디터와-에이전트의-결합">§4. Zed + ACP — 코딩 에디터와 에이전트의 결합</h3>
+<h4 id="4.1-zed-가-acp-를-만든-이유">§4.1 Zed 가 ACP 를 만든 이유</h4>
+<p>Zed 는 Rust 로 만든 협업 코드 에디터로, 처음부터 AI 워크플로우를 1급 시민으로 다뤘다. ACP 는 <strong>Zed Industries</strong> 가 주도해 공개한 프로토콜이다<sup class="ref-cite"><a href="https://zed.dev/blog/bring-your-own-agent-to-zed" target="_blank" rel="noopener">[5]</a></sup><sup class="ref-cite"><a href="https://github.com/zed-industries/agent-client-protocol" target="_blank" rel="noopener">[8]</a></sup>.</p>
+<blockquote>
+<p>&quot;Just as the Language Server Protocol unbundled language intelligence from monolithic IDEs, our goal with the Agent Client Protocol is to enable you to switch between multiple agents without switching your editor.&quot; — Nathan Sobo, Zed</p>
+</blockquote>
+<p>발단은 실용적이었다. Google Gemini CLI 팀이 자기네 에이전트를 Zed 터미널에서 쓰는 걸 선호한다는 사실을 알게 되었고, &quot;터미널 이스케이프 코드 위에&quot; 만드는 통합이 너무 빈약하다는 결론이 났다. 답은 &quot;에이전트가 말할 JSON-RPC 엔드포인트를 정의하자&quot; 였다.</p>
+<h4 id="4.2-zed-의-통합-아키텍처">§4.2 Zed 의 통합 아키텍처</h4>
+<p>Zed 는 자기 자신의 인하우스 에이전트도 동일한 ACP 코드 경로로 정렬했다. 즉 <strong>외부 에이전트와 내장 에이전트가 같은 UI 프리미티브를 공유</strong>한다. 그래서 새 UI 컴포넌트(예: 다중 버퍼 코드 리뷰, 실시간 diff)는 만들면 자동으로 외부 에이전트에서도 쓸 수 있다.</p>
+<p>ACP 통합으로 Zed 가 외부 에이전트에 제공하는 것들:</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>기능</th>
+<th>무엇이 좋아지나</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>실시간 edit 시각화</td>
+<td>에이전트가 작업하는 동안 diff 가 라이브로 보임</td>
+</tr>
+<tr>
+<td>Multi-buffer 코드 리뷰</td>
+<td>여러 파일 변경을 한 화면에 묶어 검토</td>
+</tr>
+<tr>
+<td>Language Server 통합</td>
+<td>에이전트의 편집 결과에 LSP 인텔리전스 적용</td>
+</tr>
+<tr>
+<td>Tool · MCP 접근 제어</td>
+<td>어떤 도구·MCP 서버를 허용할지 정책</td>
+</tr>
+<tr>
+<td>데이터 안전</td>
+<td>에이전트 호출이 Zed 서버를 거치지 않음</td>
+</tr>
+</tbody>
+</table>
+<h4 id="4.3-zed-에-외부-에이전트-등록하기">§4.3 Zed 에 외부 에이전트 등록하기</h4>
+<p>Zed 의 <code>settings.json</code> 에 <code>agent_servers</code> 항목을 더한다. 우리가 §3.6 에서 만든 <code>deepagents-acp</code> 서버를 그대로 꽂는 예시는 이렇다.</p>
+<pre><code class="language-json">{
+  &quot;agent_servers&quot;: {
+    &quot;DeepAgents&quot;: {
+      &quot;type&quot;: &quot;custom&quot;,
+      &quot;command&quot;: &quot;/abs/path/to/deepagents/libs/acp/run_demo_agent.sh&quot;
+    }
+  }
+}
+</code></pre>
+<p>Zed 는 이 명령을 서브프로세스로 띄우고 stdio 로 ACP JSON-RPC 를 주고받는다. 사용자에겐 그냥 채팅 패널에 &quot;DeepAgents&quot; 가 하나 더 떠 있는 것처럼 보인다.</p>
+<h4 id="4.4-acp-가-만든-생태계-클라이언트와-에이전트">§4.4 ACP 가 만든 생태계 — 클라이언트와 에이전트</h4>
+<p>ACP 가 짧은 기간에 만든 흥미로운 사실은, <strong>에디터/에이전트 둘 다 다대다 매칭</strong>이 가능해졌다는 점이다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>카테고리</th>
+<th>사례</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>클라이언트 (에디터/도구)</strong></td>
+<td>Zed, VS Code (ACP Client 확장), JetBrains, Neovim (CodeCompanion·avante.nvim·agentic.nvim), Emacs (<code>agent-shell.el</code>), Obsidian, Chrome ACP, Unity, CLI/TUI (Toad, acpx, Nori), 모바일(Happy, Mobvibe 등)</td>
+</tr>
+<tr>
+<td><strong>에이전트</strong></td>
+<td>Claude Agent (Zed SDK 어댑터), Gemini CLI, Codex CLI, Cursor, Cline, OpenHands, GitHub Copilot(public preview), Junie by JetBrains, Goose, <strong>Deep Agents (<code>deepagents-acp</code>)</strong>, 외 다수</td>
+</tr>
+</tbody>
+</table>
+<p>언어별 공식 SDK 도 다섯 개가 있다 — Rust crate <code>agent-client-protocol</code>, npm <code>@agentclientprotocol/sdk</code>, Python <code>python-sdk</code>, Java <code>java-sdk</code>, Kotlin <code>acp-kotlin</code>. 라이선스는 Apache 2.0<sup class="ref-cite"><a href="https://github.com/zed-industries/agent-client-protocol" target="_blank" rel="noopener">[8]</a></sup>.</p>
+<blockquote>
+<p><strong>요점.</strong> Zed 는 ACP 의 레퍼런스 구현체이자 가장 적극적인 클라이언트다. ACP 덕에 &quot;에디터는 그대로 두고 에이전트만 바꾸기&quot;가 가능해졌고, Deep Agents 도 그 생태계의 일원이다.</p>
+</blockquote>
+<hr />
+<h3 id="5.-deep-agents-code-langchain-의-코딩-에이전트">§5. Deep Agents Code — LangChain 의 코딩 에이전트</h3>
+<h4 id="5.1-dcode-는-무엇인가">§5.1 dcode 는 무엇인가</h4>
+<p>여기까지가 프로토콜 이야기였다면, <strong>Deep Agents Code(<code>dcode</code>)</strong> 는 그 위에서 동작하는 LangChain 의 <strong>오픈소스 코딩 에이전트</strong>다<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/deepagents/code/overview" target="_blank" rel="noopener">[4]</a></sup>. Claude Code, Cursor 같은 도구의 LangChain 판이라고 보면 된다.</p>
+<p>dcode 의 특징은 네 가지다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>특징</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>임의 LLM 지원</td>
+<td>Tool calling 만 되면 어떤 모델이든 (Anthropic, OpenAI, Gemini, Fireworks, NVIDIA …)</td>
+</tr>
+<tr>
+<td>대화 간 지속 메모리</td>
+<td>세션을 넘어 학습한 내용을 유지</td>
+</tr>
+<tr>
+<td>Skills 시스템</td>
+<td>필요할 때만 불러오는 전문 지식 (<code>SKILL.md</code>)</td>
+</tr>
+<tr>
+<td>승인 기반 실행</td>
+<td>파괴적 작업은 기본 사람의 OK 를 받음</td>
+</tr>
+</tbody>
+</table>
+<h4 id="5.2-기본-도구-세트">§5.2 기본 도구 세트</h4>
+<p><code>create_deep_agent</code> 로 직접 조립하지 않아도, dcode 는 다음 도구들을 <strong>빌트인</strong>으로 제공한다.</p>
+<p><svg style="width:100%;height:auto;display:block;margin:0.6rem auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500">
+  <rect width="960" height="500" fill="#f8fafc"/>
+  <rect x="80" y="40" width="800" height="60" rx="10" fill="#e11d48"/>
+  <text x="480" y="78" text-anchor="middle" font-family="Arial" font-size="20" fill="white" font-weight="bold">CLI · ACP · Stdin Pipe</text>
+  <rect x="80" y="130" width="800" height="80" rx="10" fill="#0f766e"/>
+  <text x="480" y="168" text-anchor="middle" font-family="Arial" font-size="22" fill="white" font-weight="bold">dcode (Deep Agents Code)</text>
+  <text x="480" y="195" text-anchor="middle" font-family="Arial" font-size="13" fill="white">tool calling 가능한 LLM · 지속 메모리 · Skills · 승인 기반 실행</text>
+  <rect x="80" y="240" width="800" height="120" rx="10" fill="#2563eb"/>
+  <text x="480" y="266" text-anchor="middle" font-family="Arial" font-size="18" fill="white" font-weight="bold">Built-in Tools</text>
+  <text x="170" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">ls</text>
+  <text x="170" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">read_file</text>
+  <text x="170" y="335" text-anchor="middle" font-family="Arial" font-size="13" fill="white">write_file</text>
+  <text x="170" y="352" text-anchor="middle" font-family="Arial" font-size="13" fill="white">edit_file</text>
+  <text x="320" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">glob</text>
+  <text x="320" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">grep</text>
+  <text x="320" y="335" text-anchor="middle" font-family="Arial" font-size="13" fill="white">execute</text>
+  <text x="470" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">web_search</text>
+  <text x="470" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">fetch_url</text>
+  <text x="470" y="335" text-anchor="middle" font-family="Arial" font-size="13" fill="white">task (subagent)</text>
+  <text x="630" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">ask_user</text>
+  <text x="630" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">write_todos</text>
+  <text x="630" y="335" text-anchor="middle" font-family="Arial" font-size="13" fill="white">compact_conversation</text>
+  <text x="800" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">MCP tools</text>
+  <text x="800" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">(원격 도구 자동)</text>
+  <rect x="80" y="390" width="380" height="80" rx="10" fill="#7c3aed"/>
+  <text x="270" y="420" text-anchor="middle" font-family="Arial" font-size="16" fill="white" font-weight="bold">Sandbox 백엔드</text>
+  <text x="270" y="445" text-anchor="middle" font-family="Arial" font-size="13" fill="white">LangSmith (기본) · Modal · Daytona</text>
+  <text x="270" y="462" text-anchor="middle" font-family="Arial" font-size="13" fill="white">AgentCore · Runloop · local none</text>
+  <rect x="500" y="390" width="380" height="80" rx="10" fill="#6B6B72"/>
+  <text x="690" y="420" text-anchor="middle" font-family="Arial" font-size="16" fill="white" font-weight="bold">Memory · Skills</text>
+  <text x="690" y="445" text-anchor="middle" font-family="Arial" font-size="13" fill="white">~/.deepagents/&lt;agent&gt;/  (사용자 메모리)</text>
+  <text x="690" y="462" text-anchor="middle" font-family="Arial" font-size="13" fill="white">.deepagents/  (프로젝트 메모리·SKILL.md)</text>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6B6B72"/></marker></defs>
+</svg>
+</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>도구</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ls</code></td>
+<td>파일·디렉토리 나열</td>
+</tr>
+<tr>
+<td><code>read_file</code></td>
+<td>파일 읽기 (일부 모델은 멀티모달)</td>
+</tr>
+<tr>
+<td><code>write_file</code></td>
+<td>새 파일 만들기·덮어쓰기</td>
+</tr>
+<tr>
+<td><code>edit_file</code></td>
+<td>기존 파일 부분 수정</td>
+</tr>
+<tr>
+<td><code>glob</code></td>
+<td>패턴 매칭으로 파일 찾기</td>
+</tr>
+<tr>
+<td><code>grep</code></td>
+<td>텍스트 패턴 검색</td>
+</tr>
+<tr>
+<td><code>execute</code></td>
+<td>셸 명령 실행 (로컬·원격)</td>
+</tr>
+<tr>
+<td><code>web_search</code></td>
+<td>Tavily 기반 웹 검색</td>
+</tr>
+<tr>
+<td><code>fetch_url</code></td>
+<td>웹페이지를 마크다운으로 가져오기</td>
+</tr>
+<tr>
+<td><code>task</code></td>
+<td>서브에이전트에 위임</td>
+</tr>
+<tr>
+<td><code>ask_user</code></td>
+<td>사용자에게 자유·객관식 질문</td>
+</tr>
+<tr>
+<td><code>compact_conversation</code></td>
+<td>메시지 요약·오프로드</td>
+</tr>
+<tr>
+<td><code>write_todos</code></td>
+<td>작업 리스트 관리</td>
+</tr>
+</tbody>
+</table>
+<p>2주차의 <code>task</code> 와 HITL 흐름이 그대로 들어와 있다는 점에 주목하자. dcode 는 &quot;Deep Agents 의 모범 답안&quot; 같은 자리다.</p>
+<h4 id="5.3-설치와-첫-실행">§5.3 설치와 첫 실행</h4>
+<p>설치는 한 줄.</p>
+<pre><code class="language-bash">curl -LsSf https://langch.in/dcode | bash
+</code></pre>
+<p>선택 의존성이 필요하면 <code>DEEPAGENTS_EXTRAS</code> 를 주거나 <code>uv tool</code> 로 깐다.</p>
+<pre><code class="language-bash">DEEPAGENTS_EXTRAS=&quot;fireworks,nvidia&quot; curl -LsSf https://langch.in/dcode | bash
+uv tool install 'deepagents-code[fireworks,nvidia]'
+</code></pre>
+<p>기본 실행은 그냥 <code>dcode</code>. 자주 쓰는 옵션은 다음과 같다.</p>
+<pre><code class="language-bash">dcode --agent mybot
+dcode --model anthropic:claude-opus-4-7
+dcode -y                                   # 모든 승인 자동 통과
+dcode --startup-cmd &quot;ls -la&quot; -m &quot;Summarize this directory&quot;
+dcode -n &quot;Write a Python script that prints hello world&quot;   # 비대화
+echo &quot;Explain this code&quot; | dcode                            # 파이프 입력
+dcode -n &quot;fix tests&quot; --max-turns 10 --timeout 120
+</code></pre>
+<h4 id="5.4-설정-위치">§5.4 설정 위치</h4>
+<p>dcode 는 두 단계의 설정 폴더를 본다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>위치</th>
+<th>용도</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>~/.deepagents/config.toml</code></td>
+<td>모델·에이전트 디폴트</td>
+</tr>
+<tr>
+<td><code>~/.deepagents/.env</code></td>
+<td>API 키·시크릿</td>
+</tr>
+<tr>
+<td><code>~/.deepagents/hooks.json</code></td>
+<td>라이프사이클 훅</td>
+</tr>
+<tr>
+<td><code>~/.deepagents/&lt;agent_name&gt;/</code></td>
+<td>에이전트별 메모리·스레드</td>
+</tr>
+<tr>
+<td><code>.deepagents/</code> (프로젝트 루트)</td>
+<td>프로젝트 전용 메모리·Skills</td>
+</tr>
+</tbody>
+</table>
+<p><code>~/.deepagents/&lt;agent&gt;/</code> 와 <code>.deepagents/</code> 분리가 핵심이다. 사용자 차원의 기본 메모리와 <strong>이 프로젝트에서만</strong> 통하는 메모리를 같은 모델이 분리해서 활용한다.</p>
+<h4 id="5.5-샌드박스-코드-실행을-격리하기">§5.5 샌드박스 — 코드 실행을 격리하기</h4>
+<p><code>execute</code> 가 위험할 수 있으니, dcode 는 여러 원격 백엔드를 옵션으로 받는다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>백엔드</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LangSmith</strong></td>
+<td>기본 포함</td>
+</tr>
+<tr>
+<td><strong>AgentCore</strong></td>
+<td>extras 필요</td>
+</tr>
+<tr>
+<td><strong>Modal</strong></td>
+<td>extras 필요</td>
+</tr>
+<tr>
+<td><strong>Daytona</strong></td>
+<td>extras 필요</td>
+</tr>
+<tr>
+<td><strong>Runloop</strong></td>
+<td>extras 필요</td>
+</tr>
+</tbody>
+</table>
+<p>별도 지정이 없으면 <code>--sandbox none</code> 으로 로컬 실행이다. 운영 환경이라면 Modal 이나 Daytona 같은 원격 샌드박스로 격리하는 게 안전하다.</p>
+<h4 id="5.6-권한-모델-위험한-작업은-사람에게">§5.6 권한 모델 — 위험한 작업은 사람에게</h4>
+<p>기본적으로 다음 도구들은 <strong>사용자 승인 후에만</strong> 실행된다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>카테고리</th>
+<th>도구</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>파일 쓰기</td>
+<td><code>write_file</code>, <code>edit_file</code></td>
+</tr>
+<tr>
+<td>셸 실행</td>
+<td><code>execute</code></td>
+</tr>
+<tr>
+<td>웹 작업</td>
+<td><code>web_search</code>, <code>fetch_url</code></td>
+</tr>
+<tr>
+<td>위임</td>
+<td><code>task</code></td>
+</tr>
+<tr>
+<td>컨텍스트 압축</td>
+<td><code>compact_conversation</code></td>
+</tr>
+</tbody>
+</table>
+<p>승인 동작은 두 방식으로 끌 수 있다.</p>
+<pre><code class="language-bash">dcode -y                # 모든 승인 통과
+dcode --auto-approve    # 동의
+# 또는 대화 중 Shift+Tab 로 토글
+</code></pre>
+<p>비대화 모드(<code>-n</code>)에서는 셸 명령에 화이트리스트도 줄 수 있다.</p>
+<pre><code class="language-bash">dcode -n &quot;fix tests&quot; -S &quot;pytest,git,make&quot;
+dcode -n &quot;build&quot; -S recommended   # 안전 디폴트
+dcode -n &quot;fix&quot; -S all             # 어떤 명령이든
+</code></pre>
+<h4 id="5.7-dcode-가-일반-deep-agent-와-다른-점">§5.7 dcode 가 일반 Deep Agent 와 다른 점</h4>
+<p>핵심 차이는 <strong>개발 워크플로우 특화</strong>다.</p>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>항목</th>
+<th>일반 Deep Agent</th>
+<th>Deep Agents Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>도구 구성</td>
+<td>사용자가 직접 조립</td>
+<td>코딩 도구 빌트인</td>
+</tr>
+<tr>
+<td>메모리</td>
+<td>세션 단위</td>
+<td>세션 간 지속, 프로젝트별 분리</td>
+</tr>
+<tr>
+<td>HITL</td>
+<td><code>interrupt_on</code> 직접 설정</td>
+<td>위험 도구는 기본 승인</td>
+</tr>
+<tr>
+<td>실행 환경</td>
+<td>사용자 정의</td>
+<td>LangSmith 샌드박스 기본 + 다수 옵션</td>
+</tr>
+<tr>
+<td>관측성</td>
+<td>옵션</td>
+<td>LangSmith 트레이싱 기본</td>
+</tr>
+</tbody>
+</table>
+<h4 id="5.8-어떻게-한-그림이-되나">§5.8 어떻게 한 그림이 되나</h4>
+<p>이번 주의 네 주제는 한 무대 위에 있다.</p>
+<ol class="nums">
+<li><strong>MCP</strong> 로 외부 도구를 끌어온다. — dcode 는 MCP 서버를 자동 인식.</li>
+<li>그 위의 에이전트가 작업을 한다. — <code>dcode</code> 자체.</li>
+<li>다른 에이전트와 협력해야 하면 <strong>A2A</strong> 로 호출한다. — LangSmith 에 배포된 다른 그래프.</li>
+<li>사람과의 접점은 터미널 또는 <strong>ACP</strong> 를 통한 에디터다. — Zed, VS Code, Neovim.</li>
+</ol>
+<blockquote>
+<p><strong>요점.</strong> Deep Agents Code 는 &quot;프로토콜의 소비자&quot; 다. MCP 로 도구를 받고, A2A 로 동료 에이전트와 말하며, ACP 를 통해 에디터에 들어간다. 세 프로토콜은 따로 외울 게 아니라 한 에이전트의 입·출구다.</p>
+</blockquote>
+<hr />
+<h3 id="부록-a.-세-프로토콜-빠른-비교">부록 A. 세 프로토콜 빠른 비교</h3>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>항목</th>
+<th>MCP</th>
+<th>A2A</th>
+<th>ACP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>표준화 대상</td>
+<td>에이전트 ↔ 도구</td>
+<td>에이전트 ↔ 에이전트</td>
+<td>에이전트 ↔ 에디터</td>
+</tr>
+<tr>
+<td>메시지 형식</td>
+<td>JSON-RPC (HTTP·stdio)</td>
+<td>JSON-RPC (HTTP)</td>
+<td>JSON-RPC (stdio 기본)</td>
+</tr>
+<tr>
+<td>디스커버리</td>
+<td>서버가 tools/resources/prompts 광고</td>
+<td><code>/.well-known/agent-card.json</code></td>
+<td><code>initialize</code> 시 capabilities 교환</td>
+</tr>
+<tr>
+<td>인증</td>
+<td>헤더·<code>httpx.Auth</code>·OAuth</td>
+<td>서버 정책</td>
+<td><code>authenticate</code> 메소드(선택)</td>
+</tr>
+<tr>
+<td>세션 식별자</td>
+<td>기본 stateless, <code>session()</code> 으로 stateful</td>
+<td><code>contextId</code> + <code>taskId</code></td>
+<td><code>sessionId</code> (<code>session/new</code> 응답)</td>
+</tr>
+<tr>
+<td>대표 구현</td>
+<td>langchain-mcp-adapters</td>
+<td>langgraph-api ≥ 0.4.21</td>
+<td>deepagents-acp, Zed</td>
+</tr>
+</tbody>
+</table>
+<h3 id="부록-b.-트러블슈팅">부록 B. 트러블슈팅</h3>
+<table class="cmp-table">
+<thead>
+<tr>
+<th>증상</th>
+<th>원인 / 해결</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MCP stdio 서버가 매 호출마다 다시 뜨는 듯</td>
+<td><code>MultiServerMCPClient</code> 기본은 stateless. <code>async with client.session(...)</code> 로 명시</td>
+</tr>
+<tr>
+<td>A2A 가 404 로 응답</td>
+<td>그래프 상태에 <code>messages</code> 키가 없거나 <code>langgraph-api</code> 가 0.4.21 미만</td>
+</tr>
+<tr>
+<td>A2A 두 번째 호출이 새 스레드로 잡힘</td>
+<td>첫 응답의 <code>contextId</code>·<code>taskId</code> 를 다시 넣지 않음</td>
+</tr>
+<tr>
+<td>Zed 에서 외부 에이전트가 안 보임</td>
+<td><code>settings.json</code> 의 <code>agent_servers.&lt;name&gt;.command</code> 가 절대경로가 아니거나 실행 권한 없음</td>
+</tr>
+<tr>
+<td>ACP <code>fs/*</code> 호출이 거부됨</td>
+<td><code>initialize</code> 단계에서 클라이언트가 해당 capability 를 광고하지 않음</td>
+</tr>
+<tr>
+<td>dcode 가 매번 승인을 묻는다</td>
+<td><code>-y</code> 또는 <code>--auto-approve</code>, 또는 대화 중 Shift+Tab</td>
+</tr>
+</tbody>
+</table>
+<h3 id="부록-c.-실행-스크립트">부록 C. 실행 스크립트</h3>
+<p>실행 스크립트는 <code>scripts/README.md</code> 에 정리되어 있다.</p>
+<ul class="bullets">
+<li><code>01</code>, <code>02</code> 는 <strong>MCP</strong> 클라이언트 패턴 (기본 / 인터셉터).</li>
+<li><code>03</code> 은 <strong>A2A</strong> Agent Card 디스커버리.</li>
+<li><code>04</code> 는 <strong>ACP</strong> Deep Agents 서버.</li>
+<li><code>05</code> 는 <strong>Deep Agents Code 스타일</strong>의 빌트인 코딩 도구 데모.</li>
+</ul>
+
+</section>
+<section class="s-refs">
+  <h3 id="부록-c.-참고문헌">부록 C. 참고문헌</h3>
+  <h4>기타</h4>
+  <ol class="references" style="list-style:none; padding:0;">
+    <li id="ref-1" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[1]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">LangChain 공식 문서 — Model Context Protocol (MCP). <a href="https://docs.langchain.com/oss/python/langchain/mcp" target="_blank" rel="noopener">https://docs.langchain.com/oss/python/langchain/mcp</a></span></li>
+    <li id="ref-2" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[2]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">LangSmith 공식 문서 — Agent-to-Agent (A2A) Server. <a href="https://docs.langchain.com/langsmith/server-a2a" target="_blank" rel="noopener">https://docs.langchain.com/langsmith/server-a2a</a></span></li>
+    <li id="ref-3" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[3]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">LangChain 공식 문서 — Deep Agents ACP. <a href="https://docs.langchain.com/oss/python/deepagents/acp" target="_blank" rel="noopener">https://docs.langchain.com/oss/python/deepagents/acp</a></span></li>
+    <li id="ref-4" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[4]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">LangChain 공식 문서 — Deep Agents Code Overview. <a href="https://docs.langchain.com/oss/python/deepagents/code/overview" target="_blank" rel="noopener">https://docs.langchain.com/oss/python/deepagents/code/overview</a></span></li>
+    <li id="ref-5" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[5]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">Zed Industries — Bring Your Own Agent to Zed. <a href="https://zed.dev/blog/bring-your-own-agent-to-zed" target="_blank" rel="noopener">https://zed.dev/blog/bring-your-own-agent-to-zed</a></span></li>
+    <li id="ref-6" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[6]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">Agent Client Protocol — Overview. <a href="https://agentclientprotocol.com/overview/introduction" target="_blank" rel="noopener">https://agentclientprotocol.com/overview/introduction</a></span></li>
+    <li id="ref-7" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[7]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">Agent Client Protocol — Protocol Reference. <a href="https://agentclientprotocol.com/protocol/overview" target="_blank" rel="noopener">https://agentclientprotocol.com/protocol/overview</a></span></li>
+    <li id="ref-8" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[8]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">Zed Industries — Agent Client Protocol (GitHub). <a href="https://github.com/zed-industries/agent-client-protocol" target="_blank" rel="noopener">https://github.com/zed-industries/agent-client-protocol</a></span></li>
+    <li id="ref-9" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[9]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">Google Cloud — Agent2Agent (A2A) Protocol. <a href="https://google.github.io/A2A" target="_blank" rel="noopener">https://google.github.io/A2A</a></span></li>
+    <li id="ref-10" style="display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);"><span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--brand-primary);min-width:36px;">[10]</span><span style="flex:1;font-size:9.5pt;line-height:1.5;">Model Context Protocol — Specification. <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">https://modelcontextprotocol.io</a></span></li>
+  </ol>
+</section>
+  </article>
+  <script src="/Users/sehun/work/langchain-docs/template/report.js"></script>
+</body>
+</html>

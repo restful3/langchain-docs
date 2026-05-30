@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500">
+  <rect width="960" height="500" fill="#f8fafc"/>
+  <rect x="50" y="50" width="220" height="400" rx="14" fill="#dc2626"/>
+  <text x="160" y="90" text-anchor="middle" font-family="Arial" font-size="22" fill="white" font-weight="bold">Zed</text>
+  <text x="160" y="112" text-anchor="middle" font-family="Arial" font-size="14" fill="white">(Client / Editor)</text>
+  <text x="160" y="142" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- 채팅 패널 UI</text>
+  <text x="160" y="162" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- 다중버퍼 diff</text>
+  <text x="160" y="182" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- LSP 인텔리전스</text>
+  <text x="160" y="202" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- 권한 모달</text>
+  <text x="160" y="232" text-anchor="middle" font-family="Arial" font-size="13" fill="white">settings.json</text>
+  <text x="160" y="252" text-anchor="middle" font-family="Arial" font-size="13" fill="white">agent_servers.</text>
+  <text x="160" y="270" text-anchor="middle" font-family="Arial" font-size="13" fill="white">DeepAgents.command</text>
+  <rect x="690" y="50" width="220" height="400" rx="14" fill="#0f766e"/>
+  <text x="800" y="90" text-anchor="middle" font-family="Arial" font-size="22" fill="white" font-weight="bold">Deep Agent</text>
+  <text x="800" y="112" text-anchor="middle" font-family="Arial" font-size="14" fill="white">(ACP Server, subprocess)</text>
+  <text x="800" y="142" text-anchor="middle" font-family="Arial" font-size="13" fill="white">deepagents-acp</text>
+  <text x="800" y="162" text-anchor="middle" font-family="Arial" font-size="13" fill="white">AgentServerACP(agent)</text>
+  <text x="800" y="190" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- subagents</text>
+  <text x="800" y="210" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- MCP tools</text>
+  <text x="800" y="230" text-anchor="middle" font-family="Arial" font-size="13" fill="white">- checkpointer</text>
+  <text x="800" y="260" text-anchor="middle" font-family="Arial" font-size="13" fill="white">run_agent(server)</text>
+  <text x="800" y="278" text-anchor="middle" font-family="Arial" font-size="13" fill="white">⮕ stdin/stdout 루프</text>
+  <path d="M270 100 H690" stroke="#334155" stroke-width="3" marker-end="url(#a)"/>
+  <text x="480" y="92" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f172a">1. initialize (캐퍼빌리티 협상)</text>
+  <path d="M270 150 H690" stroke="#334155" stroke-width="3" marker-end="url(#a)"/>
+  <text x="480" y="142" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f172a">2. session/new</text>
+  <path d="M270 200 H690" stroke="#334155" stroke-width="3" marker-end="url(#a)"/>
+  <text x="480" y="192" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f172a">3. session/prompt</text>
+  <path d="M690 250 H270" stroke="#0f766e" stroke-width="3" marker-end="url(#b)"/>
+  <text x="480" y="242" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f766e">4. session/update (메시지 청크 · tool call)</text>
+  <path d="M690 300 H270" stroke="#0f766e" stroke-width="3" marker-end="url(#b)"/>
+  <text x="480" y="292" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f766e">5. fs/read_text_file · fs/write_text_file</text>
+  <path d="M690 350 H270" stroke="#0f766e" stroke-width="3" marker-end="url(#b)"/>
+  <text x="480" y="342" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f766e">6. session/request_permission</text>
+  <path d="M270 400 H690" stroke="#334155" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#a)"/>
+  <text x="480" y="392" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f172a">7. session/cancel (필요 시)</text>
+  <text x="480" y="438" text-anchor="middle" font-family="Arial" font-size="14" fill="#475569" font-style="italic">JSON-RPC 2.0 over stdio · 모든 경로는 절대경로 · 키는 camelCase</text>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker>
+    <marker id="b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#0f766e"/></marker>
+  </defs>
+</svg>

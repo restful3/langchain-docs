@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500">
+  <rect width="960" height="500" fill="#f8fafc"/>
+  <rect x="80" y="40" width="800" height="60" rx="10" fill="#dc2626"/>
+  <text x="480" y="78" text-anchor="middle" font-family="Arial" font-size="20" fill="white" font-weight="bold">CLI · ACP · Stdin Pipe</text>
+  <rect x="80" y="130" width="800" height="80" rx="10" fill="#0f766e"/>
+  <text x="480" y="168" text-anchor="middle" font-family="Arial" font-size="22" fill="white" font-weight="bold">dcode (Deep Agents Code)</text>
+  <text x="480" y="195" text-anchor="middle" font-family="Arial" font-size="13" fill="white">tool calling 가능한 LLM · 지속 메모리 · Skills · 승인 기반 실행</text>
+  <rect x="80" y="240" width="800" height="120" rx="10" fill="#2563eb"/>
+  <text x="480" y="266" text-anchor="middle" font-family="Arial" font-size="18" fill="white" font-weight="bold">Built-in Tools</text>
+  <text x="170" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">ls</text>
+  <text x="170" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">read_file</text>
+  <text x="170" y="335" text-anchor="middle" font-family="Arial" font-size="13" fill="white">write_file</text>
+  <text x="170" y="352" text-anchor="middle" font-family="Arial" font-size="13" fill="white">edit_file</text>
+  <text x="320" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">glob</text>
+  <text x="320" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">grep</text>
+  <text x="320" y="335" text-anchor="middle" font-family="Arial" font-size="13" fill="white">execute</text>
+  <text x="470" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">web_search</text>
+  <text x="470" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">fetch_url</text>
+  <text x="470" y="335" text-anchor="middle" font-family="Arial" font-size="13" fill="white">task (subagent)</text>
+  <text x="630" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">ask_user</text>
+  <text x="630" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">write_todos</text>
+  <text x="630" y="335" text-anchor="middle" font-family="Arial" font-size="13" fill="white">compact_conversation</text>
+  <text x="800" y="295" text-anchor="middle" font-family="Arial" font-size="13" fill="white">MCP tools</text>
+  <text x="800" y="315" text-anchor="middle" font-family="Arial" font-size="13" fill="white">(원격 도구 자동)</text>
+  <rect x="80" y="390" width="380" height="80" rx="10" fill="#7c3aed"/>
+  <text x="270" y="420" text-anchor="middle" font-family="Arial" font-size="16" fill="white" font-weight="bold">Sandbox 백엔드</text>
+  <text x="270" y="445" text-anchor="middle" font-family="Arial" font-size="13" fill="white">LangSmith (기본) · Modal · Daytona</text>
+  <text x="270" y="462" text-anchor="middle" font-family="Arial" font-size="13" fill="white">AgentCore · Runloop · local none</text>
+  <rect x="500" y="390" width="380" height="80" rx="10" fill="#475569"/>
+  <text x="690" y="420" text-anchor="middle" font-family="Arial" font-size="16" fill="white" font-weight="bold">Memory · Skills</text>
+  <text x="690" y="445" text-anchor="middle" font-family="Arial" font-size="13" fill="white">~/.deepagents/&lt;agent&gt;/  (사용자 메모리)</text>
+  <text x="690" y="462" text-anchor="middle" font-family="Arial" font-size="13" fill="white">.deepagents/  (프로젝트 메모리·SKILL.md)</text>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+</svg>

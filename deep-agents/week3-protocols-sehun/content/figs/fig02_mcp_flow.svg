@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#f8fafc"/>
+  <rect x="60" y="140" width="220" height="140" rx="12" fill="#0f766e"/>
+  <text x="170" y="190" text-anchor="middle" font-family="Arial" font-size="22" fill="white">LangChain Agent</text>
+  <text x="170" y="222" text-anchor="middle" font-family="Arial" font-size="14" fill="white">create_agent(...)</text>
+  <text x="170" y="244" text-anchor="middle" font-family="Arial" font-size="14" fill="white">tools = await client.get_tools()</text>
+  <rect x="370" y="160" width="220" height="100" rx="12" fill="#2563eb"/>
+  <text x="480" y="195" text-anchor="middle" font-family="Arial" font-size="20" fill="white">MultiServerMCPClient</text>
+  <text x="480" y="222" text-anchor="middle" font-family="Arial" font-size="13" fill="white">stdio · http · sse</text>
+  <text x="480" y="240" text-anchor="middle" font-family="Arial" font-size="13" fill="white">interceptors · auth</text>
+  <path d="M280 210 H370" stroke="#334155" stroke-width="3" marker-end="url(#a)"/>
+  <rect x="680" y="40" width="220" height="80" rx="10" fill="#7c3aed"/>
+  <text x="790" y="72" text-anchor="middle" font-family="Arial" font-size="18" fill="white">math (stdio)</text>
+  <text x="790" y="98" text-anchor="middle" font-family="Arial" font-size="12" fill="white">subprocess · 로컬</text>
+  <rect x="680" y="180" width="220" height="80" rx="10" fill="#7c3aed"/>
+  <text x="790" y="212" text-anchor="middle" font-family="Arial" font-size="18" fill="white">weather (http)</text>
+  <text x="790" y="238" text-anchor="middle" font-family="Arial" font-size="12" fill="white">localhost:8000/mcp</text>
+  <rect x="680" y="320" width="220" height="80" rx="10" fill="#7c3aed"/>
+  <text x="790" y="352" text-anchor="middle" font-family="Arial" font-size="18" fill="white">github (http+auth)</text>
+  <text x="790" y="378" text-anchor="middle" font-family="Arial" font-size="12" fill="white">Bearer 토큰</text>
+  <path d="M590 200 C640 200 640 80 680 80" stroke="#334155" stroke-width="3" fill="none" marker-end="url(#a)"/>
+  <path d="M590 210 H680" stroke="#334155" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M590 230 C640 230 640 360 680 360" stroke="#334155" stroke-width="3" fill="none" marker-end="url(#a)"/>
+  <text x="935" y="220" text-anchor="middle" font-family="Arial" font-size="14" fill="#0f172a" font-weight="bold">MCP</text>
+  <text x="935" y="240" text-anchor="middle" font-family="Arial" font-size="12" fill="#0f172a">Tools</text>
+  <text x="935" y="256" text-anchor="middle" font-family="Arial" font-size="12" fill="#0f172a">Resources</text>
+  <text x="935" y="272" text-anchor="middle" font-family="Arial" font-size="12" fill="#0f172a">Prompts</text>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="440" viewBox="0 0 960 440">
+  <rect width="960" height="440" fill="#f8fafc"/>
+  <rect x="60" y="160" width="240" height="120" rx="12" fill="#0f766e"/>
+  <text x="180" y="200" text-anchor="middle" font-family="Arial" font-size="22" fill="white">Caller Agent</text>
+  <text x="180" y="230" text-anchor="middle" font-family="Arial" font-size="14" fill="white">message/send</text>
+  <text x="180" y="252" text-anchor="middle" font-family="Arial" font-size="14" fill="white">message/stream</text>
+  <rect x="640" y="160" width="240" height="120" rx="12" fill="#7c3aed"/>
+  <text x="760" y="195" text-anchor="middle" font-family="Arial" font-size="22" fill="white">Callee Agent</text>
+  <text x="760" y="225" text-anchor="middle" font-family="Arial" font-size="13" fill="white">LangSmith Deployment</text>
+  <text x="760" y="245" text-anchor="middle" font-family="Arial" font-size="13" fill="white">(messages 키 보유)</text>
+  <text x="760" y="262" text-anchor="middle" font-family="Arial" font-size="13" fill="white">/.well-known/agent-card.json</text>
+  <path d="M300 200 H640" stroke="#334155" stroke-width="3" marker-end="url(#a)"/>
+  <text x="470" y="186" text-anchor="middle" font-family="Arial" font-size="14" fill="#0f172a">POST /a2a/{assistant_id}</text>
+  <text x="470" y="220" text-anchor="middle" font-family="Arial" font-size="13" fill="#475569">{contextId, taskId, message}</text>
+  <path d="M640 250 H300" stroke="#0f766e" stroke-width="3" marker-end="url(#b)"/>
+  <text x="470" y="278" text-anchor="middle" font-family="Arial" font-size="13" fill="#0f766e">{contextId, taskId, response parts}</text>
+  <rect x="320" y="350" width="320" height="60" rx="10" fill="#475569"/>
+  <text x="480" y="385" text-anchor="middle" font-family="Arial" font-size="14" fill="white">LangSmith: contextId → thread_id 매핑</text>
+  <path d="M480 280 V350" stroke="#475569" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#c)"/>
+  <rect x="40" y="40" width="280" height="60" rx="10" fill="#dc2626"/>
+  <text x="180" y="65" text-anchor="middle" font-family="Arial" font-size="14" fill="white">Step 1. GET /.well-known/agent-card.json</text>
+  <text x="180" y="85" text-anchor="middle" font-family="Arial" font-size="12" fill="white">→ skills · I/O modes · A2A URL 광고</text>
+  <path d="M180 100 V160" stroke="#dc2626" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#d)"/>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker>
+    <marker id="b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#0f766e"/></marker>
+    <marker id="c" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker>
+    <marker id="d" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#dc2626"/></marker>
+  </defs>
+</svg>
