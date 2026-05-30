@@ -24,6 +24,8 @@ load_dotenv(find_dotenv())
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODEL = os.environ.get("MCP_MODEL", "claude-sonnet-4-6")
+# weather_server.py 가 검증하는 토큰과 같은 값이어야 한다 (.env 의 MCP_SERVER_TOKEN).
+WEATHER_TOKEN = os.environ.get("MCP_SERVER_TOKEN", "demo-secret-token")
 
 
 async def main() -> None:
@@ -37,6 +39,7 @@ async def main() -> None:
             "weather": {
                 "transport": "http",
                 "url": "http://localhost:8000/mcp",
+                "headers": {"Authorization": f"Bearer {WEATHER_TOKEN}"},
             },
         }
     )
