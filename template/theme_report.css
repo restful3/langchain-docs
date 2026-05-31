@@ -137,7 +137,7 @@ h1, h2, h3, h4, h5, h6 {
   page-break-before: always !important;
 }
 
-@page sec0 { @bottom-left { content: "§0 · Executive Summary"; } }
+@page sec0 { @bottom-left { content: "§0 · 핵심 요약"; } }
 @page sec1 { @bottom-left { content: "§1 · Computer Use"; } }
 @page sec2 { @bottom-left { content: "§2 · 빅3 벤더"; } }
 @page sec3 { @bottom-left { content: "§3 · 오픈소스 & 자율형 에이전트"; } }
@@ -372,7 +372,9 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--brand-primary);
   margin-bottom: 6px;
 }
-.report-section > h2 {
+.report-section > h1,
+.report-section > h2,
+.report-appendix > h1 {
   font-size: 22pt; font-weight: 900;
   color: var(--text);
   letter-spacing: -0.028em;
@@ -791,7 +793,8 @@ pre {
   font-family: 'JetBrains Mono', 'D2 Coding', monospace;
   font-size: 9.5pt;
   line-height: 1.65;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
   position: relative;
   border: 1px solid rgba(37, 99, 235, 0.22);
   box-shadow:
@@ -800,7 +803,8 @@ pre {
   break-inside: auto;
   orphans: 3;
   widows: 3;
-  white-space: pre-wrap;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
 }
 /* 상단 IDE 스타일 바 — 좌측 traffic-light 닷 3개 + 본문보다 살짝 밝은 배경, 통짜 검은 박스 인상 완화. */
 pre::before {
@@ -848,6 +852,38 @@ pre code {
   font-family: inherit !important;
   display: block;
   white-space: inherit;
+  min-width: max-content;
+}
+
+pre .c, pre .ch, pre .cm, pre .cp, pre .cpf, pre .c1, pre .cs {
+  color: #8B949E;
+  font-style: italic;
+}
+pre .k, pre .kc, pre .kd, pre .kn, pre .kp, pre .kr, pre .kt {
+  color: #FF7B72;
+  font-weight: 700;
+}
+pre .s, pre .sa, pre .sb, pre .sc, pre .dl, pre .sd, pre .s2, pre .se, pre .sh, pre .si, pre .sx, pre .sr, pre .s1, pre .ss {
+  color: #A5D6FF;
+}
+pre .m, pre .mb, pre .mf, pre .mh, pre .mi, pre .mo, pre .il {
+  color: #79C0FF;
+}
+pre .na, pre .nc, pre .nd, pre .ne, pre .nf, pre .fm {
+  color: #D2A8FF;
+}
+pre .nt, pre .nl, pre .nv, pre .vc, pre .vg, pre .vi, pre .vm {
+  color: #7EE787;
+}
+pre .nb, pre .bp {
+  color: #FFA657;
+}
+pre .o, pre .ow, pre .p {
+  color: #C9D1D9;
+}
+pre .err {
+  color: #FFDCD7;
+  background: rgba(248, 81, 73, 0.18);
 }
 .codeblock {
   margin: 8px 0;
@@ -1251,6 +1287,218 @@ pre code {
 }
 .report-controls button:hover { background: var(--surface-hover); color: var(--brand-primary); }
 
+.report-nav-toggle,
+.report-settings button,
+.report-settings a,
+.report-toc-drawer__head button {
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.report-nav-toggle,
+.report-settings-toggle {
+  position: fixed;
+  top: 22px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  z-index: 90;
+  font: 800 18px/1 'Inter', 'Noto Sans KR', sans-serif;
+}
+.report-nav-toggle { left: 22px; }
+.report-settings {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  z-index: 90;
+  display: block;
+}
+.report-settings-toggle {
+  position: static;
+}
+/* 스크롤 방향 기반 자동 숨김 (Medium 스타일) — 아래로 스크롤 시 body.chrome-hidden 으로
+   좌상단 TOC 토글·우상단 설정 토글을 숨기고, 위로 스크롤·최상단·좌우 가장자리 hover·
+   터치·키 입력 시 report.js 가 복귀시킨다. 인쇄 시 컨트롤 숨김은 아래 @media print 블록이 담당. */
+body.chrome-hidden .report-nav-toggle,
+body.chrome-hidden .report-settings {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.report-nav-toggle,
+.report-settings {
+  transition: opacity 0.2s ease, background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.report-settings-panel {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 248px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  color: var(--text);
+  box-shadow: 0 18px 54px rgba(0,0,0,0.18);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top right;
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+}
+.report-settings-panel.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.report-settings-panel__group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+.report-settings-panel__group:first-child { padding-top: 0; }
+.report-settings-panel__group:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.report-settings-panel__label {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.report-quick-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.report-settings-panel #themeToggle,
+.report-settings-action,
+.report-settings a {
+  position: static;
+  width: auto;
+  height: 34px;
+  min-width: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font: 800 12px/1 'Inter', 'Noto Sans KR', sans-serif;
+  text-decoration: none;
+  box-shadow: none;
+}
+.report-settings-panel #themeToggle {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  font-size: 16px;
+}
+.report-quick-links a {
+  height: 32px;
+  min-width: 0;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+.report-settings-action {
+  height: 34px;
+}
+.report-settings-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+.report-nav-toggle:hover,
+.report-settings button:hover,
+.report-settings a:hover,
+.report-toc-drawer__head button:hover {
+  background: var(--surface-hover);
+  color: var(--brand-primary);
+  transform: translateY(-1px);
+}
+.report-toc-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(10,10,10,0.28);
+  backdrop-filter: blur(2px);
+}
+.report-toc-backdrop[hidden] { display: none; }
+.report-toc-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(360px, calc(100vw - 44px));
+  z-index: 100;
+  background: var(--surface);
+  color: var(--text);
+  border-right: 1px solid var(--border);
+  box-shadow: 20px 0 48px rgba(0,0,0,0.18);
+  transform: translateX(-102%);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+}
+.report-toc-drawer.is-open { transform: translateX(0); }
+.report-toc-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 22px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--brand-primary);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.report-toc-drawer__head button {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  box-shadow: none;
+  font-size: 20px;
+  line-height: 1;
+}
+.report-toc-drawer__list {
+  list-style: none;
+  overflow-y: auto;
+  padding: 12px 16px 28px;
+}
+.report-toc-drawer__item a {
+  display: block;
+  padding: 9px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.report-toc-drawer__item--h2 a {
+  padding-left: 22px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+.report-toc-drawer__item a:hover {
+  background: var(--surface-hover);
+  color: var(--brand-primary);
+}
+
 /* ===== ENTRANCE ANIMATIONS (IntersectionObserver 트리거) ===== */
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 .animate-in { opacity: 0; }
@@ -1293,7 +1541,11 @@ pre code {
     border-radius: 0;
     box-sizing: border-box;
   }
-  .report-controls { display: none !important; }
+  .report-controls,
+  .report-nav-toggle,
+  .report-settings,
+  .report-toc-backdrop,
+  .report-toc-drawer { display: none !important; }
   .animate-in { opacity: 1 !important; animation: none !important; transform: none !important; }
   a { color: var(--brand-primary) !important; border-bottom: none !important; }
   * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
@@ -1576,6 +1828,53 @@ aside.reading-more p { margin: 2px 0; font-size: 9.5pt; }
   box-shadow: 0 1px 2px rgba(0,0,0,0.025);
 }
 
+/* ===== Asset captions — 그림 / 표 / 코드 공통 번호 표기 ===== */
+.report-section .asset-caption,
+.report-appendix .asset-caption {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin: 12pt 0 6pt;
+  font-family: 'Inter', 'Noto Sans KR', sans-serif;
+  font-size: 9.5pt;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.4;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+.report-section .asset-caption__inner,
+.report-appendix .asset-caption__inner {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+}
+.report-section .asset-caption__chip,
+.report-appendix .asset-caption__chip {
+  display: inline-block;
+  font-size: 8pt;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand-deep), var(--brand-primary));
+  padding: 2px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.report-section .asset-caption__title,
+.report-appendix .asset-caption__title {
+  font-size: 10pt;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.4;
+}
+.report-section .asset-caption--code + pre,
+.report-appendix .asset-caption--code + pre {
+  margin-top: 0;
+}
+
 /* ===== 표 캡션 (figure-style numbering) — v5.3 신설 · v5.4 수정 =====
  * markdown 의 **표 N. 제목** 패턴이 build_structured.py 에서
  * <caption class="cmp-table__caption"><div class="cmp-table__caption-inner">...
@@ -1583,12 +1882,16 @@ aside.reading-more p { margin: 2px 0; font-size: 9.5pt; }
  * ※ <caption> 자체에 display:flex 를 주면 Chrome 이 caption-side:top 을 무시하고
  *   thead 아래로 렌더링하는 버그가 있어, flex 는 내부 div 로 이동시켰다. */
 .report-section table.cmp-table > caption.cmp-table__caption {
+  display: table-caption;
   caption-side: top;
   text-align: left;
   padding: 0 0 6pt 0;
   font-family: 'Inter', 'Noto Sans KR', sans-serif;
   break-after: avoid;
   page-break-after: avoid;
+}
+.report-section table.cmp-table > caption.asset-caption {
+  margin: 0;
 }
 .report-section table.cmp-table > caption.cmp-table__caption > .cmp-table__caption-inner {
   display: flex;
@@ -1670,6 +1973,32 @@ aside.reading-more p { margin: 2px 0; font-size: 9.5pt; }
   font-size: 9pt;
   color: var(--text-secondary);
   margin-top: 2pt;
+}
+.report-figure {
+  margin: 14pt 0 18pt;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.report-figure > .asset-caption {
+  margin-top: 0;
+}
+.report-figure > img,
+.report-figure > svg {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  margin: 6pt auto;
+}
+.report-figure > .asset-note {
+  display: block;
+  margin: 6pt auto 0;
+  max-width: 92%;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 9pt;
+  line-height: 1.45;
+  font-style: italic;
 }
 .report-section table.cmp-table thead th {
   background: linear-gradient(180deg, var(--brand-primary) 0%, var(--brand-deep) 100%);
@@ -2251,7 +2580,9 @@ aside.reading-more p { margin: 2px 0; font-size: 9.5pt; }
 }
 
 /* ===== 고아 문단 방지 (v2 컴포넌트 포함) ===== */
+.report-section h1,
 .report-section h2,
+.report-appendix h1,
 .report-section h3,
 .slide-h3,
 .sub-h4 {
@@ -2703,3 +3034,572 @@ aside.reading-more,
   color: #047857;
 }
 
+/* =========================================================================
+ * BLOG MODE OVERLAY — `.continuous-mode` 스코프
+ *
+ * A4 인쇄/PDF 용 기본 스타일은 그대로 두고, 브라우저에서 보는 "테크 블로그"
+ * 형태를 위한 override 집합. build_all.py 가 report 빌드에 `--continuous
+ * --show-divider` 플래그를 넣어 `<article class="report continuous-mode
+ * show-divider">` 가 emit되면 본 블록이 활성화된다.
+ *
+ * 디자인 의도 — Vercel/Stripe/Anthropic 블로그 톤: max-width 본문 + sticky
+ * sidebar TOC + 풀폭 hero + 어두운 코드 블록 + callout style blockquote +
+ * 부드러운 figure shadow.
+ * ========================================================================= */
+
+/* ----- 0. 글로벌 캔버스 ----- */
+html.theme-light:has(.continuous-mode) {
+  background: #F7F8FA;
+}
+body:has(> .continuous-mode) {
+  padding: 0;
+  overflow-x: hidden;
+}
+.continuous-mode {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  --reader-body-size: 17px;
+  --reader-line-height: 1.76;
+  --reader-column-width: 820px;
+}
+html.reader-size-compact .continuous-mode {
+  --reader-body-size: 16px;
+  --reader-line-height: 1.74;
+  --reader-column-width: 760px;
+}
+html.reader-size-large .continuous-mode {
+  --reader-body-size: 18.5px;
+  --reader-line-height: 1.78;
+  --reader-column-width: 860px;
+}
+
+/* ----- 1. Article header — A4 cover -> technical blog title block ----- */
+.continuous-mode .report-cover {
+  break-after: auto !important;
+  page-break-after: auto !important;
+  min-height: auto;
+  width: auto;
+  max-width: var(--reader-column-width);
+  margin: 0 auto;
+  padding: 72px clamp(20px, 5vw, 32px) 44px;
+  background: transparent;
+  border-bottom: 1px solid rgba(15,44,89,0.12);
+  box-sizing: border-box;
+  overflow: visible;
+}
+.continuous-mode .report-cover::before {
+  display: none;
+}
+.continuous-mode .report-cover__wordmark {
+  display: none;
+}
+.continuous-mode .report-cover__wordmark-name {
+  font-size: 22px;
+  letter-spacing: 0;
+}
+.continuous-mode .report-cover__wordmark-sub {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+.continuous-mode .report-cover__signature {
+  position: static;
+  order: 2;
+  align-self: flex-start;
+  margin-top: 14px;
+  font-family: 'Inter', 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  color: var(--text-secondary);
+}
+.continuous-mode .report-cover__kicker {
+  order: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  margin-bottom: 22px;
+  padding: 6px 14px;
+  background: var(--brand-soft);
+  border-radius: 999px;
+  color: var(--brand-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.continuous-mode .report-cover__kicker::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.18);
+}
+.continuous-mode .report-cover__title {
+  order: 3;
+  max-width: 100%;
+  margin: 0 0 18px;
+  font-size: 48px;
+  line-height: 1.06;
+  letter-spacing: 0;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+.continuous-mode .report-cover__subtitle {
+  order: 4;
+  max-width: 36ch;
+  margin: 0 0 30px;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.continuous-mode .report-cover__meta {
+  order: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(15,44,89,0.12);
+  font-size: 13px;
+}
+.continuous-mode .report-cover__meta div {
+  min-width: 120px;
+}
+.continuous-mode .report-cover__meta dt {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+.continuous-mode .report-cover__meta dd {
+  color: var(--text-secondary);
+}
+
+/* ----- 2. Main container — reader-width article column ----- */
+.continuous-mode .report-toc,
+.continuous-mode .report-section,
+.continuous-mode .report-appendix {
+  max-width: var(--reader-column-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(20px, 5vw, 32px);
+  padding-right: clamp(20px, 5vw, 32px);
+}
+.continuous-mode .report-section {
+  padding-top: clamp(48px, 7vw, 80px);
+  padding-bottom: clamp(48px, 7vw, 80px);
+}
+
+/* ----- 3. TOC — compact article outline ----- */
+.continuous-mode .report-toc {
+  padding-top: 28px;
+  padding-bottom: 28px;
+  margin-top: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(15,44,89,0.08);
+}
+.continuous-mode .report-toc__title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-primary);
+  margin-bottom: 14px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.continuous-mode .report-toc__item {
+  padding: 5px 0;
+  border-bottom: none;
+  font-size: 14px;
+  transition: background 0.15s ease;
+}
+.continuous-mode .report-toc__item--h3 { display: none; }
+.continuous-mode .report-toc__item:hover {
+  background: transparent;
+}
+.continuous-mode .report-toc__num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--brand-primary);
+  font-weight: 700;
+  margin-right: 10px;
+  min-width: 24px;
+  display: inline-block;
+}
+.continuous-mode .report-toc__leader,
+.continuous-mode .report-toc__page {
+  display: none;
+}
+.continuous-mode .report-toc__label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ----- 4. Section dividers — disabled for blog reading ----- */
+.continuous-mode.show-divider .section-divider {
+  display: none !important;
+}
+.continuous-mode.show-divider .section-divider::before {
+  display: none;
+}
+.continuous-mode.show-divider .section-divider > * { position: relative; z-index: 1; }
+
+/* ----- 5. Section kicker (eyebrow over title) ----- */
+.continuous-mode .report-section__kicker {
+  display: none;
+}
+
+/* ----- 6. Typography — heading rhythm ----- */
+.continuous-mode .report-section h1,
+.continuous-mode .report-appendix h1 {
+  font-size: 36px;
+  line-height: 1.1;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+.continuous-mode .report-section h2 {
+  font-size: 28px;
+  line-height: 1.2;
+  margin-top: 56px;
+  margin-bottom: 16px;
+  letter-spacing: 0;
+  scroll-margin-top: 24px;
+}
+.continuous-mode .report-section h3 {
+  font-size: 21px;
+  margin-top: 40px;
+  margin-bottom: 12px;
+  color: var(--text);
+  scroll-margin-top: 24px;
+}
+.continuous-mode .report-section h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 28px;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.continuous-mode .report-section p {
+  font-size: var(--reader-body-size);
+  line-height: var(--reader-line-height);
+  margin-bottom: 18px;
+  color: var(--text);
+}
+.continuous-mode .report-section ul,
+.continuous-mode .report-section ol {
+  font-size: var(--reader-body-size);
+  line-height: calc(var(--reader-line-height) - 0.04);
+  margin: 12px 0 18px 0;
+  padding-left: 24px;
+}
+.continuous-mode .report-section li { margin-bottom: 6px; }
+
+/* ----- 7. Links — accent + hover underline ----- */
+.continuous-mode .report-section a {
+  color: var(--accent-secondary);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(37,99,235,0.3);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.continuous-mode .report-section a:hover {
+  border-bottom-color: var(--accent-secondary);
+  background: rgba(37,99,235,0.06);
+}
+
+/* ----- 8. Code blocks — dark theme ----- */
+.continuous-mode .report-section pre {
+  background: #0F1419;
+  color: #E6EDF3;
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 42px 22px 18px;
+  margin: 20px 0 24px;
+  overflow-x: auto;
+  overflow-y: visible;
+  font-size: 13px;
+  line-height: 1.55;
+  box-shadow: 0 6px 24px rgba(15,44,89,0.08);
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
+.continuous-mode .report-section .asset-caption {
+  max-width: 100%;
+  margin: 20px 0 8px;
+}
+.continuous-mode .report-section .asset-caption--code + pre {
+  margin-top: 0;
+}
+.continuous-mode .report-section pre code {
+  background: transparent;
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 13px;
+  padding: 0;
+  white-space: pre;
+  min-width: max-content;
+}
+.continuous-mode .report-section p code,
+.continuous-mode .report-section li code,
+.continuous-mode .report-section td code {
+  background: rgba(15,44,89,0.07);
+  color: var(--accent-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ----- 9. Blockquote — callout box ----- */
+.continuous-mode .report-section blockquote {
+  margin: 24px 0;
+  padding: 16px 20px 16px 22px;
+  background: rgba(37,99,235,0.05);
+  border-left: 4px solid var(--accent-secondary);
+  border-radius: 6px;
+  color: var(--text);
+  font-style: normal;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.continuous-mode .report-section blockquote::before {
+  content: "";
+}
+.continuous-mode .report-section blockquote p { margin: 0; }
+.continuous-mode .report-section blockquote p + p { margin-top: 10px; }
+
+/* ----- 10. Tables — modern data ----- */
+.continuous-mode .report-section table {
+  width: 100%;
+  max-width: 100%;
+  margin: 24px 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  border: 1px solid rgba(15,44,89,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(15,44,89,0.04);
+}
+.continuous-mode .report-section table th {
+  background: rgba(15,44,89,0.06);
+  color: var(--brand-primary);
+  font-weight: 700;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(15,44,89,0.1);
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
+}
+.continuous-mode .report-section table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  vertical-align: top;
+  line-height: 1.55;
+}
+.continuous-mode .report-section table tr:last-child td { border-bottom: none; }
+.continuous-mode .report-section table tr:hover td { background: rgba(37,99,235,0.025); }
+
+/* ----- 11. Figures (img + small caption) ----- */
+.continuous-mode .report-section img,
+.continuous-mode .report-section svg {
+  display: block;
+  margin: 28px auto 8px;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(15,44,89,0.08);
+  background: #FFFFFF;
+}
+.continuous-mode .report-section .report-figure {
+  margin: 28px 0 34px;
+}
+.continuous-mode .report-section .report-figure > img,
+.continuous-mode .report-section .report-figure > svg {
+  margin: 10px auto 8px;
+}
+.continuous-mode .report-section .report-figure > .asset-note {
+  max-width: 90%;
+}
+.continuous-mode .report-section small {
+  display: block;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0 auto 32px;
+  max-width: 90%;
+  font-style: italic;
+}
+/* svg with native bg shouldn't get extra white pad */
+.continuous-mode .report-section img[src$=".svg"] { background: transparent; }
+
+/* ----- 12. HR — subtle divider ----- */
+.continuous-mode .report-section hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(15,44,89,0.15), transparent);
+  margin: 48px auto;
+  max-width: 200px;
+}
+
+/* ----- 13. Footnote list — compact ----- */
+.continuous-mode .report-section .footnotes,
+.continuous-mode .report-appendix {
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-top: 1px solid rgba(15,44,89,0.08);
+  padding-top: 32px;
+  margin-top: 48px;
+}
+.continuous-mode .report-section .footnotes li,
+.continuous-mode .report-appendix li {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+/* ----- 14. Responsive — narrow viewports ----- */
+@media (max-width: 720px) {
+  html:has(.continuous-mode),
+  body:has(> .continuous-mode),
+  .continuous-mode {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .report-nav-toggle {
+    top: auto;
+    bottom: 18px;
+    left: 18px;
+  }
+  .report-settings {
+    top: auto;
+    right: 18px;
+    bottom: 18px;
+  }
+  .report-settings-panel {
+    top: auto;
+    right: 0;
+    bottom: 50px;
+    transform: translateY(6px) scale(0.98);
+    transform-origin: bottom right;
+  }
+  .continuous-mode .report-cover {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box;
+    padding: 44px 18px 32px;
+  }
+  .continuous-mode .report-cover__wordmark {
+    margin-bottom: 28px;
+  }
+  .continuous-mode .report-cover__signature {
+    max-width: 100%;
+  }
+  .continuous-mode .report-cover__kicker {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .continuous-mode .report-cover__title {
+    font-size: clamp(20px, 6vw, 28px);
+    line-height: 1.14;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+  }
+  .continuous-mode .report-cover__subtitle {
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .continuous-mode .report-cover__meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .continuous-mode .report-toc,
+  .continuous-mode .report-section,
+  .continuous-mode .report-appendix {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .continuous-mode .callout--hero,
+  .continuous-mode .section-summary {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+  }
+  .continuous-mode .report-cover > *,
+  .continuous-mode .report-section > *,
+  .continuous-mode .report-appendix > * {
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  .continuous-mode .callout--hero .callout__body,
+  .continuous-mode .section-summary__body li {
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+  .continuous-mode .report-toc {
+    padding-top: 24px;
+    padding-bottom: 20px;
+  }
+  .continuous-mode .report-section h2 { margin-top: 40px; }
+  .continuous-mode .report-section h1 { font-size: 30px; }
+  .continuous-mode .report-section h2 { font-size: 24px; }
+  .continuous-mode .report-section h3 { font-size: 20px; }
+  .continuous-mode .report-section h4 { font-size: 15px; }
+  .continuous-mode .report-section pre {
+    font-size: 12px;
+    padding: 38px 16px 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .continuous-mode .report-section pre code { font-size: inherit; }
+  .continuous-mode .report-section table {
+    display: block;
+    overflow-x: auto;
+    font-size: 12.5px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .continuous-mode .report-section table th,
+  .continuous-mode .report-section table td { padding: 8px 10px; }
+  .continuous-mode .report-section p,
+  .continuous-mode .report-section li {
+    font-size: max(16px, var(--reader-body-size));
+    line-height: 1.72;
+    overflow-wrap: anywhere;
+  }
+  .continuous-mode .report-section small,
+  .continuous-mode .report-appendix li {
+    overflow-wrap: anywhere;
+  }
+  .report-settings-action,
+  .report-settings a {
+    height: 32px;
+    padding: 0 9px;
+    font-size: 11px;
+  }
+  .report-settings-panel {
+    width: min(248px, calc(100vw - 36px));
+  }
+  .continuous-mode .report-section img,
+  .continuous-mode .report-section svg {
+    border-radius: 8px;
+  }
+}

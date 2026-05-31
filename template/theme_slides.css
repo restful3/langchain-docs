@@ -1552,6 +1552,119 @@ code {
   font-variant-numeric: tabular-nums;
 }
 .slide-counter span { color: var(--brand-primary); }
+.slide-counter input#slideCur {
+  width: 2.8em;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--brand-primary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 2px;
+  text-align: center;
+  cursor: text;
+}
+.slide-counter input#slideCur:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  background: var(--surface-hover);
+}
+
+/* ===== TOC ===== */
+.toc-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10001;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(12px);
+  transition: color 0.2s, opacity 0.3s ease;
+}
+.toc-toggle:hover { color: var(--brand-primary); }
+.toc-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 320px;
+  z-index: 10000;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  box-shadow: 0 0 40px rgba(0,0,0,0.18);
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow-y: auto;
+  padding: 0 0 24px;
+}
+.toc-panel.open { transform: translateX(0); }
+.toc-panel__title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  padding: 28px 20px 16px 64px;
+}
+.toc-row {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  padding: 7px 18px 7px 24px;
+  line-height: 1.45;
+  transition: background 0.12s;
+}
+.toc-row:hover { background: var(--surface-hover); }
+.toc-row--group {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--brand-primary);
+  padding-left: 14px;
+  margin-top: 8px;
+}
+.toc-row.current {
+  background: var(--surface-hover);
+  box-shadow: inset 3px 0 0 var(--brand-primary);
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+.toc-row__num {
+  display: inline-block;
+  min-width: 2.8em;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+.toc-row--group .toc-row__num,
+.toc-row.current .toc-row__num { color: var(--brand-primary); }
+
+/* ===== Auto-hide chrome ===== */
+.slide-nav, .viz-menu, .toc-toggle, .deck-progress { transition: opacity 0.3s ease; }
+body.chrome-hidden .slide-nav,
+body.chrome-hidden .viz-menu,
+body.chrome-hidden .toc-toggle,
+body.chrome-hidden .deck-progress {
+  opacity: 0;
+  pointer-events: none;
+}
 
 /* ===== MENU ===== */
 .viz-menu { position: fixed; top: 16px; right: 16px; z-index: 9999; }
@@ -1565,22 +1678,75 @@ code {
 }
 .viz-menu-toggle:hover { color: var(--brand-primary); }
 .viz-menu-dropdown {
-  position: absolute; top: 48px; right: 0; min-width: 200px;
+  position: absolute; top: 48px; right: 0; width: 248px;
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 8px;
+  border-radius: 14px; padding: 14px;
   opacity: 0; visibility: hidden; transform: translateY(-8px);
   transition: all 0.2s; backdrop-filter: blur(16px);
   box-shadow: 0 14px 36px rgba(0,0,0,0.12);
 }
 .viz-menu-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
-.viz-menu-dropdown button {
-  width: 100%; padding: 10px 14px; border: none; border-radius: 8px;
-  background: transparent; color: var(--text); font-size: 13px;
-  font-family: inherit; cursor: pointer; text-align: left;
-  display: flex; align-items: center; gap: 10px;
-  transition: background 0.15s;
+.viz-menu-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
 }
-.viz-menu-dropdown button:hover { background: var(--surface-hover); }
+.viz-menu-group:first-child { padding-top: 0; }
+.viz-menu-group:last-child { padding-bottom: 0; border-bottom: none; }
+.viz-menu-label {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.viz-menu-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.viz-menu-dropdown button,
+.viz-menu-dropdown a {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: 800 12px/1 'Inter', 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.viz-menu-icon-action {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  font-size: 16px;
+}
+.viz-menu-action {
+  width: auto;
+  height: 34px;
+  min-width: 34px;
+  padding: 0 10px;
+}
+.viz-menu-links a {
+  height: 32px;
+  min-width: 0;
+  padding: 0 10px;
+  font-size: 11px;
+}
+.viz-menu-dropdown button:hover,
+.viz-menu-dropdown a:hover { background: var(--surface-hover); }
+.viz-menu-theme-label { display: none; }
 
 /* ===== ENTRANCE ANIMATIONS ===== */
 @keyframes fadeInUp {
@@ -1665,7 +1831,7 @@ code {
     break-after: auto !important;
   }
   .slide.is-active .animate-in { animation: none !important; opacity: 1 !important; transform: none !important; }
-  .slide-nav, .viz-menu, .deck-progress, .skip-to-content { display: none !important; }
+  .slide-nav, .viz-menu, .deck-progress, .skip-to-content, .toc-toggle, .toc-panel { display: none !important; }
   * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
   /* Defensive bleed for section dividers: HORIZONTAL OUTSET + INSET box-shadow.
      - Horizontal outset (left/right only) extends dark fill 8px beyond slide sides

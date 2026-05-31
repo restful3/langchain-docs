@@ -47,6 +47,7 @@ try:
         build_section_divider,
         build_toc_stub,
         build_references_appendix,
+        add_report_asset_captions,
         strip_h1_and_front_matter,
         split_front_matter_sections,
         parse_hero_kpi,
@@ -65,6 +66,7 @@ except ImportError:
         build_section_divider,
         build_toc_stub,
         build_references_appendix,
+        add_report_asset_captions,
         strip_h1_and_front_matter,
         split_front_matter_sections,
         parse_hero_kpi,
@@ -143,24 +145,42 @@ def section_meta_for(filepath: Path, sections: dict[str, SectionMeta]) -> Sectio
 
 def build_cover_external(title: str, subtitle: str, version_badge: str,
                          meta: dict, author: str, brand: dict) -> str:
-    """리포트 커버 — brand.yaml 의 페르소나 워드마크/서명/키커 주입."""
-    b = brand["brand"]
-    return f"""
-    <section class="report-cover">
-      <div class="report-cover__wordmark">
-        <span class="report-cover__wordmark-name">{b['name']}</span>
-        <span class="report-cover__wordmark-sub">{b['sub']}</span>
-      </div>
-      <span class="report-cover__signature">{b['signature']}</span>
-      <span class="report-cover__kicker">{b['cover_kicker']} · {version_badge}</span>
-      <h1 class="report-cover__title">{title}</h1>
-      <p class="report-cover__subtitle">{subtitle}</p>
-      <dl class="report-cover__meta">
-        <div><dt>저자</dt><dd>{author}</dd></div>
-        <div><dt>발행</dt><dd>{meta.get('date','2026-04')}</dd></div>
-      </dl>
-    </section>
+    """리포트 커버 — brand.yaml 의 페르소나 워드마크/서명/키커 주입.
+
+    빈 문자열인 brand.signature / brand.cover_kicker / version_badge /
+    subtitle / meta.date 는 해당 줄(또는 dl 항목) 자체를 출력하지 않는다.
     """
+    b = brand["brand"]
+    sig = (b.get("signature") or "").strip()
+    kicker = " · ".join(
+        x for x in ((b.get("cover_kicker") or "").strip(), (version_badge or "").strip()) if x
+    )
+    date_str = (meta.get("date") or "").strip()
+    session_label = (meta.get("session_label") or "").strip()
+
+    parts = [
+        '<section class="report-cover">',
+        '  <div class="report-cover__wordmark">',
+        f'    <span class="report-cover__wordmark-name">{b["name"]}</span>',
+        f'    <span class="report-cover__wordmark-sub">{b["sub"]}</span>',
+        '  </div>',
+    ]
+    if sig:
+        parts.append(f'  <span class="report-cover__signature">{sig}</span>')
+    if kicker:
+        parts.append(f'  <span class="report-cover__kicker">{kicker}</span>')
+    parts.append(f'  <h1 class="report-cover__title">{title}</h1>')
+    if subtitle:
+        parts.append(f'  <p class="report-cover__subtitle">{subtitle}</p>')
+    parts.append('  <dl class="report-cover__meta">')
+    parts.append(f'    <div><dt>저자</dt><dd>{author}</dd></div>')
+    if session_label:
+        parts.append(f'    <div><dt>회차</dt><dd>{session_label}</dd></div>')
+    if date_str:
+        parts.append(f'    <div><dt>발행</dt><dd>{date_str}</dd></div>')
+    parts.append('  </dl>')
+    parts.append('</section>')
+    return "\n".join(parts) + "\n"
 
 
 # ---------- shell ----------
@@ -178,7 +198,7 @@ SHELL_TIER1 = """<!DOCTYPE html>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script>Chart.defaults.animation = false;</script>
-  <link rel="stylesheet" href="{css_href}">
+  <!-- THEME_CSS_INLINE -->
   {brand_style}
   <style>
     sup.ref-cite a {{
@@ -201,10 +221,47 @@ SHELL_TIER1 = """<!DOCTYPE html>
   </style>
 </head>
 <body>
+  <button id="tocToggle" class="report-nav-toggle" type="button" aria-label="목차 열기" aria-controls="tocDrawer" aria-expanded="false" title="목차">
+    <span aria-hidden="true">☰</span>
+  </button>
+  <div class="report-settings" aria-label="설정">
+    <button id="settingsToggle" class="report-settings-toggle" type="button" aria-label="설정 열기" aria-controls="settingsPanel" aria-expanded="false" title="설정">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M9.67 4.14a2.34 2.34 0 0 1 4.66 0 2.34 2.34 0 0 0 3.32 1.91 2.34 2.34 0 0 1 2.33 4.04 2.34 2.34 0 0 0 0 3.82 2.34 2.34 0 0 1-2.33 4.04 2.34 2.34 0 0 0-3.32 1.91 2.34 2.34 0 0 1-4.66 0 2.34 2.34 0 0 0-3.32-1.91 2.34 2.34 0 0 1-2.33-4.04 2.34 2.34 0 0 0 0-3.82 2.34 2.34 0 0 1 2.33-4.04 2.34 2.34 0 0 0 3.32-1.91"/>
+      </svg>
+    </button>
+    <div id="settingsPanel" class="report-settings-panel" aria-hidden="true">
+      <div class="report-settings-panel__group">
+        <span class="report-settings-panel__label">화면</span>
+        <button id="themeToggle" type="button" onclick="cycleTheme()" aria-label="나이트 모드 전환" title="나이트 모드 전환">☀</button>
+      </div>
+      <div class="report-settings-panel__group">
+        <span class="report-settings-panel__label">출력</span>
+        <button class="report-settings-action" type="button" onclick="window.print()" aria-label="PDF 또는 인쇄" title="PDF 또는 인쇄">Print / PDF</button>
+      </div>
+      <div class="report-settings-panel__group">
+        <span class="report-settings-panel__label">이동</span>
+        <nav class="report-quick-links" aria-label="세미나 링크">
+          <a href="../../index.html" title="전체 세미나 목차" aria-label="전체 세미나 목차">Index</a>
+          <a href="report.html" title="리포트" aria-label="리포트">Report</a>
+          <a href="slides.html" title="발표 슬라이드" aria-label="발표 슬라이드">Slides</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div id="tocBackdrop" class="report-toc-backdrop" hidden></div>
+  <nav id="tocDrawer" class="report-toc-drawer" aria-label="문서 목차" aria-hidden="true">
+    <div class="report-toc-drawer__head">
+      <span>목차</span>
+      <button id="tocClose" type="button" aria-label="목차 닫기">×</button>
+    </div>
+    <ol id="tocDrawerList" class="report-toc-drawer__list"></ol>
+  </nav>
   <article class="{article_class}">
 {body}
   </article>
-  <script src="{js_href}"></script>
+  <!-- REPORT_JS_INLINE -->
 </body>
 </html>
 """
@@ -224,6 +281,7 @@ def _resolve_doc_meta(args, fm_meta: dict, brand: dict) -> dict:
         "doc_title": args.doc_title or title,
         "author": args.author or bname,
         "date": args.date or "",
+        "session_label": args.session_label or "",
     }
 
 
@@ -319,7 +377,7 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
             title=doc["title"].replace("—", "<br><span style=\"color:var(--brand-primary);\">—</span>"),
             subtitle=doc["subtitle"],
             version_badge=doc["version_badge"],
-            meta={"date": doc["date"]},
+            meta={"date": doc["date"], "session_label": doc["session_label"]},
             author=doc["author"],
             brand=brand,
         ))
@@ -334,15 +392,17 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
         fm_sections = split_front_matter_sections(fm_html)
     if fm_sections:
         body_chunks.append(build_section_divider(
-            "00", "섹션 00", "Executive Summary",
+            "00", "섹션 00", "핵심 요약",
             "임원 5분 핵심 요약 — §1~§6 의 결론을 한 페이지에"))
     for es in fm_sections:
-        section_label = f'섹션 0. {es["title"]}'
-        body_html = f'<h2>{section_label}</h2>{build_hero_kpi(kpis, kpi_summary)}{es["body"]}'
+        section_label = '0. 핵심 요약' if es["title"] == "Executive Summary" else f'0. {es["title"]}'
+        heading_tag = "h1" if es["title"] == "Executive Summary" else "h2"
+        body_html = f'{build_hero_kpi(kpis, kpi_summary)}{es["body"]}'
         body_html = apply_visual_transforms(body_html)
         wrapped = wrap_section(body_html, number="00",
                                title_override=section_label,
-                               kicker_prefix="Section")
+                               kicker_prefix="Section",
+                               heading_tag=heading_tag)
         body_chunks.append(convert_footrefs(wrapped, known_nums, url_map))
 
     # 5) 본 섹션 (--sections 필터)
@@ -374,7 +434,10 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
     if refs and not args.no_references:
         body_chunks.append(build_references_appendix(refs))
 
-    # 6b) SVG 인라이닝 (--inline-svgs) — 외부 figs/*.svg 참조를 본문 HTML 안으로.
+    # 6b) 본문 asset captioning — 그림/표/코드에 전역 번호와 제목을 일관되게 부여.
+    body_chunks = [add_report_asset_captions("\n".join(body_chunks))]
+
+    # 6c) SVG 인라이닝 (--inline-svgs) — 외부 figs/*.svg 참조를 본문 HTML 안으로.
     if args.inline_svgs:
         full_body = "\n".join(body_chunks)
         full_body, n_svg, n_svg_color = inline_svgs_in_html(
@@ -394,8 +457,17 @@ def build_tier1(src: Path, out_dir: Path, args, brand: dict) -> tuple[Path, Path
         article_class=article_class,
         body="\n".join(body_chunks),
         brand_style=make_brand_style_block(brand),
-        css_href=str((HERE / "theme_report.css").resolve()).replace("file://", ""),
-        js_href=str((HERE / "report.js").resolve()).replace("file://", ""),
+    )
+    # CSS·JS 를 inline 으로 주입 — 절대 filesystem 경로 link 는 publish 후 404 가 되므로
+    # 단일 self-contained HTML 로 만든다. .format() escape 문제(`{}`)도 회피.
+    theme_css = (HERE / "theme_report.css").read_text(encoding="utf-8")
+    report_js = (HERE / "report.js").read_text(encoding="utf-8")
+    full_html = full_html.replace(
+        "<!-- THEME_CSS_INLINE -->",
+        f"<style data-source=\"theme_report.css\">\n{theme_css}\n</style>",
+    ).replace(
+        "<!-- REPORT_JS_INLINE -->",
+        f"<script data-source=\"report.js\">\n{report_js}\n</script>",
     )
     mode = (
         "monochrome"
@@ -609,6 +681,8 @@ def main() -> None:
     ap.add_argument("--author", default=None,
                     help="없으면 brand.name")
     ap.add_argument("--date", default=None)
+    ap.add_argument("--session-label", default=None,
+                    help="커버 메타에 표시할 회차. 예: '1회'")
     ap.add_argument("--html-only", action="store_true")
     ap.add_argument("--monochrome", action="store_true",
                     help="다색 SVG/배경을 페르소나 단색+명도 단계로 강등 (MONOCHROME_MAP)")

@@ -6,10 +6,15 @@
 """
 from __future__ import annotations
 
+import html as html_lib
 import re
 
 from markdown_it import MarkdownIt
 from mdit_py_plugins.anchors import anchors_plugin
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import TextLexer, get_lexer_by_name
+from pygments.util import ClassNotFound
 
 
 # ---------- markdown ----------
@@ -105,6 +110,154 @@ def convert_footrefs(html: str, known: set[int], url_map: dict[int, str] | None 
 
 # ---------- visual component post-processing ----------
 
+CODE_BLOCK_RE = re.compile(
+    r'<pre><code(?:\s+class="language-([^"]+)")?>(.*?)</code></pre>',
+    re.DOTALL,
+)
+HTML_FORMATTER = HtmlFormatter(nowrap=True)
+
+
+def _highlight_code_blocks(html: str) -> str:
+    """Markdown fenced code blocks에 Pygments span을 삽입."""
+    def rep(m: re.Match) -> str:
+        lang = (m.group(1) or "text").strip().lower()
+        code = html_lib.unescape(m.group(2))
+        try:
+            lexer = get_lexer_by_name(lang)
+        except ClassNotFound:
+            lexer = TextLexer()
+        highlighted = highlight(code, lexer, HTML_FORMATTER).rstrip("\n")
+        class_lang = re.sub(r"[^a-z0-9_-]+", "-", lang) or "text"
+        return (
+            f'<pre class="code-block code-block--{class_lang}" data-lang="{class_lang}">'
+            f'<code class="language-{class_lang}">{highlighted}</code></pre>'
+        )
+
+    return CODE_BLOCK_RE.sub(rep, html)
+
+
+def _plain_text(html: str) -> str:
+    text = re.sub(r"<[^>]+>", "", html)
+    text = html_lib.unescape(text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def _caption_title(text: str) -> str:
+    text = _plain_text(text)
+    text = re.sub(r"^(?:Figure|그림)\s*[—\-:·.]?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"^(?:Table|표)\s*[0-9A-Za-z가-힣.\-]*\s*[—\-:·.]?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"^(?:Code|코드)\s*[0-9A-Za-z가-힣.\-]*\s*[—\-:·.]?\s*", "", text, flags=re.IGNORECASE)
+    return text.strip()
+
+
+def _nearest_heading_title(prefix_html: str) -> str:
+    matches = list(re.finditer(r"<h[1-4][^>]*>(.*?)</h[1-4]>", prefix_html, flags=re.DOTALL))
+    if not matches:
+        return ""
+    return _caption_title(matches[-1].group(1))
+
+
+def _attr_value(attrs: str, name: str) -> str:
+    m = re.search(rf'\b{name}="([^"]*)"', attrs)
+    return html_lib.unescape(m.group(1)).strip() if m else ""
+
+
+def _caption_block(kind: str, num: int, title: str, tag: str = "div") -> str:
+    chip = {"figure": "그림", "table": "표", "code": "코드"}[kind]
+    title = html_lib.escape(title or {"figure": "시각 자료", "table": "비교표", "code": "예시 코드"}[kind])
+    return (
+        f'<{tag} class="asset-caption asset-caption--{kind}">'
+        f'<span class="asset-caption__chip">{chip} {num}</span>'
+        f'<span class="asset-caption__title">{title}</span>'
+        f'</{tag}>'
+    )
+
+
+def _caption_inner(kind: str, num: int, title: str) -> str:
+    chip = {"figure": "그림", "table": "표", "code": "코드"}[kind]
+    title = html_lib.escape(title or {"figure": "시각 자료", "table": "비교표", "code": "예시 코드"}[kind])
+    return (
+        f'<div class="asset-caption__inner">'
+        f'<span class="asset-caption__chip">{chip} {num}</span>'
+        f'<span class="asset-caption__title">{title}</span>'
+        f'</div>'
+    )
+
+
+def _table_title_from_headers(table_html: str) -> str:
+    headers = [_plain_text(m.group(1)) for m in re.finditer(r"<th[^>]*>(.*?)</th>", table_html, flags=re.DOTALL)]
+    headers = [h for h in headers if h]
+    if not headers:
+        return "비교표"
+    if len(headers) == 1:
+        return f"{headers[0]} 표"
+    return " / ".join(headers[:3]) + " 비교"
+
+
+def add_report_asset_captions(html: str) -> str:
+    """리포트 본문 내 모든 그림·표·코드블록에 전역 순번 캡션을 부여한다.
+
+    Markdown 이미지의 alt는 그림 제목으로, 표/코드는 가장 가까운 앞선 heading을
+    제목 후보로 사용한다. 기존 표 캡션은 제목을 유지하되 순번/마크업을 통일한다.
+    """
+    counts = {"figure": 0, "table": 0, "code": 0}
+    asset_re = re.compile(
+        r"(?P<imgp><p>\s*(?P<linkopen><a\b(?P<linkattrs>[^>]*)>\s*)?"
+        r"<img\b(?P<imgattrs>[^>]*)/?>\s*(?(linkopen)</a>\s*)"
+        r"(?P<small><small>.*?</small>)?\s*</p>)"
+        r"|(?P<table><table\b[^>]*class=\"[^\"]*\bcmp-table\b[^\"]*\"[^>]*>.*?</table>)"
+        r"|(?P<pre><pre\b[^>]*class=\"[^\"]*\bcode-block\b[^\"]*\"[^>]*>.*?</pre>)",
+        re.DOTALL,
+    )
+
+    def replace(m: re.Match) -> str:
+        prefix = html[:m.start()]
+        if m.group("imgp"):
+            counts["figure"] += 1
+            attrs = m.group("imgattrs") or ""
+            img_tag = re.search(r"<img\b[^>]*/?>", m.group("imgp"), flags=re.DOTALL).group(0)  # type: ignore[union-attr]
+            link_attrs = m.group("linkattrs") or ""
+            if link_attrs and re.search(r'href=["\']https?://', link_attrs) and "target=" not in link_attrs:
+                link_attrs += ' target="_blank" rel="noopener"'
+            media_html = f"<a{link_attrs}>{img_tag}</a>" if link_attrs else img_tag
+            small_html = m.group("small") or ""
+            alt = _attr_value(attrs, "alt")
+            title = _caption_title(alt) or _caption_title(small_html) or _nearest_heading_title(prefix) or "시각 자료"
+            if small_html:
+                small_inner = re.sub(r"^<small>|</small>$", "", small_html.strip(), flags=re.DOTALL)
+                small_inner = re.sub(r"^\s*(?:Figure|그림)\s*[—\-:·.]?\s*", "", small_inner, flags=re.IGNORECASE)
+                small_html = f'<small class="asset-note">{small_inner}</small>'
+            return (
+                '<figure class="report-figure">'
+                f'{_caption_block("figure", counts["figure"], title, "figcaption")}'
+                f'{media_html}'
+                f'{small_html}'
+                '</figure>'
+            )
+
+        if m.group("table"):
+            counts["table"] += 1
+            table_html = m.group("table")
+            cap_m = re.search(r"<caption\b[^>]*>(.*?)</caption>", table_html, flags=re.DOTALL)
+            if cap_m:
+                title_m = re.search(r'<span class="[^"]*(?:cmp-table__title|asset-caption__title)[^"]*">(.*?)</span>', cap_m.group(1), flags=re.DOTALL)
+                title = _caption_title(title_m.group(1) if title_m else cap_m.group(1))
+                caption = f'<caption class="cmp-table__caption asset-caption asset-caption--table">{_caption_inner("table", counts["table"], title)}</caption>'
+                return table_html[:cap_m.start()] + caption + table_html[cap_m.end():]
+            title = _nearest_heading_title(prefix) or _table_title_from_headers(table_html)
+            caption = f'<caption class="cmp-table__caption asset-caption asset-caption--table">{_caption_inner("table", counts["table"], title)}</caption>'
+            return re.sub(r"(<table\b[^>]*>)", r"\1" + caption, table_html, count=1)
+
+        counts["code"] += 1
+        pre_html = m.group("pre")
+        lang = _attr_value(pre_html, "data-lang") or "text"
+        heading = _nearest_heading_title(prefix)
+        title = heading or f"{lang.upper()} 예시 코드"
+        return f'{_caption_block("code", counts["code"], title)}\n{pre_html}'
+
+    return asset_re.sub(replace, html)
+
 _BADGE_LABELS = {
     ("risk", "low"):   ("badge--low",   "낮음"),
     ("risk", "mid"):   ("badge--mid",   "중간"),
@@ -155,6 +308,8 @@ def apply_visual_transforms(html: str) -> str:
     - <table> → cmp-table 클래스
     - <ul>/<ol> 최상위 → bullets/nums 클래스
     """
+    html = _highlight_code_blocks(html)
+
     # 1. 핵심 메시지 → hero callout
     html = re.sub(
         r'<p><strong>핵심 메시지</strong>\s*[:：]\s*(.+?)</p>',
@@ -447,7 +602,8 @@ def split_front_matter_sections(html: str) -> list[dict]:
 
 def wrap_section(html_body: str, number: str, title_override: str | None = None,
                  kicker_prefix: str = "Section",
-                 keep_first_h2: bool = False) -> str:
+                 keep_first_h2: bool = False,
+                 heading_tag: str = "h2") -> str:
     """섹션 HTML 을 <section class="report-section page-break"> 로 감싸고 kicker·lede 추가.
 
     keep_first_h2=True 면 첫 h2 를 교체하지 않고 kicker 만 본문 앞에 삽입한다
@@ -466,7 +622,7 @@ def wrap_section(html_body: str, number: str, title_override: str | None = None,
     else:
         replacement = (
             f'<div class="report-section__kicker">{kicker}</div>\n'
-            f'<h2>{title_text}</h2>'
+            f'<{heading_tag}>{title_text}</{heading_tag}>'
         )
         if h2_m:
             html_body = html_body[:h2_m.start()] + replacement + html_body[h2_m.end():]
@@ -474,7 +630,7 @@ def wrap_section(html_body: str, number: str, title_override: str | None = None,
             html_body = replacement + html_body
 
     html_body = re.sub(
-        r'(<h2>[^<]*</h2>\s*)<p>(.+?)</p>',
+        r'(<h[12]>[^<]*</h[12]>\s*)<p>(.+?)</p>',
         r'\1<p class="report-section__lede">\2</p>',
         html_body, count=1, flags=re.DOTALL
     )
@@ -489,15 +645,15 @@ def wrap_section(html_body: str, number: str, title_override: str | None = None,
 # ---------- reference appendix ----------
 
 def build_references_appendix(items: list[dict]) -> str:
-    """참고문헌 부록 — 다른 부록(용어집·실행 스크립트 등)과 같은 h3 계위로 인라인 렌더."""
+    """참고문헌 섹션을 문서 말미에 렌더."""
     from collections import OrderedDict
     grouped: "OrderedDict[str, list[dict]]" = OrderedDict()
     for it in items:
         grouped.setdefault(it["group"] or "기타", []).append(it)
 
     parts = [
-        '<section class="s-refs">',
-        '  <h3 id="부록-c.-참고문헌">부록 C. 참고문헌</h3>',
+        '<section class="report-appendix s-refs page-break">',
+        '  <h1 id="참고문헌">참고문헌</h1>',
     ]
     for gname, entries in grouped.items():
         parts.append(f'  <h4>{gname}</h4>')

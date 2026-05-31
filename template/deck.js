@@ -43,25 +43,164 @@ var total = slides.length;
 var curIdx = 0;
 document.getElementById('slideTotal').textContent = total;
 
-function goTo(i) {
+function goTo(i, opts) {
+  opts = opts || {};
   curIdx = Math.max(0, Math.min(total - 1, i));
   slidesEl.style.transform = 'translateX(-' + (curIdx * 100) + '%)';
-  document.getElementById('slideCur').textContent = (curIdx + 1);
+  var curEl = document.getElementById('slideCur');
+  if (curEl) {
+    if ('value' in curEl) curEl.value = (curIdx + 1);
+    else curEl.textContent = (curIdx + 1);
+  }
   document.getElementById('progressFill').style.width = ((curIdx + 1) / total * 100) + '%';
   slides.forEach(function(s, idx) { s.classList.toggle('is-active', idx === curIdx); });
-  // Animate counters on slides as they become active
   animateCountersOnSlide(slides[curIdx]);
+  updateTocCurrent();
+  if (!opts.skipHash) setSlideHash(curIdx);
 }
 function nextSlide() { goTo(curIdx + 1); }
 function prevSlide() { goTo(curIdx - 1); }
 
 // Keyboard nav
 document.addEventListener('keydown', function(e) {
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
   if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
   if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
   if (e.key === 'Home') { e.preventDefault(); goTo(0); }
   if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
 });
+
+// Page number input
+var slideCurInput = document.getElementById('slideCur');
+if (slideCurInput && 'value' in slideCurInput) {
+  slideCurInput.addEventListener('focus', function() { slideCurInput.select(); });
+  slideCurInput.addEventListener('input', function() {
+    slideCurInput.value = slideCurInput.value.replace(/[^0-9]/g, '').slice(0, 4);
+  });
+  slideCurInput.addEventListener('keydown', function(e) {
+    e.stopPropagation();
+    if (e.key === 'Enter') {
+      var n = parseInt(slideCurInput.value, 10);
+      if (n >= 1) goTo(n - 1);
+      slideCurInput.blur();
+    } else if (e.key === 'Escape') {
+      slideCurInput.value = (curIdx + 1);
+      slideCurInput.blur();
+    }
+  });
+  slideCurInput.addEventListener('blur', function() {
+    slideCurInput.value = (curIdx + 1);
+  });
+}
+
+// Table of contents
+var tocPanel = document.getElementById('tocPanel');
+var tocToggle = document.getElementById('tocToggle');
+
+function slideLabel(slide, idx) {
+  if (slide.classList.contains('slide--cover')) return '표지';
+  if (slide.classList.contains('slide--closing')) return '마무리';
+  if (slide.classList.contains('slide--section')) {
+    var sectionTitle = slide.querySelector('h1');
+    var sectionNum = slide.querySelector('.section-num');
+    var n = sectionNum ? sectionNum.textContent.trim() : '';
+    return (n ? 'S' + n + '  ' : '') + (sectionTitle ? sectionTitle.textContent.trim() : '섹션');
+  }
+  var h = slide.querySelector('.slide-title, h1');
+  return (slide.getAttribute('aria-label') || (h ? h.textContent.trim() : '') || ('슬라이드 ' + (idx + 1))).trim();
+}
+
+function buildToc() {
+  if (!tocPanel || tocPanel.dataset.built === '1') return;
+  tocPanel.dataset.built = '1';
+  var title = document.createElement('div');
+  title.className = 'toc-panel__title';
+  title.textContent = '목차';
+  tocPanel.appendChild(title);
+  slides.forEach(function(s, idx) {
+    var isSection = s.classList.contains('slide--section');
+    var btn = document.createElement('button');
+    btn.className = 'toc-row' + (isSection ? ' toc-row--group' : '');
+    btn.dataset.idx = idx;
+    var num = document.createElement('span');
+    num.className = 'toc-row__num';
+    num.textContent = idx + 1;
+    btn.appendChild(num);
+    btn.appendChild(document.createTextNode(slideLabel(s, idx)));
+    btn.addEventListener('click', function() { goTo(idx); closeToc(); });
+    tocPanel.appendChild(btn);
+  });
+}
+
+function updateTocCurrent() {
+  if (!tocPanel) return;
+  tocPanel.querySelectorAll('.toc-row').forEach(function(r) {
+    var on = parseInt(r.dataset.idx, 10) === curIdx;
+    r.classList.toggle('current', on);
+    if (on && tocPanel.classList.contains('open')) r.scrollIntoView({ block: 'nearest' });
+  });
+}
+
+function openToc() {
+  if (!tocPanel) return;
+  buildToc();
+  tocPanel.classList.add('open');
+  tocPanel.setAttribute('aria-hidden', 'false');
+  if (tocToggle) tocToggle.setAttribute('aria-expanded', 'true');
+  updateTocCurrent();
+  showChrome();
+}
+function closeToc() {
+  if (!tocPanel) return;
+  tocPanel.classList.remove('open');
+  tocPanel.setAttribute('aria-hidden', 'true');
+  if (tocToggle) tocToggle.setAttribute('aria-expanded', 'false');
+  showChrome();
+}
+function toggleToc() {
+  if (tocPanel && tocPanel.classList.contains('open')) closeToc();
+  else openToc();
+}
+document.addEventListener('click', function(e) {
+  if (!tocPanel || !tocPanel.classList.contains('open')) return;
+  if (!e.target.closest('.toc-panel') && !e.target.closest('.toc-toggle')) closeToc();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeToc();
+});
+
+// Shareable slide hash
+function parseSlideHash() {
+  var m = window.location.hash.match(/(?:slide-|\/)?(\d+)$/);
+  if (!m) return 0;
+  return Math.max(0, Math.min(total - 1, parseInt(m[1], 10) - 1));
+}
+function setSlideHash(idx) {
+  var h = '#/' + (idx + 1);
+  if (window.location.hash !== h) history.replaceState(null, '', h);
+}
+window.addEventListener('hashchange', function() {
+  goTo(parseSlideHash(), { skipHash: true });
+});
+
+// Auto-hide chrome on mouse idle
+var chromeTimer = null;
+function hideChrome() {
+  var dd = document.getElementById('vizMenuDropdown');
+  if ((tocPanel && tocPanel.classList.contains('open'))
+      || (dd && dd.classList.contains('open'))
+      || (slideCurInput && document.activeElement === slideCurInput)) {
+    chromeTimer = setTimeout(hideChrome, 3000);
+    return;
+  }
+  document.body.classList.add('chrome-hidden');
+}
+function showChrome() {
+  document.body.classList.remove('chrome-hidden');
+  if (chromeTimer) clearTimeout(chromeTimer);
+  chromeTimer = setTimeout(hideChrome, 3000);
+}
+document.addEventListener('mousemove', showChrome);
 
 // Touch swipe
 var touchStart = null;
@@ -71,14 +210,6 @@ document.addEventListener('touchend', function(e) {
   var dx = e.changedTouches[0].clientX - touchStart;
   if (Math.abs(dx) > 50) { if (dx < 0) nextSlide(); else prevSlide(); }
   touchStart = null;
-});
-
-// Click left/right third of screen
-document.querySelector('.deck').addEventListener('click', function(e) {
-  if (e.target.closest('.slide-nav') || e.target.closest('.viz-menu') || e.target.closest('button') || e.target.closest('a')) return;
-  var x = e.clientX, w = window.innerWidth;
-  if (x < w * 0.33) prevSlide();
-  else if (x > w * 0.66) nextSlide();
 });
 
 // ===== Number Counter (per slide) =====
@@ -218,25 +349,7 @@ window.addEventListener('afterprint', function() {
 window.addEventListener('load', function() {
   fitStage();
   buildCharts();
-  goTo(0);
+  buildToc();
+  goTo(parseSlideHash(), { skipHash: true });
+  document.body.classList.add('chrome-hidden');
 });
-
-// ===== Download PNG =====
-async function downloadImage() {
-  var menu = document.querySelector('.viz-menu');
-  var nav = document.querySelector('.slide-nav');
-  var prog = document.querySelector('.deck-progress');
-  menu.style.display = 'none';
-  nav.style.display = 'none';
-  prog.style.display = 'none';
-  try {
-    var url = await htmlToImage.toPng(document.body, { quality: 1, pixelRatio: 2 });
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'ai-odyssey-slide-' + (curIdx + 1) + '.png';
-    a.click();
-  } catch (e) { console.error('Download failed:', e); }
-  menu.style.display = '';
-  nav.style.display = '';
-  prog.style.display = '';
-}

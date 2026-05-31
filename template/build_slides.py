@@ -195,14 +195,16 @@ def apply_visual_transforms(html: str) -> str:
 
 # ---------- slide rendering ----------
 
-def _make_brand_mark(brand: dict) -> str:
-    """슬라이드 헤더 워드마크 HTML — brand.yaml 의 name/sub 주입."""
+def _make_brand_mark(deck: dict, brand: dict) -> str:
+    """슬라이드 헤더 워드마크 HTML — 반복 노출은 발표자보다 덱 정체성을 우선."""
     b = brand["brand"]
+    name = deck.get("org") or b["name"]
+    sub = deck.get("kicker") or b["sub"]
     return (
         '<div class="brand-mark">'
         '<div class="brand-mark__stack">'
-        f'<span class="brand-mark__name">{b["name"]}</span>'
-        f'<span class="brand-mark__sub">{b["sub"]}</span>'
+        f'<span class="brand-mark__name">{name}</span>'
+        f'<span class="brand-mark__sub">{sub}</span>'
         '</div>'
         '</div>'
     )
@@ -244,7 +246,7 @@ def render_default(slide: dict, page: int, total: int, deck: dict, brand: dict) 
 
     return f"""<section class="slide" aria-label="{aria_label}">
   <div class="slide-header">
-    {_make_brand_mark(brand)}
+    {_make_brand_mark(deck, brand)}
     {section_tag_html}
   </div>
   {title_block}
@@ -291,11 +293,14 @@ def render_cover(slide: dict, deck: dict, brand: dict) -> str:
     author = deck.get("author", "")
     org = deck["org"]
     date = deck.get("date", "")
+    session_label = deck.get("session") or deck.get("session_label") or ""
+    mark_name = org or b["name"]
+    mark_sub = kicker or b["sub"]
 
     return f"""<section class="slide slide--cover" aria-label="Cover">
   <div class="cover-wordmark">
-    <span class="cover-wordmark__name">{b['name']}</span>
-    <span class="cover-wordmark__sub">{b['sub']}</span>
+    <span class="cover-wordmark__name">{mark_name}</span>
+    <span class="cover-wordmark__sub">{mark_sub}</span>
   </div>
   <div class="cover-signature">{b['signature']}</div>
   <div class="cover-hero">
@@ -305,6 +310,7 @@ def render_cover(slide: dict, deck: dict, brand: dict) -> str:
   </div>
   <div class="cover-meta">
     <div><strong>발표자</strong>{author}</div>
+    {f'<div><strong>회차</strong>{session_label}</div>' if session_label else ''}
     <div><strong>채널</strong>{org}</div>
     <div><strong>일시</strong>{date}</div>
   </div>
@@ -324,7 +330,7 @@ def render_closing(slide: dict, deck: dict, brand: dict) -> str:
 
     return f"""<section class="slide slide--closing" aria-label="{aria}">
   <div class="slide-header">
-    {_make_brand_mark(brand)}
+    {_make_brand_mark(deck, brand)}
     <div class="slide-section-tag">Thank you</div>
   </div>
   <div class="slide-body" style="justify-content:flex-start;">
@@ -350,22 +356,43 @@ SHELL = """<!DOCTYPE html>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script>Chart.defaults.animation = false;</script>
-  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
   <link rel="stylesheet" href="{css_href}">
   {brand_style}
 </head>
-<body>
+<body class="chrome-hidden">
   <a href="#main-content" class="skip-to-content" style="position:absolute;left:-9999px;">Skip to content</a>
+  <button class="toc-toggle" id="tocToggle" onclick="toggleToc()" aria-label="목차" aria-expanded="false">
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="3.2" cy="5" r="1.4" fill="currentColor" stroke="none"/><line x1="7.5" y1="5" x2="17" y2="5"/>
+      <circle cx="3.2" cy="10" r="1.4" fill="currentColor" stroke="none"/><line x1="7.5" y1="10" x2="17" y2="10"/>
+      <circle cx="3.2" cy="15" r="1.4" fill="currentColor" stroke="none"/><line x1="7.5" y1="15" x2="17" y2="15"/>
+    </svg>
+  </button>
+  <nav class="toc-panel" id="tocPanel" aria-label="목차" aria-hidden="true"></nav>
   <div class="viz-menu">
-    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="Menu">
-      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="설정">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M9.67 4.14a2.34 2.34 0 0 1 4.66 0 2.34 2.34 0 0 0 3.32 1.91 2.34 2.34 0 0 1 2.33 4.04 2.34 2.34 0 0 0 0 3.82 2.34 2.34 0 0 1-2.33 4.04 2.34 2.34 0 0 0-3.32 1.91 2.34 2.34 0 0 1-4.66 0 2.34 2.34 0 0 0-3.32-1.91 2.34 2.34 0 0 1-2.33-4.04 2.34 2.34 0 0 0 0-3.82 2.34 2.34 0 0 1 2.33-4.04 2.34 2.34 0 0 0 3.32-1.91"/>
       </svg>
     </button>
     <div class="viz-menu-dropdown" id="vizMenuDropdown">
-      <button onclick="cycleTheme()"><span id="themeIcon">☀️</span><span id="themeLabel">Light</span></button>
-      <button onclick="downloadImage()"><span>📥</span><span>Download PNG</span></button>
-      <button onclick="window.print()"><span>🖨️</span><span>Print / PDF</span></button>
+      <div class="viz-menu-group">
+        <span class="viz-menu-label">화면</span>
+        <button class="viz-menu-icon-action" onclick="cycleTheme()" aria-label="나이트 모드 전환" title="나이트 모드 전환"><span id="themeIcon">☀️</span><span id="themeLabel" class="viz-menu-theme-label">Light</span></button>
+      </div>
+      <div class="viz-menu-group">
+        <span class="viz-menu-label">출력</span>
+        <button class="viz-menu-action" onclick="window.print()" aria-label="PDF 또는 인쇄" title="PDF 또는 인쇄">Print / PDF</button>
+      </div>
+      <div class="viz-menu-group">
+        <span class="viz-menu-label">이동</span>
+        <nav class="viz-menu-links" aria-label="세미나 링크">
+          <a href="../../index.html" title="전체 세미나 목차" aria-label="전체 세미나 목차">Index</a>
+          <a href="report.html" title="리포트" aria-label="리포트">Report</a>
+          <a href="slides.html" title="발표 슬라이드" aria-label="발표 슬라이드">Slides</a>
+        </nav>
+      </div>
     </div>
   </div>
   <div class="deck-progress"><div class="deck-progress__fill" id="progressFill"></div></div>
@@ -381,7 +408,7 @@ SHELL = """<!DOCTYPE html>
       <button onclick="prevSlide()" aria-label="Previous slide">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <span class="slide-counter"><span id="slideCur">1</span> / <span id="slideTotal">{total_all}</span></span>
+      <span class="slide-counter"><input id="slideCur" type="text" inputmode="numeric" value="1" aria-label="현재 페이지 — 번호 입력 후 Enter" /> / <span id="slideTotal">{total_all}</span></span>
       <button onclick="nextSlide()" aria-label="Next slide">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>

@@ -1,7 +1,8 @@
 // AI Odyssey Publisher — Report 런타임 (인터랙티브 HTML + 인쇄 프리프로세스)
-// 슬라이드 `deck.js` 에서 네비게이션·PNG 다운로드·뷰포트 스케일링을 제거하고,
-// 리포트에 필요한 (1) 테마 토글 (2) Chart.js 빌더 (3) IntersectionObserver
-// 기반 카운터/애니메이션 (4) TOC 자동 생성 (5) 각주 번호 자동 부여만 남겼다.
+// 슬라이드 `deck.js` 에서 네비게이션·뷰포트 스케일링을 제거하고,
+// 리포트에 필요한 (1) 테마 토글 (2) Chart.js 빌더
+// (4) IntersectionObserver 기반 카운터/애니메이션 (5) TOC 자동 생성
+// (6) 각주 번호 자동 부여만 남겼다.
 
 (function () {
   // ===== Theme toggle =====
@@ -12,13 +13,164 @@
   window.applyTheme = function (t) {
     document.documentElement.className = 'theme-' + t;
     var btn = document.getElementById('themeToggle');
-    if (btn) btn.textContent = t === 'dark' ? '🌙' : '☀️';
+    if (btn) {
+      btn.textContent = t === 'dark' ? '☾' : '☀';
+      btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+      btn.setAttribute('title', t === 'dark' ? '라이트 모드로 전환' : '나이트 모드로 전환');
+    }
     localStorage.setItem(THEME_KEY, t);
     current = t;
     if (typeof onThemeChange === 'function') onThemeChange();
   };
   window.cycleTheme = function () { window.applyTheme(current === 'dark' ? 'light' : 'dark'); };
   window.applyTheme(current);
+
+  // ===== Floating controls / drawer TOC =====
+  function getHeadingLabel(h) {
+    return (h.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function ensureHeadingId(h, idx) {
+    if (h.id) return h.id;
+    h.id = 'toc-heading-' + idx;
+    return h.id;
+  }
+
+  window.buildDrawerTOC = function () {
+    var list = document.getElementById('tocDrawerList');
+    if (!list || list.children.length) return;
+    var headings = Array.from(document.querySelectorAll('.report-section h1, .report-section h2, .report-appendix h1, .report-appendix h2'));
+    headings.forEach(function (h, idx) {
+      var label = getHeadingLabel(h);
+      if (!label || /^References$/i.test(label)) label = '참고문헌';
+      var id = ensureHeadingId(h, idx + 1);
+      var li = document.createElement('li');
+      li.className = 'report-toc-drawer__item report-toc-drawer__item--' + h.tagName.toLowerCase();
+      var a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = label;
+      a.addEventListener('click', function () { window.closeTOCDrawer(); });
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  };
+
+  window.openTOCDrawer = function () {
+    window.buildDrawerTOC();
+    var drawer = document.getElementById('tocDrawer');
+    var backdrop = document.getElementById('tocBackdrop');
+    var toggle = document.getElementById('tocToggle');
+    if (!drawer || !backdrop) return;
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    backdrop.hidden = false;
+    backdrop.classList.add('is-open');
+    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+  };
+
+  window.closeTOCDrawer = function () {
+    var drawer = document.getElementById('tocDrawer');
+    var backdrop = document.getElementById('tocBackdrop');
+    var toggle = document.getElementById('tocToggle');
+    if (!drawer || !backdrop) return;
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    backdrop.classList.remove('is-open');
+    backdrop.hidden = true;
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  };
+
+  window.openSettingsPanel = function () {
+    var panel = document.getElementById('settingsPanel');
+    var toggle = document.getElementById('settingsToggle');
+    if (!panel || !toggle) return;
+    panel.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+    toggle.setAttribute('aria-expanded', 'true');
+  };
+
+  window.closeSettingsPanel = function () {
+    var panel = document.getElementById('settingsPanel');
+    var toggle = document.getElementById('settingsToggle');
+    if (!panel || !toggle) return;
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+    toggle.setAttribute('aria-expanded', 'false');
+  };
+
+  window.toggleSettingsPanel = function () {
+    var panel = document.getElementById('settingsPanel');
+    if (panel && panel.classList.contains('is-open')) window.closeSettingsPanel();
+    else window.openSettingsPanel();
+  };
+
+  function setupFloatingControls() {
+    var tocToggle = document.getElementById('tocToggle');
+    var tocClose = document.getElementById('tocClose');
+    var backdrop = document.getElementById('tocBackdrop');
+    var settingsToggle = document.getElementById('settingsToggle');
+    if (tocToggle) tocToggle.addEventListener('click', window.openTOCDrawer);
+    if (tocClose) tocClose.addEventListener('click', window.closeTOCDrawer);
+    if (backdrop) backdrop.addEventListener('click', window.closeTOCDrawer);
+    if (settingsToggle) settingsToggle.addEventListener('click', window.toggleSettingsPanel);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        window.closeTOCDrawer();
+        window.closeSettingsPanel();
+      }
+    });
+    document.addEventListener('click', function (e) {
+      var settings = document.querySelector('.report-settings');
+      if (settings && !settings.contains(e.target)) window.closeSettingsPanel();
+    });
+
+    // Auto-hide floating controls — Medium/Substack scroll-direction reveal +
+    // edge-hover boost. idle timer 가 아니라 사용자 의도(읽기 vs 탐색)에 연동.
+    // - 아래로 스크롤 = 읽는 중 → 숨김
+    // - 위로 스크롤 = 탐색 의도 → 표시
+    // - scrollY < 100 (페이지 최상단 부근) = 항상 표시
+    // - 마우스가 좌/우 가장자리 100px 영역 = 즉시 표시
+    // - TOC 드로어 / 설정 패널 열림 = 강제 표시
+    var SCROLL_THRESHOLD = 8;
+    var TOP_ZONE = 100;
+    var EDGE_ZONE = 100;
+    var lastScrollY = window.scrollY || window.pageYOffset || 0;
+
+    function isAnyPanelOpen() {
+      var drawer = document.getElementById('tocDrawer');
+      var panel = document.getElementById('settingsPanel');
+      return (drawer && drawer.classList.contains('is-open'))
+          || (panel && panel.classList.contains('is-open'));
+    }
+    function showChrome() {
+      if (!document.body.classList.contains('chrome-hidden')) return;
+      document.body.classList.remove('chrome-hidden');
+    }
+    function hideChrome() {
+      if (isAnyPanelOpen()) return;
+      if ((window.scrollY || 0) < TOP_ZONE) return;
+      if (document.body.classList.contains('chrome-hidden')) return;
+      document.body.classList.add('chrome-hidden');
+    }
+    function onScroll() {
+      var y = window.scrollY || window.pageYOffset || 0;
+      var dy = y - lastScrollY;
+      if (Math.abs(dy) < SCROLL_THRESHOLD) return;
+      if (y < TOP_ZONE) showChrome();
+      else if (dy > 0) hideChrome();
+      else showChrome();
+      lastScrollY = y;
+    }
+    function onMouseMove(e) {
+      if (e.clientX <= EDGE_ZONE || e.clientX >= window.innerWidth - EDGE_ZONE) {
+        showChrome();
+      }
+    }
+    document.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('touchstart', showChrome, { passive: true });
+    document.addEventListener('keydown', showChrome);
+  }
 
   // ===== TOC auto-generation =====
   window.buildTOC = function () {
@@ -52,12 +204,12 @@
     // 1) 일반 섹션 — 부록(Appendix) 이 아닌 .report-section
     document.querySelectorAll('.report-section').forEach(function (sec) {
       if (isAppendixSection(sec)) return;
-      var h2 = sec.querySelector(':scope > h2');
-      if (h2) {
+      var heading = sec.querySelector(':scope > h1, :scope > h2');
+      if (heading) {
         secCount += 1;
         subCount = 0;
         if (!sec.id) sec.id = 'section-' + secCount;
-        tocList.appendChild(makeItem(sec.id, String(secCount).padStart(2, '0'), h2.textContent, false));
+        tocList.appendChild(makeItem(sec.id, String(secCount).padStart(2, '0'), heading.textContent, false));
       }
       sec.querySelectorAll(':scope h3').forEach(function (h3) {
         subCount += 1;
@@ -66,25 +218,14 @@
       });
     });
 
-    // 2) 부록 묶음 — 단일 "부록" 부모 + 부록 A·B·C + 참고 문헌 H2 들
-    var appendixSections = Array.from(
-      document.querySelectorAll('.report-section, .report-appendix')
-    ).filter(isAppendixSection);
-
-    if (appendixSections.length) {
+    // 2) 참고문헌 — report 말미의 독립 섹션
+    var refs = document.querySelector('.report-appendix.s-refs');
+    if (refs) {
+      var refsHeading = refs.querySelector(':scope > h1, :scope > h2');
       secCount += 1;
-      var firstSec = appendixSections[0];
-      if (!firstSec.id) firstSec.id = 'section-' + secCount;
-      tocList.appendChild(makeItem(firstSec.id, String(secCount).padStart(2, '0'), '부록', false));
-
-      var appSubCount = 0;
-      appendixSections.forEach(function (sec) {
-        sec.querySelectorAll(':scope > h2').forEach(function (h2) {
-          appSubCount += 1;
-          if (!h2.id) h2.id = (sec.id || 'appendix-' + secCount) + '-h2-' + appSubCount;
-          tocList.appendChild(makeItem(h2.id, secCount + '.' + appSubCount, h2.textContent, true));
-        });
-      });
+      if (!refs.id) refs.id = 'section-' + secCount;
+      if (refsHeading && !refsHeading.id) refsHeading.id = refs.id + '-' + refsHeading.tagName.toLowerCase();
+      tocList.appendChild(makeItem(refs.id, String(secCount).padStart(2, '0'), refsHeading ? refsHeading.textContent : '참고문헌', false));
     }
   };
 
@@ -364,7 +505,9 @@
   // ===== Init =====
   window.addEventListener('load', function () {
     window.buildTOC();
+    window.buildDrawerTOC();
     window.numberFootnotes();
+    setupFloatingControls();
     setupObserver();
     window.buildCharts();
   });
