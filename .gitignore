@@ -25,3 +25,9 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Session handoff (local-only, do not push)
+HANDOFF.md
+
+# Agent comms scratch (local-only)
+.tori-comms/
