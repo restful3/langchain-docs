@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 16 608 99" font-family="'Helvetica Neue',Arial,'Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0F2C59"/>
+    </marker>
+  </defs>
+
+  <rect x="14"  y="28" width="96" height="52" rx="8" fill="#EEF2FB" stroke="#2563EB" stroke-width="1.4"/>
+  <text x="62"  y="59" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0F2C59">① 분해</text>
+  <text x="62"  y="100" text-anchor="middle" font-size="10.5" fill="#6B6B72">§2</text>
+
+  <rect x="136" y="28" width="96" height="52" rx="8" fill="#EEF2FB" stroke="#2563EB" stroke-width="1.4"/>
+  <text x="184" y="59" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0F2C59">② 스텝 유형</text>
+  <text x="184" y="100" text-anchor="middle" font-size="10.5" fill="#6B6B72">§2</text>
+
+  <rect x="258" y="28" width="96" height="52" rx="8" fill="#EEF2FB" stroke="#2563EB" stroke-width="1.4"/>
+  <text x="306" y="59" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0F2C59">③ State</text>
+  <text x="306" y="100" text-anchor="middle" font-size="10.5" fill="#6B6B72">§3</text>
+
+  <rect x="380" y="28" width="96" height="52" rx="8" fill="#EEF2FB" stroke="#2563EB" stroke-width="1.4"/>
+  <text x="428" y="59" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0F2C59">④ 노드 구현</text>
+  <text x="428" y="100" text-anchor="middle" font-size="10.5" fill="#6B6B72">§3·§4</text>
+
+  <rect x="502" y="28" width="96" height="52" rx="8" fill="#EEF2FB" stroke="#2563EB" stroke-width="1.4"/>
+  <text x="550" y="59" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0F2C59">⑤ 연결</text>
+  <text x="550" y="100" text-anchor="middle" font-size="10.5" fill="#6B6B72">§4</text>
+
+  <line x1="110" y1="54" x2="136" y2="54" stroke="#0F2C59" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="232" y1="54" x2="258" y2="54" stroke="#0F2C59" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="354" y1="54" x2="380" y2="54" stroke="#0F2C59" stroke-width="1.6" marker-end="url(#ar)"/>
+  <line x1="476" y1="54" x2="502" y2="54" stroke="#0F2C59" stroke-width="1.6" marker-end="url(#ar)"/>
+</svg>

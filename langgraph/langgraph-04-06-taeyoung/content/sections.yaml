@@ -1,0 +1,3 @@
+# 단일 섹션 — 디바이더에 표시될 라벨/제목/부제 매핑.
+sections:
+  "01_textbook.md": ["4", "LangGraph 04~06", "노드·엣지·State 로 사고하기", "Thinking · Local Server · Changelog"]

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LangGraph 노드·엣지·State 편 — 발표 자료</title>
+<style>
+  :root { --navy:#0F2C59; --blue:#2563EB; --bg:#FAFAF9; --surface:#FFFFFF; --text:#0F0F10; --muted:#6B6B72; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,'Segoe UI','Noto Sans KR','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); }
+  header { background:linear-gradient(135deg,var(--navy),#091F40); color:#fff; padding:48px 24px 40px; }
+  .wrap { max-width:880px; margin:0 auto; }
+  header .kicker { font-size:13px; letter-spacing:.12em; text-transform:uppercase; opacity:.8; }
+  header h1 { margin:.3em 0 .2em; font-size:28px; line-height:1.3; }
+  header p { margin:0; opacity:.85; font-size:15px; }
+  .meta { margin-top:16px; font-size:13px; opacity:.8; }
+  ul.units { list-style:none; margin:32px auto; padding:0; max-width:880px; }
+  .card { display:flex; align-items:center; gap:18px; background:var(--surface); border:1px solid #ECEAE6;
+           border-radius:14px; padding:18px 20px; margin:0 24px 14px; box-shadow:0 1px 3px rgba(15,44,89,.05); }
+  .card__no { flex:0 0 44px; height:44px; border-radius:50%; background:#E9F2FB; color:var(--blue);
+               font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; }
+  .card__body { flex:1 1 auto; min-width:0; }
+  .card__title { font-weight:700; font-size:16px; }
+  .card__sum { color:var(--muted); font-size:13px; margin-top:4px; line-height:1.5; }
+  .card__links { flex:0 0 auto; display:flex; gap:8px; }
+  .btn { display:inline-block; padding:9px 16px; border-radius:8px; font-size:13px; font-weight:700;
+          text-decoration:none; background:var(--blue); color:#fff; white-space:nowrap; }
+  .btn--alt { background:var(--navy); }
+  footer { text-align:center; color:var(--muted); font-size:12px; padding:24px; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="kicker">AI 오딧세이 세미나 · LangGraph 스터디 노드·엣지·State 편 발제 · 태영</div>
+  <h1>LangGraph 로 사고하기 — 노드·엣지·State</h1>
+  <p>Thinking in LangGraph · Run a local server · Changelog 를 핵심 5주제로 통합</p>
+  <div class="meta">상세 교과서(단독 학습용) + 발표 슬라이드(16:9 · 19장) · 그림 9개 · 표 9개</div>
+</div></header>
+<ul class="units">
+  <li class="card">
+    <div class="card__no" aria-hidden="true">교안</div>
+    <div class="card__body">
+      <div class="card__title">상세 교과서 (Report)</div>
+      <div class="card__sum">§0 들머리 ~ §6 + 부록 — 노드·엣지·State, 설계 5단계, State/에러, 사람 개입·내구성, 로컬 실행·근황. 발표 전후 단독 학습용.</div>
+    </div>
+    <div class="card__links"><a class="btn" href="report.html" aria-label="상세 교과서 report.html 열기">리포트 열기</a></div>
+  </li>
+  <li class="card">
+    <div class="card__no" aria-hidden="true">발표</div>
+    <div class="card__body">
+      <div class="card__title">발표 슬라이드 (Slides)</div>
+      <div class="card__sum">19장 · 1280×720 16:9 — 방향키(→/←)로 넘김, 우상단 메뉴에서 라이트/다크·PNG 내보내기(PNG 는 네트워크 필요).</div>
+    </div>
+    <div class="card__links"><a class="btn btn--alt" href="slides.html" aria-label="발표 슬라이드 slides.html 열기">슬라이드 열기</a></div>
+  </li>
+</ul>
+<footer>AI 오딧세이 세미나 · 로컬 self-contained 미리보기 (ai-odyssey template 빌드) · 2026-05-30</footer>
+</body>
+</html>

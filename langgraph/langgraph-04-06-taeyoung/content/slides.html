@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko" class="theme-light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LangGraph 로 사고하기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script>Chart.defaults.animation = false;</script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <link rel="stylesheet" href="../../../template/theme_slides.css">
+  <style id="brand-vars">:root{
+  --running-header-left: "AI Odyssey · Independent Research";
+  --running-header-right: "AI ODYSSEY";
+  --slide-section-monogram: "AIO";
+}</style>
+</head>
+<body>
+  <a href="#main-content" class="skip-to-content" style="position:absolute;left:-9999px;">Skip to content</a>
+  <div class="viz-menu">
+    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <div class="viz-menu-dropdown" id="vizMenuDropdown">
+      <button onclick="cycleTheme()"><span id="themeIcon">☀️</span><span id="themeLabel">Light</span></button>
+      <button onclick="downloadImage()"><span>📥</span><span>Download PNG</span></button>
+      <button onclick="window.print()"><span>🖨️</span><span>Print / PDF</span></button>
+    </div>
+  </div>
+  <div class="deck-progress"><div class="deck-progress__fill" id="progressFill"></div></div>
+  <main id="main-content" role="main">
+    <div class="deck">
+      <div class="stage">
+        <div class="slides" id="slidesContainer">
+<section class="slide slide--cover" aria-label="Cover">
+  <div class="cover-wordmark">
+    <span class="cover-wordmark__name">AI Odyssey</span>
+    <span class="cover-wordmark__sub">Deep Research</span>
+  </div>
+  <div class="cover-signature">YouTube · @AI_odysseys</div>
+  <div class="cover-hero">
+    <div class="cover-kicker animate-in">Research Deck</div>
+    <h1 class="animate-in delay-1">LangGraph 로 사고하기</h1>
+    <p class="cover-subtitle animate-in delay-2">노드·엣지·State 로 에이전트를 짜는 법 — Thinking · Local Server · Changelog</p>
+  </div>
+  <div class="cover-meta">
+    <div><strong>발표자</strong>송태영</div>
+    <div><strong>채널</strong>AI Odyssey</div>
+    <div><strong>일시</strong>2026년 5월 30일</div>
+  </div>
+</section>
+<section class="slide" aria-label="깔개였던 엔진을 연다">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">Intro</div>
+  </div>
+  <h1 class="slide-title animate-in">깔개였던 엔진을 연다</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">DeepAgent 4주 내내 &quot;LangGraph 위에 얹혀 있다&quot;던 그 LangGraph 를 오늘 직접 본다</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>핵심 주제</th>
+<th>출처</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 왜 그래프인가 — 노드·엣지·State</td>
+<td>Thinking</td>
+</tr>
+<tr>
+<td>② 에이전트 설계 5단계</td>
+<td>Thinking</td>
+</tr>
+<tr>
+<td>③ State 설계 &amp; 에러</td>
+<td>Thinking</td>
+</tr>
+<tr>
+<td>④ 사람 개입 &amp; 내구성</td>
+<td>Thinking</td>
+</tr>
+<tr>
+<td>⑤ 로컬 실행 &amp; 근황</td>
+<td>Local Server · Changelog</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>한 문장 — LangGraph 는 에이전트를 <strong>노드·엣지·State 의 그래프</strong> 로 모델링하는 런타임이다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>01</span> / 12</span>
+  </div>
+</section>
+<section class="slide slide--section" aria-label="Section 01 divider">
+  <div class="section-tag">Section</div>
+  <h1>섹션 01.<br>왜 그래프인가</h1>
+  <p class="section-subtitle">노드는 작업, 엣지는 다음 결정, State 는 공유 메모리</p>
+  <div class="section-rule"></div>
+  <div class="section-num">01</div>
+</section>
+<section class="slide" aria-label="한 번의 LLM 호출로는 부족한 순간">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">한 번의 LLM 호출로는 부족한 순간</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">다단계·분기·외부 호출·사람 개입이 얽히면, 함수 하나로는 무너진다</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>함수 하나에 몰면</th>
+<th>그래프로 쪼개면</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>중간 상태를 볼 수 없다</td>
+<td>노드 사이에서 State 를 들여다본다</td>
+</tr>
+<tr>
+<td>실패 시 처음부터 다시</td>
+<td>checkpointer 로 멈춘 노드부터 재개</td>
+</tr>
+<tr>
+<td>&quot;사람 승인 대기&quot; 표현 불가</td>
+<td><code>interrupt()</code> 로 일시정지</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>쪼개는 비용을 치르고 <strong>스트리밍 · 재개 · 단계별 디버깅</strong> 을 얻는다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>02</span> / 12</span>
+  </div>
+</section>
+<section class="slide" aria-label="세 부품 — 노드·엣지·State">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§1 · Why</div>
+  </div>
+  <h1 class="slide-title animate-in">세 부품 — 노드·엣지·State</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">로직(노드)과 제어 흐름(엣지)을 분리하고, State 로 잇는다</p>
+  <div class="slide-body">
+<img src="figs/fig01_three_parts.svg" alt="노드·엣지·State 세 부품" style="display:block; margin:8px auto; max-width:70%; max-height:400px;" />
+<blockquote>
+<p>&quot;노드는 작업을 수행하고, 엣지는 다음에 무엇을 할지 알려준다.&quot;</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>03</span> / 12</span>
+  </div>
+</section>
+<section class="slide slide--section" aria-label="Section 02 divider">
+  <div class="section-tag">Section</div>
+  <h1>섹션 02.<br>에이전트 설계 5단계</h1>
+  <p class="section-subtitle">분해 → 스텝 유형 → State → 노드 → 연결</p>
+  <div class="section-rule"></div>
+  <div class="section-num">02</div>
+</section>
+<section class="slide" aria-label="설계는 다섯 단계로 좁힌다">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Design</div>
+  </div>
+  <h1 class="slide-title animate-in">설계는 다섯 단계로 좁힌다</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">하나의 업무 — 고객지원 이메일 에이전트 — 를 다섯 단계로 옮긴다</p>
+  <div class="slide-body">
+<img src="figs/fig02_design_5steps.svg" alt="설계 5단계 파이프라인" style="display:block; margin:14px auto; max-width:92%; max-height:300px;" />
+<blockquote>
+<p>①② 분해와 유형, ③ State, ④ 노드 구현, ⑤ 연결 — 이후 섹션이 이 순서를 따른다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>04</span> / 12</span>
+  </div>
+</section>
+<section class="slide" aria-label="Step 1 — 업무를 노드로 분해">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Design</div>
+  </div>
+  <h1 class="slide-title animate-in">Step 1 — 업무를 노드로 분해</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">실선 = 늘 같은 다음 노드, 보라 점선 = 노드 내부 <code>Command(goto=...)</code> 분기</p>
+  <div class="slide-body">
+<img src="figs/fig03_email_agent_graph.svg" alt="이메일 에이전트 그래프" style="display:block; margin:4px auto; max-width:58%; max-height:430px;" />
+<blockquote>
+<p>라우팅을 노드 안에 두니 엣지는 최소 — 흐름이 명시적이고 추적 가능하다. (<code>human_review</code> 가 두 번 보이는 건 같은 노드의 레이아웃 단순화)</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>05</span> / 12</span>
+  </div>
+</section>
+<section class="slide" aria-label="Step 2 — 스텝 유형 식별">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§2 · Design</div>
+  </div>
+  <h1 class="slide-title animate-in">Step 2 — 스텝 유형 식별</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">같은 &quot;노드&quot; 라도 유형마다 재시도·캐싱·에러 정책이 다르다</p>
+  <div class="slide-body">
+<img src="figs/fig04_step_types.svg" alt="네 가지 스텝 유형" style="display:block; margin:8px auto; max-width:72%; max-height:410px;" />
+<blockquote>
+<p>유형을 먼저 나눠 두면, 노드별 정책을 따로 줄 근거가 생긴다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>06</span> / 12</span>
+  </div>
+</section>
+<section class="slide slide--section" aria-label="Section 03 divider">
+  <div class="section-tag">Section</div>
+  <h1>섹션 03.<br>State 설계 & 에러</h1>
+  <p class="section-subtitle">raw 로 저장하고, 에러는 흐름의 일부로 다룬다</p>
+  <div class="section-rule"></div>
+  <div class="section-num">03</div>
+</section>
+<section class="slide" aria-label="Step 3 — State 는 raw 로">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§3 · State</div>
+  </div>
+  <h1 class="slide-title animate-in">Step 3 — State 는 raw 로</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">포맷된 문자열이 아니라 원시 데이터를 저장, 프롬프트는 노드에서 온디맨드</p>
+  <div class="slide-body">
+<img src="figs/fig05_state_raw.svg" alt="State 는 raw, 포맷은 노드에서" style="display:block; margin:8px auto; max-width:74%; max-height:400px;" />
+<blockquote>
+<p>같은 raw 를 노드마다 다르게 포맷 — 프롬프트만 바꿔도 State 스키마는 그대로.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>07</span> / 12</span>
+  </div>
+</section>
+<section class="slide" aria-label="에러도 흐름의 일부">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§3 · Errors</div>
+  </div>
+  <h1 class="slide-title animate-in">에러도 흐름의 일부</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">모든 에러를 try/except 로 삼키지 않는다 — &quot;누가 고치나&quot; 로 전략이 갈린다</p>
+  <div class="slide-body">
+<img src="figs/fig06_error_strategies.svg" alt="네 가지 에러 처리 전략" style="display:block; margin:8px auto; max-width:84%; max-height:380px;" />
+<blockquote>
+<p>일시적 = 재시도, LLM 복구 = 되돌아오기, 사용자 = 일시정지, 예상 밖 = 띄워보내기.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>08</span> / 12</span>
+  </div>
+</section>
+<section class="slide slide--section" aria-label="Section 04 divider">
+  <div class="section-tag">Section</div>
+  <h1>섹션 04.<br>사람 개입 & 내구성</h1>
+  <p class="section-subtitle"><code>interrupt()</code> 로 멈추고, checkpointer 로 재개한다</p>
+  <div class="section-rule"></div>
+  <div class="section-num">04</div>
+</section>
+<section class="slide" aria-label="사람 입력은 1급 시민">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§4 · HITL</div>
+  </div>
+  <h1 class="slide-title animate-in">사람 입력은 1급 시민</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1"><code>interrupt()</code> 가 State 를 저장하고 멈춘다 — checkpoint 가 남아 있으면 같은 <code>thread_id</code> + <code>Command(resume=...)</code> 로 재개</p>
+  <div class="slide-body">
+<img src="figs/fig07_interrupt_resume.svg" alt="interrupt → checkpointer → resume" style="display:block; margin:6px auto; max-width:90%; max-height:300px;" />
+<ul class="bullets">
+<li><code>interrupt()</code> 는 <strong>비멱등 side effect 보다 앞에</strong> — 재개 시 그 앞의 순수 코드는 재실행된다</li>
+<li><code>thread_id</code> 는 식별 키, 보존은 checkpointer (<code>MemorySaver</code> 는 인메모리 데모)</li>
+</ul>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>09</span> / 12</span>
+  </div>
+</section>
+<section class="slide" aria-label="노드를 작게 쪼갤수록">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§4 · Durable</div>
+  </div>
+  <h1 class="slide-title animate-in">노드를 작게 쪼갤수록</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">내구성 있는 실행 — 노드/슈퍼스텝 경계에서 체크포인트</p>
+  <div class="slide-body">
+<img src="figs/fig08_node_granularity.svg" alt="노드 granularity 와 재실행 범위" style="display:block; margin:8px auto; max-width:82%; max-height:380px;" />
+<blockquote>
+<p>작은 노드 = 실패 시 재실행 범위가 작다. 기본 <strong>async durability</strong> 는 checkpoint write 를 매번 기다리지 않는다 — 단, 의미 있는 경계로 쪼갠다.</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>10</span> / 12</span>
+  </div>
+</section>
+<section class="slide slide--section" aria-label="Section 05 divider">
+  <div class="section-tag">Section</div>
+  <h1>섹션 05.<br>로컬 실행 & 근황</h1>
+  <p class="section-subtitle"><code>langgraph dev</code> 로 띄우고 Studio 로 디버깅</p>
+  <div class="section-rule"></div>
+  <div class="section-num">05</div>
+</section>
+<section class="slide" aria-label="langgraph dev — 한 줄로 띄운다">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§5 · Local</div>
+  </div>
+  <h1 class="slide-title animate-in">langgraph dev — 한 줄로 띄운다</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1"><code>langgraph.json</code> 에 등록된 그래프를 인메모리 서버(:2024)로</p>
+  <div class="slide-body">
+<img src="figs/fig09_local_topology.svg" alt="langgraph dev 로컬 토폴로지" style="display:block; margin:6px auto; max-width:70%; max-height:360px;" />
+<ul class="bullets">
+<li><code>langgraph dev</code> → 포트 2024 인메모리(개발용), 운영은 <strong>LangSmith Deployment</strong></li>
+<li>Studio 로 시각화·단계 디버깅, Python SDK / REST 로 호출</li>
+</ul>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>11</span> / 12</span>
+  </div>
+</section>
+<section class="slide" aria-label="생태계는 빠르게 움직인다">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">§5 · Changelog</div>
+  </div>
+  <h1 class="slide-title animate-in">생태계는 빠르게 움직인다</h1>
+  <div class="slide-title-rule"></div>
+  <p class="slide-subtitle animate-in delay-1">원문 05 (2025-12-15 시점) 발췌 — 발표 시점엔 더 있으니 공식 changelog 를 직접 확인</p>
+  <div class="slide-body">
+<table class="cmp-table">
+<thead>
+<tr>
+<th>시점</th>
+<th>핵심</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-10</td>
+<td><code>langchain</code> · <code>langgraph</code> <strong>v1.0 정식</strong></td>
+</tr>
+<tr>
+<td>2025-11</td>
+<td>model profiles · 요약/재시도/검열 <strong>미들웨어</strong></td>
+</tr>
+<tr>
+<td>2025-12-08</td>
+<td>Google GenAI SDK 통합 (<code>langchain-google-genai</code> v4)</td>
+</tr>
+<tr>
+<td>2025-12-15</td>
+<td><code>create_agent</code> extras (<code>langchain</code> v1.2)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>미들웨어 흐름은 우리가 DeepAgent 에서 본 &quot;4대 능력을 미들웨어로 얹는다&quot; 와 같은 줄기 (해석).</p>
+</blockquote>
+
+  </div>
+  <div class="slide-footer">
+    <span>AI Odyssey</span>
+    <span class="slide-footer__page"><span>12</span> / 12</span>
+  </div>
+</section>
+<section class="slide slide--closing" aria-label="한 문장으로">
+  <div class="slide-header">
+    <div class="brand-mark"><div class="brand-mark__stack"><span class="brand-mark__name">AI Odyssey</span><span class="brand-mark__sub">Deep Research</span></div></div>
+    <div class="slide-section-tag">Thank you</div>
+  </div>
+  <div class="slide-body" style="justify-content:flex-start;">
+    <div class="cover-kicker animate-in">Q&A</div>
+    <h1 class="animate-in delay-1">한 문장으로</h1>
+    <p class="closing-sub animate-in delay-2">LangGraph = 노드·엣지·State 의 그래프 런타임 — 분해하고, raw State 로 잇고, 에러·사람 개입을 흐름에 담고, <code>langgraph dev</code> 로 띄운다.</p>
+<div class="closing-contact">
+  <div>
+    <strong>발표자</strong>
+    <span>송태영 · LangGraph 04-06</span>
+  </div>
+  <div>
+    <strong>다룬 주제</strong>
+    <span>왜 그래프 · 5단계 · State/에러<br/>사람 개입 · 로컬 실행</span>
+  </div>
+  <div>
+    <strong>자료</strong>
+    <span>content/01_textbook.md · figs/fig01~09</span>
+  </div>
+</div>
+
+  </div>
+</section>
+        </div>
+      </div>
+    </div>
+    <nav class="slide-nav" aria-label="Slide navigation">
+      <button onclick="prevSlide()" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="slide-counter"><span id="slideCur">1</span> / <span id="slideTotal">19</span></span>
+      <button onclick="nextSlide()" aria-label="Next slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </nav>
+  </main>
+  <script src="../../../template/deck.js"></script>
+</body>
+</html>

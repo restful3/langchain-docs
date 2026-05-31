@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 -4 568 372" font-family="'Helvetica Neue',Arial,'Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0F2C59"/>
+    </marker>
+    <style>
+      .n{fill:#EEF2FB;stroke:#2563EB;stroke-width:1.4;rx:7}
+      .lbl{font-size:12.5px;fill:#0F2C59;font-family:'SF Mono',Menlo,Consolas,monospace}
+      .solid{stroke:#0F2C59;stroke-width:1.6;fill:none}
+      .dash{stroke:#7C3AED;stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+    </style>
+  </defs>
+
+  <!-- START -->
+  <rect x="266" y="8" width="68" height="24" rx="12" fill="#0F2C59"/>
+  <text x="300" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">START</text>
+
+  <!-- read_email -->
+  <rect x="222" y="46" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="66" text-anchor="middle" class="lbl">read_email</text>
+
+  <!-- classify_intent -->
+  <rect x="222" y="96" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="116" text-anchor="middle" class="lbl">classify_intent</text>
+
+  <!-- branch row -->
+  <rect x="22" y="156" width="168" height="32" rx="7" class="n"/>
+  <text x="106" y="176" text-anchor="middle" class="lbl">search_documentation</text>
+
+  <rect x="222" y="156" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="176" text-anchor="middle" class="lbl">bug_tracking</text>
+
+  <rect x="410" y="156" width="156" height="32" rx="7" class="n"/>
+  <text x="488" y="176" text-anchor="middle" class="lbl">human_review</text>
+
+  <!-- draft_response -->
+  <rect x="222" y="216" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="236" text-anchor="middle" class="lbl">draft_response</text>
+
+  <!-- draft branches -->
+  <rect x="120" y="276" width="140" height="32" rx="7" class="n"/>
+  <text x="190" y="296" text-anchor="middle" class="lbl">send_reply</text>
+
+  <rect x="330" y="276" width="156" height="32" rx="7" class="n"/>
+  <text x="408" y="296" text-anchor="middle" class="lbl">human_review</text>
+
+  <!-- END -->
+  <rect x="266" y="332" width="68" height="24" rx="12" fill="#0F2C59"/>
+  <text x="300" y="348" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">END</text>
+
+  <!-- solid edges -->
+  <path class="solid" d="M300,32 L300,46" marker-end="url(#ar)"/>
+  <path class="solid" d="M300,78 L300,96" marker-end="url(#ar)"/>
+  <!-- branch -> draft (solid) -->
+  <path class="solid" d="M106,188 L106,232 L222,232" marker-end="url(#ar)"/>
+  <path class="solid" d="M300,188 L300,216" marker-end="url(#ar)"/>
+  <path class="solid" d="M488,188 L488,232 L378,232" marker-end="url(#ar)"/>
+  <!-- send_reply / human_review2 -> END (solid) -->
+  <path class="solid" d="M190,308 L190,344 L266,344" marker-end="url(#ar)"/>
+  <path class="solid" d="M408,308 L408,344 L334,344" marker-end="url(#ar)"/>
+
+  <!-- dashed: classify -> 3 branches (node-internal routing) -->
+  <path class="dash" d="M222,118 C150,128 106,134 106,156" marker-end="url(#ar)"/>
+  <path class="dash" d="M300,128 L300,156" marker-end="url(#ar)"/>
+  <path class="dash" d="M378,118 C450,128 488,134 488,156" marker-end="url(#ar)"/>
+  <!-- dashed: draft -> send / review2 -->
+  <path class="dash" d="M222,238 C200,250 190,258 190,276" marker-end="url(#ar)"/>
+  <path class="dash" d="M378,238 C400,250 408,258 408,276" marker-end="url(#ar)"/>
+</svg>

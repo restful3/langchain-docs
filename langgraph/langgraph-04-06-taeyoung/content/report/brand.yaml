@@ -1,0 +1,9 @@
+# AI 오딧세이 세미나 브랜드 — template/brand.default.yaml(AI Odyssey) 위에 부분 override.
+# 미정의 키(palette, signature 등)는 default 에서 보충된다.
+brand:
+  name: "AI Odyssey"
+  sub: "Seminar"
+  cover_kicker: "AI 오딧세이 세미나"
+  running_header_left: "AI Odyssey · 세미나"
+  running_header_right: "AI ODYSSEY"
+  monogram: "AIO"
