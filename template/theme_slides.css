@@ -1498,6 +1498,43 @@ code {
   color: var(--text);
   font-weight: 500;
 }
+/* closing slide 토론 거리(Q&A) 카드 — 보고서의 feature-card 와 같은 시각 언어.
+   선택자를 .slide--closing 하위로 한정해 공용 템플릿 충돌을 방지한다. */
+.slide--closing .closing-qa {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 12px 0 6px;
+}
+.slide--closing .closing-qa__card {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid rgba(15, 44, 89, 0.10);
+  border-radius: 12px;
+  padding: 16px 18px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  box-shadow: 0 6px 18px rgba(15, 44, 89, 0.07);
+}
+.slide--closing .closing-qa__card::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-deep));
+}
+.slide--closing .closing-qa__q {
+  font-size: clamp(11px, 13cqi / 10, 13px);
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  color: var(--brand-primary);
+}
+.slide--closing .closing-qa__card p {
+  margin: 0;
+  font-size: clamp(13px, 15.5cqi / 10, 16px);
+  line-height: 1.46;
+  color: var(--text);
+}
+.slide--closing .closing-qa__card code { font-size: 0.92em; }
 
 /* ===== NAV / PROGRESS ===== */
 .deck-progress {
