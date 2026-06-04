@@ -61,7 +61,7 @@ date: 2026년 5월 30일
 <!-- slide: tag="§2 · Design" -->
 # 설계는 다섯 단계로 좁힌다
 
-> 하나의 업무 — 고객지원 이메일 에이전트 — 를 다섯 단계로 옮긴다
+> 하나의 업무 — 평균회귀 트레이딩 에이전트 — 를 다섯 단계로 옮긴다
 
 <img src="figs/fig02_design_5steps.svg" alt="설계 5단계 파이프라인" style="display:block; margin:14px auto; max-width:92%; max-height:300px;" />
 
@@ -72,9 +72,9 @@ date: 2026년 5월 30일
 
 > 실선 = 늘 같은 다음 노드, 보라 점선 = 노드 내부 `Command(goto=...)` 분기
 
-<img src="figs/fig03_email_agent_graph.svg" alt="이메일 에이전트 그래프" style="display:block; margin:4px auto; max-width:58%; max-height:430px;" />
+<img src="figs/fig03_trading_agent_graph.svg" alt="트레이딩 에이전트 그래프" style="display:block; margin:4px auto; max-width:58%; max-height:430px;" />
 
-> 라우팅을 노드 안에 두니 엣지는 최소 — 흐름이 명시적이고 추적 가능하다. (`human_review` 가 두 번 보이는 건 같은 노드의 레이아웃 단순화)
+> 라우팅을 노드 안에 두니 엣지는 최소 — 흐름이 명시적이고 추적 가능하다. (`approve_order` 가 두 번 보이는 건 같은 노드의 레이아웃 단순화 · 교육용 dry-run)
 
 <!-- slide: tag="§2 · Design" -->
 # Step 2 — 스텝 유형 식별
@@ -180,7 +180,7 @@ date: 2026년 5월 30일
 
 <div class="closing-qa">
   <div class="closing-qa__card"><span class="closing-qa__q">Q1 · 연결</span><p>DeepAgent 의 4대 능력은 이 노드·엣지·State 위에서 어떻게 도는가?</p></div>
-  <div class="closing-qa__card"><span class="closing-qa__q">Q2 · 설계</span><p>내 에이전트에서 <code>interrupt()</code> 는 어디에 둘까 — 발송·결제 같은 비멱등 호출 앞에?</p></div>
+  <div class="closing-qa__card"><span class="closing-qa__q">Q2 · 설계</span><p>내 에이전트에서 <code>interrupt()</code> 는 어디에 둘까 — 주문 전송 같은 비멱등 호출 앞에?</p></div>
   <div class="closing-qa__card"><span class="closing-qa__q">Q3 · 트레이드오프</span><p>노드를 얼마나 잘게 쪼갤까 — 회복력 vs 관찰가능성?</p></div>
 </div>
 

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 -4 574 414" font-family="'Helvetica Neue',Arial,'Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0F2C59"/>
+    </marker>
+    <style>
+      .n{fill:#EEF2FB;stroke:#2563EB;stroke-width:1.4;rx:7}
+      .lbl{font-size:12.5px;fill:#0F2C59;font-family:'SF Mono',Menlo,Consolas,monospace}
+      .solid{stroke:#0F2C59;stroke-width:1.6;fill:none}
+      .dash{stroke:#7C3AED;stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+    </style>
+  </defs>
+
+  <!-- START -->
+  <rect x="266" y="8" width="68" height="24" rx="12" fill="#0F2C59"/>
+  <text x="300" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">START</text>
+
+  <!-- fetch_market_data -->
+  <rect x="222" y="50" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="70" text-anchor="middle" class="lbl">fetch_market_data</text>
+
+  <!-- generate_signal -->
+  <rect x="222" y="100" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="120" text-anchor="middle" class="lbl">generate_signal</text>
+
+  <!-- flag_anomaly (left) -->
+  <rect x="24" y="156" width="160" height="32" rx="7" class="n"/>
+  <text x="104" y="176" text-anchor="middle" class="lbl">flag_anomaly</text>
+
+  <!-- check_risk -->
+  <rect x="222" y="156" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="176" text-anchor="middle" class="lbl">check_risk</text>
+
+  <!-- size_position -->
+  <rect x="222" y="212" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="232" text-anchor="middle" class="lbl">size_position</text>
+
+  <!-- approve_order (escalation entry, right) -->
+  <rect x="414" y="212" width="160" height="32" rx="7" class="n"/>
+  <text x="494" y="232" text-anchor="middle" class="lbl">approve_order</text>
+
+  <!-- approve_order (normal entry) -->
+  <rect x="222" y="268" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="288" text-anchor="middle" class="lbl">approve_order</text>
+
+  <!-- place_order -->
+  <rect x="222" y="324" width="156" height="32" rx="7" class="n"/>
+  <text x="300" y="344" text-anchor="middle" class="lbl">place_order</text>
+
+  <!-- END -->
+  <rect x="266" y="380" width="68" height="24" rx="12" fill="#0F2C59"/>
+  <text x="300" y="396" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">END</text>
+
+  <!-- solid edges (add_edge: 고정 엣지는 셋뿐) -->
+  <path class="solid" d="M300,32 L300,50" marker-end="url(#ar)"/>
+  <path class="solid" d="M300,82 L300,100" marker-end="url(#ar)"/>
+  <path class="solid" d="M300,356 L300,380" marker-end="url(#ar)"/>
+
+  <!-- dashed edges (node-internal Command(goto)) -->
+  <path class="dash" d="M222,116 C150,130 104,138 104,156" marker-end="url(#ar)"/>
+  <path class="dash" d="M300,132 L300,156" marker-end="url(#ar)"/>
+  <path class="dash" d="M378,170 C440,180 494,190 494,212" marker-end="url(#ar)"/>
+  <path class="dash" d="M300,188 L300,212" marker-end="url(#ar)"/>
+  <path class="dash" d="M300,244 L300,268" marker-end="url(#ar)"/>
+  <path class="dash" d="M300,300 L300,324" marker-end="url(#ar)"/>
+  <!-- escalation approve_order -> place_order -->
+  <path class="dash" d="M494,244 L494,340 L378,340" marker-end="url(#ar)"/>
+  <!-- flag_anomaly -> END -->
+  <path class="dash" d="M104,188 L104,392 L266,392" marker-end="url(#ar)"/>
+</svg>

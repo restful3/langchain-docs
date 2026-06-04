@@ -3727,7 +3727,7 @@ html.reader-size-large .continuous-mode {
     </ul>
   </div>
 </div>
-<p>§1~§4 는 공식 문서가 끝까지 끌고 가는 하나의 예제 — <strong>고객지원 이메일 에이전트</strong> — 를 함께 따라간다. 추상적인 &quot;노드와 엣지&quot; 가 한 사례로 어떻게 살이 붙는지 관통해 본다.</p>
+<p>§1~§4 는 하나의 예제 — <strong>평균회귀 트레이딩 에이전트</strong> — 를 함께 따라간다. 공식 문서의 설계 흐름을 퀀트 사례로 옮겨, 추상적인 &quot;노드와 엣지&quot; 가 한 사례로 어떻게 살이 붙는지 관통해 본다.</p>
 </section>
 
     <aside class="section-divider" aria-hidden="true">
@@ -3784,7 +3784,7 @@ html.reader-size-large .continuous-mode {
 </tr>
 </tbody>
 </table>
-<p>§1~§4 는 공식 문서가 끝까지 끌고 가는 하나의 예제 — <strong>고객지원 이메일 에이전트</strong> — 를 함께 따라간다. 추상적인 &quot;노드와 엣지&quot; 가 실제로 어떻게 살이 붙는지 한 사례로 관통해 보는 것이다.</p>
+<p>§1~§4 는 하나의 예제 — <strong>평균회귀 트레이딩 에이전트</strong> — 를 함께 따라간다. 공식 문서의 설계 흐름을 퀀트 사례로 옮겨, 추상적인 &quot;노드와 엣지&quot; 가 실제로 어떻게 살이 붙는지 한 사례로 관통해 보는 것이다.</p>
 
 </section>
 
@@ -3804,7 +3804,7 @@ html.reader-size-large .continuous-mode {
   <div class="section-summary__body"><strong>노드는 작업을 수행하고, 엣지는 다음에 무엇을 할지 알려주며, State 는 모든 노드가 읽고 쓰는 공유 메모리다.</strong></div>
 </div>
 <h3 id="1.1.-한-번의-llm-호출로는-부족한-순간">1.1. 한 번의 LLM 호출로는 부족한 순간</h3>
-<p>간단한 질문 하나라면 LLM 을 한 번 부르면 끝이다. 그러나 현실의 에이전트 업무는 그렇지 않다. 예컨대 &quot;들어온 고객 이메일을 읽고, 긴급도와 주제로 분류하고, 필요하면 문서를 검색해 답을 만들고, 복잡하면 사람에게 넘기고, 후속 일정을 잡아라&quot; 같은 업무는 <strong>여러 단계 · 분기 · 외부 호출 · 사람 개입</strong> 이 얽힌다.</p>
+<p>간단한 질문 하나라면 LLM 을 한 번 부르면 끝이다. 그러나 현실의 에이전트 업무는 그렇지 않다. 예컨대 &quot;종목 시세를 읽고, 평균회귀 신호로 방향을 판단하고, 리스크 한도를 점검하고, 주문 전에 사람 승인을 받고, 체결을 기록하라&quot; 같은 업무는 <strong>여러 단계 · 분기 · 외부 호출 · 사람 개입</strong> 이 얽힌다.</p>
 <p>이런 업무를 함수 하나에 if/for 로 몰아넣으면, 중간에 무슨 일이 일어났는지 들여다볼 수 없고, 한 단계가 실패하면 처음부터 다시 해야 하며, &quot;사람의 승인을 기다리는 동안 멈춰 있기&quot; 같은 동작을 표현하기 어렵다.</p>
 <h3 id="1.2.-세-가지-부품">1.2. 세 가지 부품</h3>
 <p>LangGraph 는 이 복잡함을 세 가지 부품으로 분해한다.</p>
@@ -3843,25 +3843,28 @@ html.reader-size-large .continuous-mode {
 <ul class="bullets">
 <li><strong>스트리밍 진행상황</strong>: 노드 경계마다 &quot;지금 어디까지 했다&quot; 를 사용자에게 흘려보낼 수 있다.</li>
 <li><strong>내구성 있는 일시정지·재개</strong>: 노드 경계에서 상태를 저장해 두므로, 멈췄다가 며칠 뒤에 이어서 실행할 수 있다.</li>
-<li><strong>단계별 디버깅</strong>: 노드 사이에서 State 를 들여다보며 &quot;분류기가 무엇으로 판단했는지&quot; 를 실행 전에 확인할 수 있다.</li>
+<li><strong>단계별 디버깅</strong>: 노드 사이에서 State 를 들여다보며 &quot;신호 생성기가 무엇으로(z-score·방향) 판단했는지&quot; 를 주문 전에 확인할 수 있다.</li>
 </ul>
-<h3 id="1.4.-따라갈-예제-고객지원-이메일-에이전트">1.4. 따라갈 예제 — 고객지원 이메일 에이전트</h3>
-<p>앞으로 §4 까지 함께 따라갈 예제다. 제품팀이 요구한 동작은 이렇다.<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" target="_blank" rel="noopener">[1]</a></sup></p>
-<div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 1</span><span class="asset-caption__title">1.4. 따라갈 예제 — 고객지원 이메일 에이전트</span></div>
+<h3 id="1.4.-따라갈-예제-평균회귀-트레이딩-에이전트">1.4. 따라갈 예제 — 평균회귀 트레이딩 에이전트</h3>
+<p>앞으로 §4 까지 함께 따라갈 예제다. 공식 문서가 고객지원 에이전트로 보여 준 <strong>설계 흐름</strong> 을, 이 발제에서는 퀀트 사례로 옮겼다.<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" target="_blank" rel="noopener">[1]</a></sup> 요구 동작은 이렇다.</p>
+<div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 1</span><span class="asset-caption__title">1.4. 따라갈 예제 — 평균회귀 트레이딩 에이전트</span></div>
 <pre class="code-block code-block--text" data-lang="text"><code class="language-text">에이전트는 다음을 해야 한다:
-- 들어온 고객 이메일을 읽는다
-- 긴급도와 주제로 분류한다
-- 답을 위해 관련 문서를 검색한다
-- 적절한 답변 초안을 작성한다
-- 복잡한 이슈는 사람 상담원에게 에스컬레이션한다
-- 필요하면 후속 일정을 잡는다
+- 종목의 최근 시세(종가 윈도우)를 가져온다
+- z-score 로 평균회귀 방향·확신을 판단한다
+- 진입 신호면 변동성·노출 한도를 점검한다
+- 한도 안에서 주문 수량을 산출한다
+- 주문 전송 전 사람의 승인을 받는다
+- 데이터 이상이면 기록하고 거래하지 않는다
 
 처리해야 할 시나리오:
-1. 단순 질문:   &quot;비밀번호를 어떻게 재설정하나요?&quot;
-2. 버그 리포트: &quot;PDF 형식으로 내보내기를 선택하면 충돌합니다&quot;
-3. 긴급 청구:   &quot;구독료가 두 번 청구됐어요!&quot;
-4. 기능 요청:   &quot;모바일 앱에 다크 모드 추가해 주세요&quot;
-5. 복잡한 기술 이슈: &quot;API 연동이 간헐적으로 504 오류로 실패합니다&quot;</code></pre>
+1. 저평가 되돌림: 가격이 평균 아래로 크게 벗어남 → 롱
+2. 급등 과열:     가격이 평균 위로 크게 벗어남 → 숏 (강한 신호 → 사람 검토)
+3. 평탄:         평균 근처 → 무거래
+4. 변동성 초과:   리스크 한도 초과 → 사람 에스컬레이션
+5. 데이터 이상:   결측·비정상 가격 → 이상 기록, 무거래</code></pre>
+<blockquote>
+<p>⚠️ <strong>교육용 예제다.</strong> 실제 매매 전략이 아니라 LangGraph 의 노드·엣지·State 를 보여 주기 위한 dry-run 이다 — 신호·리스크·사이징은 의도적으로 단순화했다.</p>
+</blockquote>
 <p>이 업무를 LangGraph 로 옮기는 일은 보통 <strong>다섯 단계</strong> 를 거친다. §2 부터가 그 다섯 단계다.</p>
 
 </section>
@@ -3927,10 +3930,10 @@ html.reader-size-large .continuous-mode {
 <figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 2</span><span class="asset-caption__title">설계 5단계 파이프라인</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIgMTYgNjA4IDk5IiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxBcmlhbCwnQXBwbGUgU0QgR290aGljIE5lbycsJ01hbGd1biBHb3RoaWMnLHNhbnMtc2VyaWYiPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjUiIG1hcmtlckhlaWdodD0iNSIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwwIEwxMCw1IEwwLDEwIHoiIGZpbGw9IiMwRjJDNTkiLz4KICAgIDwvbWFya2VyPgogIDwvZGVmcz4KCiAgPHJlY3QgeD0iMTQiICB5PSIyOCIgd2lkdGg9Ijk2IiBoZWlnaHQ9IjUyIiByeD0iOCIgZmlsbD0iI0VFRjJGQiIgc3Ryb2tlPSIjMjU2M0VCIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDx0ZXh0IHg9IjYyIiAgeT0iNTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+4pGgIOu2hO2VtDwvdGV4dD4KICA8dGV4dCB4PSI2MiIgIHk9IjEwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMC41IiBmaWxsPSIjNkI2QjcyIj7CpzI8L3RleHQ+CgogIDxyZWN0IHg9IjEzNiIgeT0iMjgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI1MiIgcng9IjgiIGZpbGw9IiNFRUYyRkIiIHN0cm9rZT0iIzI1NjNFQiIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSIxODQiIHk9IjU5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwRjJDNTkiPuKRoSDsiqTthZ0g7Jyg7ZiVPC90ZXh0PgogIDx0ZXh0IHg9IjE4NCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwLjUiIGZpbGw9IiM2QjZCNzIiPsKnMjwvdGV4dD4KCiAgPHJlY3QgeD0iMjU4IiB5PSIyOCIgd2lkdGg9Ijk2IiBoZWlnaHQ9IjUyIiByeD0iOCIgZmlsbD0iI0VFRjJGQiIgc3Ryb2tlPSIjMjU2M0VCIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDx0ZXh0IHg9IjMwNiIgeT0iNTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+4pGiIFN0YXRlPC90ZXh0PgogIDx0ZXh0IHg9IjMwNiIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwLjUiIGZpbGw9IiM2QjZCNzIiPsKnMzwvdGV4dD4KCiAgPHJlY3QgeD0iMzgwIiB5PSIyOCIgd2lkdGg9Ijk2IiBoZWlnaHQ9IjUyIiByeD0iOCIgZmlsbD0iI0VFRjJGQiIgc3Ryb2tlPSIjMjU2M0VCIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDx0ZXh0IHg9IjQyOCIgeT0iNTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+4pGjIOuFuOuTnCDqtaztmIQ8L3RleHQ+CiAgPHRleHQgeD0iNDI4IiB5PSIxMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTAuNSIgZmlsbD0iIzZCNkI3MiI+wqczwrfCpzQ8L3RleHQ+CgogIDxyZWN0IHg9IjUwMiIgeT0iMjgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI1MiIgcng9IjgiIGZpbGw9IiNFRUYyRkIiIHN0cm9rZT0iIzI1NjNFQiIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSI1NTAiIHk9IjU5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwRjJDNTkiPuKRpCDsl7DqsrA8L3RleHQ+CiAgPHRleHQgeD0iNTUwIiB5PSIxMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTAuNSIgZmlsbD0iIzZCNkI3MiI+wqc0PC90ZXh0PgoKICA8bGluZSB4MT0iMTEwIiB5MT0iNTQiIHgyPSIxMzYiIHkyPSI1NCIgc3Ryb2tlPSIjMEYyQzU5IiBzdHJva2Utd2lkdGg9IjEuNiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8bGluZSB4MT0iMjMyIiB5MT0iNTQiIHgyPSIyNTgiIHkyPSI1NCIgc3Ryb2tlPSIjMEYyQzU5IiBzdHJva2Utd2lkdGg9IjEuNiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8bGluZSB4MT0iMzU0IiB5MT0iNTQiIHgyPSIzODAiIHkyPSI1NCIgc3Ryb2tlPSIjMEYyQzU5IiBzdHJva2Utd2lkdGg9IjEuNiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8bGluZSB4MT0iNDc2IiB5MT0iNTQiIHgyPSI1MDIiIHkyPSI1NCIgc3Ryb2tlPSIjMEYyQzU5IiBzdHJva2Utd2lkdGg9IjEuNiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KPC9zdmc+Cg==" alt="설계 5단계 파이프라인" /><small class="asset-note">설계 5단계 파이프라인. ①② 는 §2, ③ 은 §3, ④ 는 §3·§4, ⑤ 는 §4 에서 다룬다.</small></figure>
 <h3 id="2.1.-step-1-워크플로우를-개별-스텝으로-분해">2.1. Step 1 — 워크플로우를 개별 스텝으로 분해</h3>
 <p>먼저 업무 안의 서로 다른 단계를 식별한다. 각 단계가 하나의 <strong>노드</strong>(한 가지 일만 하는 함수)가 된다. 그런 다음 이 단계들이 어떻게 이어지는지 스케치한다.</p>
-<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 3</span><span class="asset-caption__title">이메일 에이전트 그래프</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjEwIC00IDU2OCAzNzIiIGZvbnQtZmFtaWx5PSInSGVsdmV0aWNhIE5ldWUnLEFyaWFsLCdBcHBsZSBTRCBHb3RoaWMgTmVvJywnTWFsZ3VuIEdvdGhpYycsc2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhciIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNSIgbWFya2VySGVpZ2h0PSI1IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0wLDAgTDEwLDUgTDAsMTAgeiIgZmlsbD0iIzBGMkM1OSIvPgogICAgPC9tYXJrZXI+CiAgICA8c3R5bGU+CiAgICAgIC5ue2ZpbGw6I0VFRjJGQjtzdHJva2U6IzI1NjNFQjtzdHJva2Utd2lkdGg6MS40O3J4Ojd9CiAgICAgIC5sYmx7Zm9udC1zaXplOjEyLjVweDtmaWxsOiMwRjJDNTk7Zm9udC1mYW1pbHk6J1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZX0KICAgICAgLnNvbGlke3N0cm9rZTojMEYyQzU5O3N0cm9rZS13aWR0aDoxLjY7ZmlsbDpub25lfQogICAgICAuZGFzaHtzdHJva2U6IzdDM0FFRDtzdHJva2Utd2lkdGg6MS41O2ZpbGw6bm9uZTtzdHJva2UtZGFzaGFycmF5OjUgNH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgoKICA8IS0tIFNUQVJUIC0tPgogIDxyZWN0IHg9IjI2NiIgeT0iOCIgd2lkdGg9IjY4IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiMwRjJDNTkiLz4KICA8dGV4dCB4PSIzMDAiIHk9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZmIj5TVEFSVDwvdGV4dD4KCiAgPCEtLSByZWFkX2VtYWlsIC0tPgogIDxyZWN0IHg9IjIyMiIgeT0iNDYiIHdpZHRoPSIxNTYiIGhlaWdodD0iMzIiIHJ4PSI3IiBjbGFzcz0ibiIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iNjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJsYmwiPnJlYWRfZW1haWw8L3RleHQ+CgogIDwhLS0gY2xhc3NpZnlfaW50ZW50IC0tPgogIDxyZWN0IHg9IjIyMiIgeT0iOTYiIHdpZHRoPSIxNTYiIGhlaWdodD0iMzIiIHJ4PSI3IiBjbGFzcz0ibiIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iMTE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0ibGJsIj5jbGFzc2lmeV9pbnRlbnQ8L3RleHQ+CgogIDwhLS0gYnJhbmNoIHJvdyAtLT4KICA8cmVjdCB4PSIyMiIgeT0iMTU2IiB3aWR0aD0iMTY4IiBoZWlnaHQ9IjMyIiByeD0iNyIgY2xhc3M9Im4iLz4KICA8dGV4dCB4PSIxMDYiIHk9IjE3NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9ImxibCI+c2VhcmNoX2RvY3VtZW50YXRpb248L3RleHQ+CgogIDxyZWN0IHg9IjIyMiIgeT0iMTU2IiB3aWR0aD0iMTU2IiBoZWlnaHQ9IjMyIiByeD0iNyIgY2xhc3M9Im4iLz4KICA8dGV4dCB4PSIzMDAiIHk9IjE3NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9ImxibCI+YnVnX3RyYWNraW5nPC90ZXh0PgoKICA8cmVjdCB4PSI0MTAiIHk9IjE1NiIgd2lkdGg9IjE1NiIgaGVpZ2h0PSIzMiIgcng9IjciIGNsYXNzPSJuIi8+CiAgPHRleHQgeD0iNDg4IiB5PSIxNzYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJsYmwiPmh1bWFuX3JldmlldzwvdGV4dD4KCiAgPCEtLSBkcmFmdF9yZXNwb25zZSAtLT4KICA8cmVjdCB4PSIyMjIiIHk9IjIxNiIgd2lkdGg9IjE1NiIgaGVpZ2h0PSIzMiIgcng9IjciIGNsYXNzPSJuIi8+CiAgPHRleHQgeD0iMzAwIiB5PSIyMzYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJsYmwiPmRyYWZ0X3Jlc3BvbnNlPC90ZXh0PgoKICA8IS0tIGRyYWZ0IGJyYW5jaGVzIC0tPgogIDxyZWN0IHg9IjEyMCIgeT0iMjc2IiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjMyIiByeD0iNyIgY2xhc3M9Im4iLz4KICA8dGV4dCB4PSIxOTAiIHk9IjI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9ImxibCI+c2VuZF9yZXBseTwvdGV4dD4KCiAgPHJlY3QgeD0iMzMwIiB5PSIyNzYiIHdpZHRoPSIxNTYiIGhlaWdodD0iMzIiIHJ4PSI3IiBjbGFzcz0ibiIvPgogIDx0ZXh0IHg9IjQwOCIgeT0iMjk2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0ibGJsIj5odW1hbl9yZXZpZXc8L3RleHQ+CgogIDwhLS0gRU5EIC0tPgogIDxyZWN0IHg9IjI2NiIgeT0iMzMyIiB3aWR0aD0iNjgiIGhlaWdodD0iMjQiIHJ4PSIxMiIgZmlsbD0iIzBGMkM1OSIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iMzQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZmIj5FTkQ8L3RleHQ+CgogIDwhLS0gc29saWQgZWRnZXMgLS0+CiAgPHBhdGggY2xhc3M9InNvbGlkIiBkPSJNMzAwLDMyIEwzMDAsNDYiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHBhdGggY2xhc3M9InNvbGlkIiBkPSJNMzAwLDc4IEwzMDAsOTYiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPCEtLSBicmFuY2ggLT4gZHJhZnQgKHNvbGlkKSAtLT4KICA8cGF0aCBjbGFzcz0ic29saWQiIGQ9Ik0xMDYsMTg4IEwxMDYsMjMyIEwyMjIsMjMyIiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgogIDxwYXRoIGNsYXNzPSJzb2xpZCIgZD0iTTMwMCwxODggTDMwMCwyMTYiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHBhdGggY2xhc3M9InNvbGlkIiBkPSJNNDg4LDE4OCBMNDg4LDIzMiBMMzc4LDIzMiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8IS0tIHNlbmRfcmVwbHkgLyBodW1hbl9yZXZpZXcyIC0+IEVORCAoc29saWQpIC0tPgogIDxwYXRoIGNsYXNzPSJzb2xpZCIgZD0iTTE5MCwzMDggTDE5MCwzNDQgTDI2NiwzNDQiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHBhdGggY2xhc3M9InNvbGlkIiBkPSJNNDA4LDMwOCBMNDA4LDM0NCBMMzM0LDM0NCIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KCiAgPCEtLSBkYXNoZWQ6IGNsYXNzaWZ5IC0+IDMgYnJhbmNoZXMgKG5vZGUtaW50ZXJuYWwgcm91dGluZykgLS0+CiAgPHBhdGggY2xhc3M9ImRhc2giIGQ9Ik0yMjIsMTE4IEMxNTAsMTI4IDEwNiwxMzQgMTA2LDE1NiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8cGF0aCBjbGFzcz0iZGFzaCIgZD0iTTMwMCwxMjggTDMwMCwxNTYiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHBhdGggY2xhc3M9ImRhc2giIGQ9Ik0zNzgsMTE4IEM0NTAsMTI4IDQ4OCwxMzQgNDg4LDE1NiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8IS0tIGRhc2hlZDogZHJhZnQgLT4gc2VuZCAvIHJldmlldzIgLS0+CiAgPHBhdGggY2xhc3M9ImRhc2giIGQ9Ik0yMjIsMjM4IEMyMDAsMjUwIDE5MCwyNTggMTkwLDI3NiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8cGF0aCBjbGFzcz0iZGFzaCIgZD0iTTM3OCwyMzggQzQwMCwyNTAgNDA4LDI1OCA0MDgsMjc2IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgo8L3N2Zz4K" alt="이메일 에이전트 그래프" /><small class="asset-note">고객지원 이메일 에이전트 그래프. <strong>실선</strong> 은 늘 같은 다음 노드로 가는 고정 엣지, <strong>보라 점선</strong> 은 노드 내부에서 <code>Command(goto=...)</code> 로 결정하는 분기다. (<code>human_review</code> 가 두 번 보이는 것은 같은 노드를 두 진입 경로 — 분류 직후 에스컬레이션, 초안 후 검토 — 로 나눠 그린 레이아웃 단순화다.)</small></figure>
+<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 3</span><span class="asset-caption__title">트레이딩 에이전트 그래프</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjEyIC00IDU3NCA0MTQiIGZvbnQtZmFtaWx5PSInSGVsdmV0aWNhIE5ldWUnLEFyaWFsLCdBcHBsZSBTRCBHb3RoaWMgTmVvJywnTWFsZ3VuIEdvdGhpYycsc2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhciIgdmlld0JveD0iMCAwIDEwIDEwIiByZWZYPSI5IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNSIgbWFya2VySGVpZ2h0PSI1IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+CiAgICAgIDxwYXRoIGQ9Ik0wLDAgTDEwLDUgTDAsMTAgeiIgZmlsbD0iIzBGMkM1OSIvPgogICAgPC9tYXJrZXI+CiAgICA8c3R5bGU+CiAgICAgIC5ue2ZpbGw6I0VFRjJGQjtzdHJva2U6IzI1NjNFQjtzdHJva2Utd2lkdGg6MS40O3J4Ojd9CiAgICAgIC5sYmx7Zm9udC1zaXplOjEyLjVweDtmaWxsOiMwRjJDNTk7Zm9udC1mYW1pbHk6J1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZX0KICAgICAgLnNvbGlke3N0cm9rZTojMEYyQzU5O3N0cm9rZS13aWR0aDoxLjY7ZmlsbDpub25lfQogICAgICAuZGFzaHtzdHJva2U6IzdDM0FFRDtzdHJva2Utd2lkdGg6MS41O2ZpbGw6bm9uZTtzdHJva2UtZGFzaGFycmF5OjUgNH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgoKICA8IS0tIFNUQVJUIC0tPgogIDxyZWN0IHg9IjI2NiIgeT0iOCIgd2lkdGg9IjY4IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiMwRjJDNTkiLz4KICA8dGV4dCB4PSIzMDAiIHk9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZmIj5TVEFSVDwvdGV4dD4KCiAgPCEtLSBmZXRjaF9tYXJrZXRfZGF0YSAtLT4KICA8cmVjdCB4PSIyMjIiIHk9IjUwIiB3aWR0aD0iMTU2IiBoZWlnaHQ9IjMyIiByeD0iNyIgY2xhc3M9Im4iLz4KICA8dGV4dCB4PSIzMDAiIHk9IjcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0ibGJsIj5mZXRjaF9tYXJrZXRfZGF0YTwvdGV4dD4KCiAgPCEtLSBnZW5lcmF0ZV9zaWduYWwgLS0+CiAgPHJlY3QgeD0iMjIyIiB5PSIxMDAiIHdpZHRoPSIxNTYiIGhlaWdodD0iMzIiIHJ4PSI3IiBjbGFzcz0ibiIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0ibGJsIj5nZW5lcmF0ZV9zaWduYWw8L3RleHQ+CgogIDwhLS0gZmxhZ19hbm9tYWx5IChsZWZ0KSAtLT4KICA8cmVjdCB4PSIyNCIgeT0iMTU2IiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjMyIiByeD0iNyIgY2xhc3M9Im4iLz4KICA8dGV4dCB4PSIxMDQiIHk9IjE3NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9ImxibCI+ZmxhZ19hbm9tYWx5PC90ZXh0PgoKICA8IS0tIGNoZWNrX3Jpc2sgLS0+CiAgPHJlY3QgeD0iMjIyIiB5PSIxNTYiIHdpZHRoPSIxNTYiIGhlaWdodD0iMzIiIHJ4PSI3IiBjbGFzcz0ibiIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iMTc2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0ibGJsIj5jaGVja19yaXNrPC90ZXh0PgoKICA8IS0tIHNpemVfcG9zaXRpb24gLS0+CiAgPHJlY3QgeD0iMjIyIiB5PSIyMTIiIHdpZHRoPSIxNTYiIGhlaWdodD0iMzIiIHJ4PSI3IiBjbGFzcz0ibiIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iMjMyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0ibGJsIj5zaXplX3Bvc2l0aW9uPC90ZXh0PgoKICA8IS0tIGFwcHJvdmVfb3JkZXIgKGVzY2FsYXRpb24gZW50cnksIHJpZ2h0KSAtLT4KICA8cmVjdCB4PSI0MTQiIHk9IjIxMiIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIzMiIgcng9IjciIGNsYXNzPSJuIi8+CiAgPHRleHQgeD0iNDk0IiB5PSIyMzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJsYmwiPmFwcHJvdmVfb3JkZXI8L3RleHQ+CgogIDwhLS0gYXBwcm92ZV9vcmRlciAobm9ybWFsIGVudHJ5KSAtLT4KICA8cmVjdCB4PSIyMjIiIHk9IjI2OCIgd2lkdGg9IjE1NiIgaGVpZ2h0PSIzMiIgcng9IjciIGNsYXNzPSJuIi8+CiAgPHRleHQgeD0iMzAwIiB5PSIyODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJsYmwiPmFwcHJvdmVfb3JkZXI8L3RleHQ+CgogIDwhLS0gcGxhY2Vfb3JkZXIgLS0+CiAgPHJlY3QgeD0iMjIyIiB5PSIzMjQiIHdpZHRoPSIxNTYiIGhlaWdodD0iMzIiIHJ4PSI3IiBjbGFzcz0ibiIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iMzQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0ibGJsIj5wbGFjZV9vcmRlcjwvdGV4dD4KCiAgPCEtLSBFTkQgLS0+CiAgPHJlY3QgeD0iMjY2IiB5PSIzODAiIHdpZHRoPSI2OCIgaGVpZ2h0PSIyNCIgcng9IjEyIiBmaWxsPSIjMEYyQzU5Ii8+CiAgPHRleHQgeD0iMzAwIiB5PSIzOTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiPkVORDwvdGV4dD4KCiAgPCEtLSBzb2xpZCBlZGdlcyAoYWRkX2VkZ2U6IOqzoOyglSDsl6Psp4DripQg7IWL67+QKSAtLT4KICA8cGF0aCBjbGFzcz0ic29saWQiIGQ9Ik0zMDAsMzIgTDMwMCw1MCIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8cGF0aCBjbGFzcz0ic29saWQiIGQ9Ik0zMDAsODIgTDMwMCwxMDAiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHBhdGggY2xhc3M9InNvbGlkIiBkPSJNMzAwLDM1NiBMMzAwLDM4MCIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KCiAgPCEtLSBkYXNoZWQgZWRnZXMgKG5vZGUtaW50ZXJuYWwgQ29tbWFuZChnb3RvKSkgLS0+CiAgPHBhdGggY2xhc3M9ImRhc2giIGQ9Ik0yMjIsMTE2IEMxNTAsMTMwIDEwNCwxMzggMTA0LDE1NiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8cGF0aCBjbGFzcz0iZGFzaCIgZD0iTTMwMCwxMzIgTDMwMCwxNTYiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHBhdGggY2xhc3M9ImRhc2giIGQ9Ik0zNzgsMTcwIEM0NDAsMTgwIDQ5NCwxOTAgNDk0LDIxMiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8cGF0aCBjbGFzcz0iZGFzaCIgZD0iTTMwMCwxODggTDMwMCwyMTIiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHBhdGggY2xhc3M9ImRhc2giIGQ9Ik0zMDAsMjQ0IEwzMDAsMjY4IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgogIDxwYXRoIGNsYXNzPSJkYXNoIiBkPSJNMzAwLDMwMCBMMzAwLDMyNCIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8IS0tIGVzY2FsYXRpb24gYXBwcm92ZV9vcmRlciAtPiBwbGFjZV9vcmRlciAtLT4KICA8cGF0aCBjbGFzcz0iZGFzaCIgZD0iTTQ5NCwyNDQgTDQ5NCwzNDAgTDM3OCwzNDAiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPCEtLSBmbGFnX2Fub21hbHkgLT4gRU5EIC0tPgogIDxwYXRoIGNsYXNzPSJkYXNoIiBkPSJNMTA0LDE4OCBMMTA0LDM5MiBMMjY2LDM5MiIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KPC9zdmc+Cg==" alt="트레이딩 에이전트 그래프" /><small class="asset-note">평균회귀 트레이딩 에이전트 그래프. <strong>실선</strong> 은 늘 같은 다음 노드로 가는 고정 엣지, <strong>보라 점선</strong> 은 노드 내부에서 <code>Command(goto=...)</code> 로 결정하는 분기다. (<code>approve_order</code> 가 두 번 보이는 것은 같은 노드를 두 진입 경로 — 리스크 차단 에스컬레이션, 정상 사이징 후 검토 — 로 나눠 그린 레이아웃 단순화다.)</small></figure>
 <p>화살표는 <strong>가능한 경로</strong> 를 보여줄 뿐, 실제로 어느 길로 갈지의 결정은 각 노드 <strong>안에서</strong> 일어난다(점선이 분기 가능 경로다).</p>
 <p>각 노드가 할 일:</p>
-<table class="cmp-table"><caption class="cmp-table__caption asset-caption asset-caption--table"><div class="asset-caption__inner"><span class="asset-caption__chip">표 4</span><span class="asset-caption__title">이메일 에이전트의 노드별 역할</span></div></caption>
+<table class="cmp-table"><caption class="cmp-table__caption asset-caption asset-caption--table"><div class="asset-caption__inner"><span class="asset-caption__chip">표 4</span><span class="asset-caption__title">트레이딩 에이전트의 노드별 역할</span></div></caption>
 <thead>
 <tr>
 <th>노드</th>
@@ -3939,37 +3942,37 @@ html.reader-size-large .continuous-mode {
 </thead>
 <tbody>
 <tr>
-<td><code>read_email</code></td>
-<td>이메일 내용을 추출·파싱</td>
+<td><code>fetch_market_data</code></td>
+<td>최근 종가(또는 스프레드) 윈도우를 가져온다</td>
 </tr>
 <tr>
-<td><code>classify_intent</code></td>
-<td>LLM 으로 긴급도·주제를 분류하고 다음 행동으로 라우팅</td>
+<td><code>generate_signal</code></td>
+<td>z-score 로 방향·확신을 정하고 다음 행동으로 라우팅</td>
 </tr>
 <tr>
-<td><code>search_documentation</code></td>
-<td>지식 베이스에서 관련 정보 검색</td>
+<td><code>check_risk</code></td>
+<td>변동성·노출을 점검하고 허용 한도를 계산</td>
 </tr>
 <tr>
-<td><code>bug_tracking</code></td>
-<td>트래킹 시스템에 이슈 생성/갱신</td>
+<td><code>flag_anomaly</code></td>
+<td>데이터 품질 이상을 기록(무거래)</td>
 </tr>
 <tr>
-<td><code>draft_response</code></td>
-<td>적절한 답변 생성</td>
+<td><code>size_position</code></td>
+<td>한도 안에서 고정비중 주문 수량을 산출</td>
 </tr>
 <tr>
-<td><code>human_review</code></td>
-<td>사람 상담원에게 승인/처리 에스컬레이션</td>
+<td><code>approve_order</code></td>
+<td>사람에게 주문 승인/거부/수정 에스컬레이션</td>
 </tr>
 <tr>
-<td><code>send_reply</code></td>
-<td>이메일 답변 발송</td>
+<td><code>place_order</code></td>
+<td>브로커로 주문 전송</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p><strong>유의</strong>: 어떤 노드는 다음 행선지를 <strong>스스로 결정</strong> 하고(<code>classify_intent</code>, <code>draft_response</code>, <code>human_review</code>), 어떤 노드는 늘 같은 다음 노드로 간다(<code>read_email</code> → 항상 <code>classify_intent</code>). 이 차이가 §4 에서 &quot;엣지는 최소, 라우팅은 노드 안&quot; 으로 이어진다.</p>
+<p><strong>유의</strong>: 어떤 노드는 다음 행선지를 <strong>스스로 결정</strong> 하고(<code>generate_signal</code>, <code>check_risk</code>, <code>approve_order</code>), 어떤 노드는 늘 같은 다음 노드로 간다(<code>fetch_market_data</code> → 항상 <code>generate_signal</code>). 이 차이가 §4 에서 &quot;엣지는 최소, 라우팅은 노드 안&quot; 으로 이어진다.</p>
 </blockquote>
 <h3 id="2.2.-step-2-각-스텝이-무엇을-하는지유형-식별">2.2. Step 2 — 각 스텝이 무엇을 하는지(유형) 식별</h3>
 <p>분해한 각 노드가 어떤 <strong>종류</strong> 의 작업이고, 제대로 동작하려면 어떤 맥락이 필요한지 정한다. 작업은 대체로 네 유형으로 나뉜다.</p>
@@ -3985,31 +3988,31 @@ html.reader-size-large .continuous-mode {
 <tr>
 <td>🧠 <strong>LLM 스텝</strong></td>
 <td>이해·분석·생성·추론 판단이 필요할 때</td>
-<td><code>classify_intent</code>, <code>draft_response</code></td>
+<td><code>generate_signal</code>(근거 생성)</td>
 </tr>
 <tr>
 <td>🗄️ <strong>데이터 스텝</strong></td>
 <td>외부 소스에서 정보를 가져올 때</td>
-<td><code>search_documentation</code>, 고객 이력 조회</td>
+<td><code>fetch_market_data</code>, <code>check_risk</code></td>
 </tr>
 <tr>
 <td>⚡ <strong>액션 스텝</strong></td>
 <td>외부에 실제 행동을 가할 때</td>
-<td><code>send_reply</code>, <code>bug_tracking</code></td>
+<td><code>place_order</code>, <code>flag_anomaly</code></td>
 </tr>
 <tr>
 <td>👤 <strong>사용자 입력 스텝</strong></td>
 <td>사람의 개입이 필요할 때</td>
-<td><code>human_review</code></td>
+<td><code>approve_order</code></td>
 </tr>
 </tbody>
 </table>
-<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 4</span><span class="asset-caption__title">네 가지 스텝 유형</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIgMiA0NzYgMjMyIiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxBcmlhbCwnQXBwbGUgU0QgR290aGljIE5lbycsJ01hbGd1biBHb3RoaWMnLHNhbnMtc2VyaWYiPgogIDxyZWN0IHg9IjE0IiB5PSIxNCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSI5NiIgcng9IjgiIGZpbGw9IiNFRUYyRkIiIHN0cm9rZT0iIzI1NjNFQiIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSIxMjQiIHk9IjQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij5MTE0g7Iqk7YWdPC90ZXh0PgogIDx0ZXh0IHg9IjEyNCIgeT0iNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEuNSIgZmlsbD0iIzI1NjNFQiIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPmNsYXNzaWZ5X2ludGVudDwvdGV4dD4KICA8dGV4dCB4PSIxMjQiIHk9IjkwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExLjUiIGZpbGw9IiMyNTYzRUIiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5kcmFmdF9yZXNwb25zZTwvdGV4dD4KCiAgPHJlY3QgeD0iMjQ2IiB5PSIxNCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSI5NiIgcng9IjgiIGZpbGw9IiNFQ0ZERjUiIHN0cm9rZT0iIzA1OTY2OSIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSIzNTYiIHk9IjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij7rjbDsnbTthLAg7Iqk7YWdPC90ZXh0PgogIDx0ZXh0IHg9IjM1NiIgeT0iODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEuNSIgZmlsbD0iIzA1OTY2OSIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPnNlYXJjaF9kb2N1bWVudGF0aW9uPC90ZXh0PgoKICA8cmVjdCB4PSIxNCIgeT0iMTI2IiB3aWR0aD0iMjIwIiBoZWlnaHQ9Ijk2IiByeD0iOCIgZmlsbD0iI0ZGRkJFQiIgc3Ryb2tlPSIjRDk3NzA2IiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDx0ZXh0IHg9IjEyNCIgeT0iMTU2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij7slaHshZgg7Iqk7YWdPC90ZXh0PgogIDx0ZXh0IHg9IjEyNCIgeT0iMTg0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExLjUiIGZpbGw9IiNEOTc3MDYiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5zZW5kX3JlcGx5PC90ZXh0PgogIDx0ZXh0IHg9IjEyNCIgeT0iMjAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExLjUiIGZpbGw9IiNEOTc3MDYiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5idWdfdHJhY2tpbmc8L3RleHQ+CgogIDxyZWN0IHg9IjI0NiIgeT0iMTI2IiB3aWR0aD0iMjIwIiBoZWlnaHQ9Ijk2IiByeD0iOCIgZmlsbD0iI0Y1RjNGRiIgc3Ryb2tlPSIjN0MzQUVEIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDx0ZXh0IHg9IjM1NiIgeT0iMTU2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij7sgqzsmqnsnpAg7J6F66ClIOyKpO2FnTwvdGV4dD4KICA8dGV4dCB4PSIzNTYiIHk9IjE4NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMS41IiBmaWxsPSIjN0MzQUVEIiBmb250LWZhbWlseT0iJ1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZSI+aHVtYW5fcmV2aWV3PC90ZXh0PgogIDx0ZXh0IHg9IjM1NiIgeT0iMjAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExLjUiIGZpbGw9IiM3QzNBRUQiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5pbnRlcnJ1cHQoKTwvdGV4dD4KPC9zdmc+Cg==" alt="네 가지 스텝 유형" /><small class="asset-note">네 가지 스텝 유형과 이메일 에이전트에서의 예시 노드.</small></figure>
+<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 4</span><span class="asset-caption__title">네 가지 스텝 유형</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIgMiA0NzYgMjMyIiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxBcmlhbCwnQXBwbGUgU0QgR290aGljIE5lbycsJ01hbGd1biBHb3RoaWMnLHNhbnMtc2VyaWYiPgogIDxyZWN0IHg9IjE0IiB5PSIxNCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSI5NiIgcng9IjgiIGZpbGw9IiNFRUYyRkIiIHN0cm9rZT0iIzI1NjNFQiIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSIxMjQiIHk9IjQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij5MTE3Ct+qzhOyCsCDsiqTthZ08L3RleHQ+CiAgPHRleHQgeD0iMTI0IiB5PSI3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMS41IiBmaWxsPSIjMjU2M0VCIiBmb250LWZhbWlseT0iJ1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZSI+Z2VuZXJhdGVfc2lnbmFsPC90ZXh0PgogIDx0ZXh0IHg9IjEyNCIgeT0iOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEuNSIgZmlsbD0iIzI1NjNFQiIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPnNpemVfcG9zaXRpb248L3RleHQ+CgogIDxyZWN0IHg9IjI0NiIgeT0iMTQiIHdpZHRoPSIyMjAiIGhlaWdodD0iOTYiIHJ4PSI4IiBmaWxsPSIjRUNGREY1IiBzdHJva2U9IiMwNTk2NjkiIHN0cm9rZS13aWR0aD0iMS40Ii8+CiAgPHRleHQgeD0iMzU2IiB5PSI0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+642w7J207YSwIOyKpO2FnTwvdGV4dD4KICA8dGV4dCB4PSIzNTYiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExLjUiIGZpbGw9IiMwNTk2NjkiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5mZXRjaF9tYXJrZXRfZGF0YTwvdGV4dD4KICA8dGV4dCB4PSIzNTYiIHk9IjkwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExLjUiIGZpbGw9IiMwNTk2NjkiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5jaGVja19yaXNrPC90ZXh0PgoKICA8cmVjdCB4PSIxNCIgeT0iMTI2IiB3aWR0aD0iMjIwIiBoZWlnaHQ9Ijk2IiByeD0iOCIgZmlsbD0iI0ZGRkJFQiIgc3Ryb2tlPSIjRDk3NzA2IiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDx0ZXh0IHg9IjEyNCIgeT0iMTU2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij7slaHshZgg7Iqk7YWdPC90ZXh0PgogIDx0ZXh0IHg9IjEyNCIgeT0iMTg0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExLjUiIGZpbGw9IiNEOTc3MDYiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5wbGFjZV9vcmRlcjwvdGV4dD4KICA8dGV4dCB4PSIxMjQiIHk9IjIwMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMS41IiBmaWxsPSIjRDk3NzA2IiBmb250LWZhbWlseT0iJ1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZSI+ZmxhZ19hbm9tYWx5PC90ZXh0PgoKICA8cmVjdCB4PSIyNDYiIHk9IjEyNiIgd2lkdGg9IjIyMCIgaGVpZ2h0PSI5NiIgcng9IjgiIGZpbGw9IiNGNUYzRkYiIHN0cm9rZT0iIzdDM0FFRCIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSIzNTYiIHk9IjE1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+7IKs7Jqp7J6QIOyeheugpSDsiqTthZ08L3RleHQ+CiAgPHRleHQgeD0iMzU2IiB5PSIxODQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEuNSIgZmlsbD0iIzdDM0FFRCIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPmFwcHJvdmVfb3JkZXI8L3RleHQ+CiAgPHRleHQgeD0iMzU2IiB5PSIyMDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEuNSIgZmlsbD0iIzdDM0FFRCIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPmludGVycnVwdCgpPC90ZXh0Pgo8L3N2Zz4K" alt="네 가지 스텝 유형" /><small class="asset-note">네 가지 스텝 유형과 트레이딩 에이전트에서의 예시 노드. (<code>size_position</code> 처럼 순수 계산만 하는 노드는 LLM 스텝의 결정론적 변형으로 본다.)</small></figure>
 <p>각 유형마다 고려할 점이 다르다.<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" target="_blank" rel="noopener">[1]</a></sup></p>
 <ul class="bullets">
-<li><strong>LLM 스텝</strong>은 <em>정적 맥락(프롬프트)</em> 과 <em>동적 맥락(State 에서 오는 데이터)</em>, 그리고 <em>원하는 출력 형태</em> 를 구분해 둔다. 예컨대 <code>classify_intent</code> 의 정적 맥락은 &quot;분류 카테고리·긴급도 정의·출력 포맷&quot;, 동적 맥락은 &quot;이메일 내용·발신자&quot;, 출력은 &quot;라우팅을 결정하는 구조화된 분류 결과&quot; 다.</li>
-<li><strong>데이터 스텝</strong>은 <em>파라미터·재시도 전략·캐싱</em> 을 따진다. 문서 검색은 일시적 실패에 지수 백오프 재시도를 걸 만하고, 자주 쓰는 질의는 캐시할 수 있다.</li>
-<li><strong>액션 스텝</strong>은 <em>언제 실행할지·재시도 전략</em> 을 정하되 <strong>캐시하지 않는다</strong> — 매 전송은 고유한 행동이다.</li>
+<li><strong>LLM 스텝</strong>은 <em>정적 맥락(프롬프트)</em> 과 <em>동적 맥락(State 에서 오는 데이터)</em>, 그리고 <em>원하는 출력 형태</em> 를 구분해 둔다. 예컨대 <code>generate_signal</code> 의 정적 맥락은 &quot;평균회귀 해석 규칙·출력 포맷&quot;, 동적 맥락은 &quot;가격 윈도우·헤드라인&quot; 이다. (방향 자체는 결정론적 z-score 가 정하고, LLM 은 근거·구조화 출력을 맡는다 — §3.2.)</li>
+<li><strong>데이터 스텝</strong>은 <em>파라미터·재시도 전략·캐싱</em> 을 따진다. 시세 조회는 일시적 실패에 지수 백오프 재시도를 걸 만하고, 자주 쓰는 질의는 캐시할 수 있다.</li>
+<li><strong>액션 스텝</strong>은 <em>언제 실행할지·재시도 전략</em> 을 정하되 <strong>캐시하지 않는다</strong> — 매 주문 전송은 고유한 행동이다.</li>
 <li><strong>사용자 입력 스텝</strong>은 <em>판단에 필요한 맥락·기대 입력 형식·언제 트리거되는지</em> 를 정한다.</li>
 </ul>
 <p>이렇게 스텝 유형을 먼저 분류해 두면, 같은 &quot;노드&quot; 라도 재시도·캐싱·에러 처리 정책을 유형별로 다르게 가져갈 근거가 생긴다(§3 의 에러 표로 이어진다).</p>
@@ -4038,12 +4041,12 @@ html.reader-size-large .continuous-mode {
 <li>✅ <strong>담는다</strong>: 단계를 넘어 살아남아야 하는 데이터 (나중에 재구성 불가능하거나, 다시 가져오기 비싼 것)</li>
 <li>⛔ <strong>담지 않는다</strong>: 다른 데이터로부터 <strong>파생</strong> 할 수 있는 것 → 저장하지 말고 필요할 때 계산</li>
 </ul>
-<p>이메일 에이전트라면 다음을 추적해야 한다.<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" target="_blank" rel="noopener">[1]</a></sup></p>
+<p>트레이딩 에이전트라면 다음을 추적해야 한다.<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" target="_blank" rel="noopener">[1]</a></sup></p>
 <ul class="bullets">
-<li>원본 이메일과 발신자 정보 (나중에 재구성 불가)</li>
-<li>분류 결과 (이후 여러 노드가 사용)</li>
-<li>검색 결과·고객 데이터 (다시 가져오기 비쌈)</li>
-<li>답변 초안 (검토를 거치는 동안 보존)</li>
+<li>원본 가격 윈도우와 종목·시점 정보 (나중에 재구성 불가)</li>
+<li>신호 결과 (이후 여러 노드가 사용)</li>
+<li>리스크 점검 결과 (다시 계산하기 비쌈)</li>
+<li>주문 후보 (승인을 거치는 동안 보존)</li>
 <li>실행 메타데이터 (디버깅·복구용)</li>
 </ul>
 <h3 id="3.2.-원칙-state-는-raw-로-프롬프트는-온디맨드로">3.2. 원칙 — State 는 raw 로, 프롬프트는 온디맨드로</h3>
@@ -4057,35 +4060,35 @@ html.reader-size-large .continuous-mode {
 <li>디버깅이 명확해진다 — 각 노드가 정확히 어떤 데이터를 받았는지 보인다.</li>
 <li>State 가 기존 데이터를 깨뜨리지 않고 진화할 수 있다.</li>
 </ul>
-<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 5</span><span class="asset-caption__title">State 는 raw, 포맷은 노드에서</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE4IDQgNTA0IDI0MCIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsQXJpYWwsJ0FwcGxlIFNEIEdvdGhpYyBOZW8nLCdNYWxndW4gR290aGljJyxzYW5zLXNlcmlmIj4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI1IiBtYXJrZXJIZWlnaHQ9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjMEYyQzU5Ii8+CiAgICA8L21hcmtlcj4KICAgIDxzdHlsZT4uZWx7cGFpbnQtb3JkZXI6c3Ryb2tlIGZpbGw7c3Ryb2tlOiNGQUZBRjk7c3Ryb2tlLXdpZHRoOjNweDtzdHJva2UtbGluZWpvaW46cm91bmQ7Zm9udC1zaXplOjExcHg7ZmlsbDojMEYyQzU5fTwvc3R5bGU+CiAgPC9kZWZzPgoKICA8cmVjdCB4PSIxNjAiIHk9IjE2IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjkyIiByeD0iOCIgZmlsbD0iI0YxRjVGOSIgc3Ryb2tlPSIjMEYyQzU5IiBzdHJva2Utd2lkdGg9IjEuNiIvPgogIDx0ZXh0IHg9IjI3MCIgeT0iNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwRjJDNTkiPlN0YXRlIChyYXcpPC90ZXh0PgogIDx0ZXh0IHg9IjI3MCIgeT0iNjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM2QjZCNzIiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5jbGFzc2lmaWNhdGlvbjwvdGV4dD4KICA8dGV4dCB4PSIyNzAiIHk9Ijc4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExIiBmaWxsPSIjNkI2QjcyIiBmb250LWZhbWlseT0iJ1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZSI+c2VhcmNoX3Jlc3VsdHM8L3RleHQ+CiAgPHRleHQgeD0iMjcwIiB5PSI5NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzZCNkI3MiIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPmRyYWZ0X3Jlc3BvbnNlPC90ZXh0PgoKICA8cmVjdCB4PSIzMCIgeT0iMTg0IiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjQ4IiByeD0iOCIgZmlsbD0iI0VFRjJGQiIgc3Ryb2tlPSIjMjU2M0VCIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDx0ZXh0IHg9IjEzNSIgeT0iMjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij7rhbjrk5wgQTwvdGV4dD4KCiAgPHJlY3QgeD0iMzAwIiB5PSIxODQiIHdpZHRoPSIyMTAiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRUVGMkZCIiBzdHJva2U9IiMyNTYzRUIiIHN0cm9rZS13aWR0aD0iMS40Ii8+CiAgPHRleHQgeD0iNDA1IiB5PSIyMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwRjJDNTkiPuuFuOuTnCBCPC90ZXh0PgoKICA8cGF0aCBkPSJNMjIwLDEwOCBDMTgwLDE0MCAxMzUsMTU1IDEzNSwxODQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzZCNkI3MiIgc3Ryb2tlLXdpZHRoPSIxLjQiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHBhdGggZD0iTTMyMCwxMDggQzM2MCwxNDAgNDA1LDE1NSA0MDUsMTg0IiBmaWxsPSJub25lIiBzdHJva2U9IiM2QjZCNzIiIHN0cm9rZS13aWR0aD0iMS40IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgogIDx0ZXh0IGNsYXNzPSJlbCIgeD0iMTUwIiB5PSIxNTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPnJlYWQgcmF3PC90ZXh0PgogIDx0ZXh0IGNsYXNzPSJlbCIgeD0iMzkyIiB5PSIxNTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPnJlYWQgcmF3PC90ZXh0Pgo8L3N2Zz4K" alt="State 는 raw, 포맷은 노드에서" /><small class="asset-note">State 에는 raw 데이터만 두고, 각 노드가 같은 데이터를 자기 프롬프트로 그때그때 다르게 포맷한다.</small></figure>
+<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 5</span><span class="asset-caption__title">State 는 raw, 포맷은 노드에서</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE4IDQgNTA0IDI0MCIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsQXJpYWwsJ0FwcGxlIFNEIEdvdGhpYyBOZW8nLCdNYWxndW4gR290aGljJyxzYW5zLXNlcmlmIj4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI1IiBtYXJrZXJIZWlnaHQ9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjMEYyQzU5Ii8+CiAgICA8L21hcmtlcj4KICAgIDxzdHlsZT4uZWx7cGFpbnQtb3JkZXI6c3Ryb2tlIGZpbGw7c3Ryb2tlOiNGQUZBRjk7c3Ryb2tlLXdpZHRoOjNweDtzdHJva2UtbGluZWpvaW46cm91bmQ7Zm9udC1zaXplOjExcHg7ZmlsbDojMEYyQzU5fTwvc3R5bGU+CiAgPC9kZWZzPgoKICA8cmVjdCB4PSIxNjAiIHk9IjE2IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjkyIiByeD0iOCIgZmlsbD0iI0YxRjVGOSIgc3Ryb2tlPSIjMEYyQzU5IiBzdHJva2Utd2lkdGg9IjEuNiIvPgogIDx0ZXh0IHg9IjI3MCIgeT0iNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwRjJDNTkiPlN0YXRlIChyYXcpPC90ZXh0PgogIDx0ZXh0IHg9IjI3MCIgeT0iNjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM2QjZCNzIiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5wcmljZV93aW5kb3c8L3RleHQ+CiAgPHRleHQgeD0iMjcwIiB5PSI3OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzZCNkI3MiIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPnNpZ25hbDwvdGV4dD4KICA8dGV4dCB4PSIyNzAiIHk9Ijk0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExIiBmaWxsPSIjNkI2QjcyIiBmb250LWZhbWlseT0iJ1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZSI+cmlza19yZXBvcnQ8L3RleHQ+CgogIDxyZWN0IHg9IjMwIiB5PSIxODQiIHdpZHRoPSIyMTAiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRUVGMkZCIiBzdHJva2U9IiMyNTYzRUIiIHN0cm9rZS13aWR0aD0iMS40Ii8+CiAgPHRleHQgeD0iMTM1IiB5PSIyMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwRjJDNTkiPuuFuOuTnCBBPC90ZXh0PgoKICA8cmVjdCB4PSIzMDAiIHk9IjE4NCIgd2lkdGg9IjIxMCIgaGVpZ2h0PSI0OCIgcng9IjgiIGZpbGw9IiNFRUYyRkIiIHN0cm9rZT0iIzI1NjNFQiIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSI0MDUiIHk9IjIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+64W465OcIEI8L3RleHQ+CgogIDxwYXRoIGQ9Ik0yMjAsMTA4IEMxODAsMTQwIDEzNSwxNTUgMTM1LDE4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNkI2QjcyIiBzdHJva2Utd2lkdGg9IjEuNCIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8cGF0aCBkPSJNMzIwLDEwOCBDMzYwLDE0MCA0MDUsMTU1IDQwNSwxODQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzZCNkI3MiIgc3Ryb2tlLXdpZHRoPSIxLjQiIG1hcmtlci1lbmQ9InVybCgjYXIpIi8+CiAgPHRleHQgY2xhc3M9ImVsIiB4PSIxNTAiIHk9IjE1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+cmVhZCByYXc8L3RleHQ+CiAgPHRleHQgY2xhc3M9ImVsIiB4PSIzOTIiIHk9IjE1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+cmVhZCByYXc8L3RleHQ+Cjwvc3ZnPgo=" alt="State 는 raw, 포맷은 노드에서" /><small class="asset-note">State 에는 raw 데이터만 두고, 각 노드가 같은 데이터를 자기 프롬프트로 그때그때 다르게 포맷한다.</small></figure>
 <p>State 스키마는 <code>TypedDict</code> 로 정의한다.</p>
 <div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 2</span><span class="asset-caption__title">3.2. 원칙 — State 는 raw 로, 프롬프트는 온디맨드로</span></div>
 <pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Literal</span>
 
-<span class="c1"># 이메일 분류 결과의 구조</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">EmailClassification</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
-    <span class="n">intent</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="s2">&quot;bug&quot;</span><span class="p">,</span> <span class="s2">&quot;billing&quot;</span><span class="p">,</span> <span class="s2">&quot;feature&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">]</span>
-    <span class="n">urgency</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;critical&quot;</span><span class="p">]</span>
-    <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span>
+<span class="c1"># 평균회귀 신호 결과의 구조</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SignalDecision</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+    <span class="n">direction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;long&quot;</span><span class="p">,</span> <span class="s2">&quot;short&quot;</span><span class="p">,</span> <span class="s2">&quot;flat&quot;</span><span class="p">,</span> <span class="s2">&quot;uncertain&quot;</span><span class="p">]</span>
+    <span class="n">conviction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;critical&quot;</span><span class="p">]</span>  <span class="c1"># critical = &#39;사람 검토 필요&#39;</span>
+    <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">rationale</span><span class="p">:</span> <span class="nb">str</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">EmailAgentState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
-    <span class="c1"># 원본 이메일 데이터</span>
-    <span class="n">email_content</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">sender_email</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">email_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TradingAgentState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+    <span class="c1"># 원본 시장 데이터</span>
+    <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">price_window</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>           <span class="c1"># 원시 종가(또는 스프레드) 윈도우</span>
+    <span class="n">market_data_timestamp</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">headline</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>                <span class="c1"># LLM 의 동적 맥락 (옵션)</span>
 
-    <span class="c1"># 분류 결과</span>
-    <span class="n">classification</span><span class="p">:</span> <span class="n">EmailClassification</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="c1"># 신호 결과</span>
+    <span class="n">signal</span><span class="p">:</span> <span class="n">SignalDecision</span> <span class="o">|</span> <span class="kc">None</span>
 
-    <span class="c1"># 원본 검색/API 결과</span>
-    <span class="n">search_results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>   <span class="c1"># 원시 문서 청크 목록</span>
-    <span class="n">customer_history</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span>       <span class="c1"># CRM 의 원시 고객 데이터</span>
+    <span class="c1"># 원본 리스크/계좌 조회 결과</span>
+    <span class="n">risk_report</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span>            <span class="c1"># 변동성·노출·허용 한도</span>
 
-    <span class="c1"># 생성된 콘텐츠</span>
-    <span class="n">draft_response</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
-    <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span></code></pre>
-<p>State 안에는 프롬프트 템플릿도, 포맷된 문자열도, 지시문도 없다. 분류 출력은 LLM 이 준 그대로 <strong>하나의 딕셔너리</strong> 로 저장된다.</p>
+    <span class="c1"># 생성된 주문</span>
+    <span class="n">order</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">approval_required</span><span class="p">:</span> <span class="nb">bool</span>             <span class="c1"># 큰 신호/리스크 초과 → 사람 검토 표시</span></code></pre>
+<p>State 안에는 프롬프트 템플릿도, 포맷된 문자열도, 지시문도 없다. 신호 결과는 <strong>하나의 딕셔너리</strong> 로 저장된다 — 방향은 결정론적 z-score 가, 근거(rationale)는 LLM 이 채운다.</p>
 <h3 id="3.3.-step-41부-노드는-함수다-그리고-에러는-흐름의-일부다">3.3. Step 4(1부) — 노드는 함수다, 그리고 에러는 흐름의 일부다</h3>
 <p>노드는 <strong>State 를 받아 업데이트를 돌려주는 파이썬 함수</strong> 일 뿐이다. 구현에서 가장 중요한 설계 판단은 &quot;에러를 어떻게 다룰 것인가&quot; 다. LangGraph 는 에러를 예외적 사건이 아니라 <strong>흐름의 일부</strong> 로 본다. 에러 종류마다 처리 전략이 다르다.<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" target="_blank" rel="noopener">[1]</a></sup></p>
 <table class="cmp-table"><caption class="cmp-table__caption asset-caption asset-caption--table"><div class="asset-caption__inner"><span class="asset-caption__chip">표 6</span><span class="asset-caption__title">에러 유형별 처리 전략</span></div></caption>
@@ -4130,101 +4133,92 @@ html.reader-size-large .continuous-mode {
 <pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">RetryPolicy</span>
 
 <span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
-    <span class="s2">&quot;search_documentation&quot;</span><span class="p">,</span>
-    <span class="n">search_documentation</span><span class="p">,</span>
+    <span class="s2">&quot;fetch_market_data&quot;</span><span class="p">,</span>
+    <span class="n">fetch_market_data</span><span class="p">,</span>
     <span class="n">retry_policy</span><span class="o">=</span><span class="n">RetryPolicy</span><span class="p">(</span><span class="n">max_attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">initial_interval</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 <span class="p">)</span></code></pre>
 <p><strong>② LLM 복구 가능 — State 에 에러 저장 후 되돌아오기</strong></p>
 <div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 4</span><span class="asset-caption__title">3.3. Step 4(1부) — 노드는 함수다, 그리고 에러는 흐름의 일부다</span></div>
 <pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Command</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">execute_tool</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Command</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">,</span> <span class="s2">&quot;execute_tool&quot;</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_indicator</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Command</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">,</span> <span class="s2">&quot;run_indicator&quot;</span><span class="p">]]:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">run_tool</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;tool_call&#39;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">Command</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;tool_result&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">},</span> <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;agent&quot;</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">ToolError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="c1"># LLM 이 무엇이 잘못됐는지 보고 다시 시도하도록</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">compute_indicator</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;indicator_call&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Command</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;indicator_result&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">},</span> <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;agent&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">IndicatorError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># LLM 이 무엇이 잘못됐는지 보고 파라미터를 바꾸도록</span>
         <span class="k">return</span> <span class="n">Command</span><span class="p">(</span>
-            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;tool_result&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Tool error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;indicator_result&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Indicator error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
             <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;agent&quot;</span>
         <span class="p">)</span></code></pre>
-<p>여기서 핵심 전제는, 되돌아간 <code>agent</code> 노드가 이 에러 문자열을 <strong>실제 프롬프트·메시지 맥락으로 읽어</strong> 다시 계획한다는 것이다 — State 에 저장만 한다고 자동으로 회복되지는 않는다. 필드명을 <code>tool_result</code> 대신 <code>tool_error</code> 처럼 에러임이 드러나게 두면 더 명확하다.</p>
+<p>여기서 핵심 전제는, 되돌아간 <code>agent</code> 노드가 이 에러 문자열을 <strong>실제 프롬프트·메시지 맥락으로 읽어</strong> 다시 계획한다는 것이다 — State 에 저장만 한다고 자동으로 회복되지는 않는다. 필드명을 <code>indicator_result</code> 대신 <code>indicator_error</code> 처럼 에러임이 드러나게 두면 더 명확하다. (이 도구 루프 패턴은 트레이딩 주 경로엔 없고 <code>scripts/steps/04_errors.py</code> 에서 따로 시연한다.)</p>
 <p><strong>③ 사용자 수정 가능 — <code>interrupt()</code> 로 멈추고 입력 받기</strong></p>
 <div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 5</span><span class="asset-caption__title">3.3. Step 4(1부) — 노드는 함수다, 그리고 에러는 흐름의 일부다</span></div>
 <pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Command</span><span class="p">,</span> <span class="n">interrupt</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">lookup_customer_history</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Command</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;draft_response&quot;</span><span class="p">]]:</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;customer_id&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lookup_account</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">State</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Command</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;size_position&quot;</span><span class="p">]]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;account_id&#39;</span><span class="p">):</span>
         <span class="n">user_input</span> <span class="o">=</span> <span class="n">interrupt</span><span class="p">({</span>
-            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;고객 ID 필요&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="s2">&quot;구독 이력을 조회할 고객 계정 ID 를 입력해 주세요&quot;</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;계좌 ID 필요&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="s2">&quot;주문에 쓸 계좌(매수여력 조회용) ID 를 입력해 주세요&quot;</span>
         <span class="p">})</span>
         <span class="k">return</span> <span class="n">Command</span><span class="p">(</span>
-            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;customer_id&quot;</span><span class="p">:</span> <span class="n">user_input</span><span class="p">[</span><span class="s1">&#39;customer_id&#39;</span><span class="p">]},</span>
-            <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;lookup_customer_history&quot;</span>
+            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;account_id&quot;</span><span class="p">:</span> <span class="n">user_input</span><span class="p">[</span><span class="s1">&#39;account_id&#39;</span><span class="p">]},</span>
+            <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;lookup_account&quot;</span>
         <span class="p">)</span>
-    <span class="n">customer_data</span> <span class="o">=</span> <span class="n">fetch_customer_history</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;customer_id&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">Command</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;customer_history&quot;</span><span class="p">:</span> <span class="n">customer_data</span><span class="p">},</span> <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;draft_response&quot;</span><span class="p">)</span></code></pre>
+    <span class="n">account_data</span> <span class="o">=</span> <span class="n">fetch_account</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;account_id&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Command</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;account_data&quot;</span><span class="p">:</span> <span class="n">account_data</span><span class="p">},</span> <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;size_position&quot;</span><span class="p">)</span></code></pre>
 <p><strong>④ 예상치 못한 오류 — 그대로 띄워보내기</strong></p>
 <div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 6</span><span class="asset-caption__title">3.3. Step 4(1부) — 노드는 함수다, 그리고 에러는 흐름의 일부다</span></div>
-<pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="k">def</span><span class="w"> </span><span class="nf">send_reply</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">EmailAgentState</span><span class="p">):</span>
+<pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="k">def</span><span class="w"> </span><span class="nf">place_order</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">TradingAgentState</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">email_service</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;draft_response&quot;</span><span class="p">])</span>
+        <span class="n">broker</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;order&quot;</span><span class="p">])</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">raise</span>  <span class="c1"># 다룰 수 없는 건 표면화시켜 디버깅</span></code></pre>
 <p>핵심은 &quot;모든 에러를 try/except 로 삼키지 않는다&quot; 는 것이다. 어떤 에러는 자동 재시도가, 어떤 에러는 LLM 에게 되먹임이, 어떤 에러는 사람의 입력이, 어떤 에러는 그냥 터지게 두는 것이 맞다.</p>
-<h3 id="3.4.-노드-구현-예-읽기분류검색">3.4. 노드 구현 예 — 읽기·분류·검색</h3>
+<h3 id="3.4.-노드-구현-예-시세-수신신호-생성">3.4. 노드 구현 예 — 시세 수신·신호 생성</h3>
 <p>스텝 유형(§2.2)과 에러 전략(§3.3)을 적용한 노드들이다. 라우팅이 노드 <strong>안에서</strong> <code>Command(goto=...)</code> 로 결정되는 점에 주목하라.</p>
 <blockquote>
-<p><strong>이 절 이하의 코드는 핵심 패턴만 보이는 축약본이다.</strong> <code>search_documentation</code>·<code>bug_tracking</code>·<code>draft_response</code>·<code>send_reply</code> 의 본문과 일부 타입 처리는 생략했다 — 그대로 복사하면 바로 돌지 않는다(예: 기본 <code>TypedDict</code> 는 모든 키가 required 라, <code>initial_state</code> 에 전부 채우거나 <code>total=False</code>/<code>NotRequired</code> 가 필요하다). 실행 가능한 전체본은 후속 <code>scripts/</code> 에 둔다.</p>
+<p><strong>이 절 이하의 코드는 핵심 패턴만 보이는 축약본이다.</strong> <code>check_risk</code>·<code>size_position</code>·<code>flag_anomaly</code>·<code>place_order</code> 의 본문과 일부 타입 처리(rationale 생성·데이터 이상 분기 등)는 생략했다 — 그대로 복사하면 바로 돌지 않는다(예: 기본 <code>TypedDict</code> 는 모든 키가 required 라, <code>initial_state</code> 에 전부 채우거나 <code>total=False</code>/<code>NotRequired</code> 가 필요하다). 실행 가능한 전체본은 후속 <code>scripts/</code> 에 둔다.</p>
 </blockquote>
-<div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 7</span><span class="asset-caption__title">3.4. 노드 구현 예 — 읽기·분류·검색</span></div>
-<pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 7</span><span class="asset-caption__title">3.4. 노드 구현 예 — 시세 수신·신호 생성</span></div>
+<pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.graph</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateGraph</span><span class="p">,</span> <span class="n">START</span><span class="p">,</span> <span class="n">END</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">interrupt</span><span class="p">,</span> <span class="n">Command</span><span class="p">,</span> <span class="n">RetryPolicy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">HumanMessage</span>
 
 <span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-5-nano&quot;</span><span class="p">)</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">read_email</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">EmailAgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;이메일 내용 추출·파싱&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Processing email: </span><span class="si">{</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;email_content&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)]</span>
-    <span class="p">}</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_market_data</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">TradingAgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;최근 종가 윈도우 수신 (RetryPolicy 대상 — §3.3①)&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;fetched </span><span class="si">{</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;instrument&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;price_window&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> bars&quot;</span><span class="p">]}</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">classify_intent</span><span class="p">(</span>
-    <span class="n">state</span><span class="p">:</span> <span class="n">EmailAgentState</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Command</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;search_documentation&quot;</span><span class="p">,</span> <span class="s2">&quot;human_review&quot;</span><span class="p">,</span> <span class="s2">&quot;draft_response&quot;</span><span class="p">,</span> <span class="s2">&quot;bug_tracking&quot;</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;LLM 으로 의도·긴급도를 분류하고 그에 맞게 라우팅&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_signal</span><span class="p">(</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">TradingAgentState</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Command</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;check_risk&quot;</span><span class="p">,</span> <span class="s2">&quot;flag_anomaly&quot;</span><span class="p">,</span> <span class="n">END</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;z-score 로 방향·확신을 정하고 그에 맞게 라우팅&quot;&quot;&quot;</span>
 
-    <span class="c1"># EmailClassification 딕셔너리를 돌려주는 구조화 LLM</span>
-    <span class="n">structured_llm</span> <span class="o">=</span> <span class="n">llm</span><span class="o">.</span><span class="n">with_structured_output</span><span class="p">(</span><span class="n">EmailClassification</span><span class="p">)</span>
+    <span class="c1"># 방향은 결정론적 z-score 가 정한다 — LLM 은 근거(rationale)만 맡는다</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;price_window&quot;</span><span class="p">]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">statistics</span><span class="o">.</span><span class="n">fmean</span><span class="p">(</span><span class="n">w</span><span class="p">))</span> <span class="o">/</span> <span class="n">statistics</span><span class="o">.</span><span class="n">pstdev</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span> <span class="k">if</span> <span class="n">z</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="k">else</span> <span class="s2">&quot;short&quot;</span> <span class="k">if</span> <span class="n">z</span> <span class="o">&gt;=</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="s2">&quot;flat&quot;</span>
+    <span class="n">conviction</span> <span class="o">=</span> <span class="s2">&quot;critical&quot;</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">2.5</span> <span class="k">else</span> <span class="s2">&quot;high&quot;</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">1.5</span> <span class="k">else</span> <span class="s2">&quot;medium&quot;</span>
 
-    <span class="c1"># 프롬프트는 State 에 저장하지 않고 여기서 그때 포맷</span>
-    <span class="n">classification_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    이 고객 이메일을 분석해 분류하라:</span>
-
-<span class="s2">    Email: </span><span class="si">{</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;email_content&#39;</span><span class="p">]</span><span class="si">}</span>
-<span class="s2">    From: </span><span class="si">{</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;sender_email&#39;</span><span class="p">]</span><span class="si">}</span>
-
-<span class="s2">    intent, urgency, topic, summary 를 포함해 분류하라.</span>
-<span class="s2">    &quot;&quot;&quot;</span>
-
-    <span class="n">classification</span> <span class="o">=</span> <span class="n">structured_llm</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">classification_prompt</span><span class="p">)</span>
-
-    <span class="c1"># 분류에 따라 다음 노드 결정</span>
-    <span class="k">if</span> <span class="n">classification</span><span class="p">[</span><span class="s1">&#39;intent&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;billing&#39;</span> <span class="ow">or</span> <span class="n">classification</span><span class="p">[</span><span class="s1">&#39;urgency&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;critical&#39;</span><span class="p">:</span>
-        <span class="n">goto</span> <span class="o">=</span> <span class="s2">&quot;human_review&quot;</span>
-    <span class="k">elif</span> <span class="n">classification</span><span class="p">[</span><span class="s1">&#39;intent&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">]:</span>
-        <span class="n">goto</span> <span class="o">=</span> <span class="s2">&quot;search_documentation&quot;</span>
-    <span class="k">elif</span> <span class="n">classification</span><span class="p">[</span><span class="s1">&#39;intent&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bug&#39;</span><span class="p">:</span>
-        <span class="n">goto</span> <span class="o">=</span> <span class="s2">&quot;bug_tracking&quot;</span>
+    <span class="c1"># 신호에 따라 다음 노드 결정</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="n">goto</span> <span class="o">=</span> <span class="n">END</span>                      <span class="c1"># 진입 신호 없음 → 무거래</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">goto</span> <span class="o">=</span> <span class="s2">&quot;draft_response&quot;</span>
+        <span class="n">goto</span> <span class="o">=</span> <span class="s2">&quot;check_risk&quot;</span>
 
-    <span class="c1"># 분류 결과를 단일 딕셔너리로 State 에 저장</span>
-    <span class="k">return</span> <span class="n">Command</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;classification&quot;</span><span class="p">:</span> <span class="n">classification</span><span class="p">},</span> <span class="n">goto</span><span class="o">=</span><span class="n">goto</span><span class="p">)</span></code></pre>
+    <span class="n">signal</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="n">direction</span><span class="p">,</span> <span class="s2">&quot;conviction&quot;</span><span class="p">:</span> <span class="n">conviction</span><span class="p">,</span>
+              <span class="s2">&quot;instrument&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">],</span> <span class="s2">&quot;rationale&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;z=</span><span class="si">{</span><span class="n">z</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+
+    <span class="c1"># critical(비정상적으로 강한 신호)이면 &#39;사람 검토 필요&#39; 플래그만 — 직행하지 않는다</span>
+    <span class="k">return</span> <span class="n">Command</span><span class="p">(</span>
+        <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;signal&quot;</span><span class="p">:</span> <span class="n">signal</span><span class="p">,</span> <span class="s2">&quot;approval_required&quot;</span><span class="p">:</span> <span class="n">conviction</span> <span class="o">==</span> <span class="s2">&quot;critical&quot;</span><span class="p">},</span>
+        <span class="n">goto</span><span class="o">=</span><span class="n">goto</span><span class="p">,</span>
+    <span class="p">)</span></code></pre>
 
 </section>
 
@@ -4247,31 +4241,31 @@ html.reader-size-large .continuous-mode {
 <blockquote>
 <div class="callout callout--hero"><span class="callout__kicker">핵심 메시지</span><span class="callout__body">LangGraph 에서 <strong>사람의 입력은 1급 시민(first-class)</strong> 이다.</span></div>
 </blockquote>
-<p><code>human_review</code> 노드는 답변 초안을 사람에게 보여 주고 승인/수정을 받는다. 핵심은 <code>interrupt()</code> 를 가능한 한 노드 앞쪽에, <strong>특히 비멱등(non-idempotent) side effect — 외부 API 호출·DB 쓰기·이메일 발송 — 보다 먼저</strong> 두는 것이다. 재개 시 <code>interrupt()</code> 이전의 순수 계산·State 읽기는 다시 실행되므로(아래에서 <code>classification</code> 을 읽는 것처럼 부작용 없는 코드는 무방하다), 부작용이 있는 호출을 그 앞에 두면 중복 실행된다.</p>
+<p><code>approve_order</code> 노드는 주문 후보를 사람에게 보여 주고 승인/수정을 받는다. 핵심은 <code>interrupt()</code> 를 가능한 한 노드 앞쪽에, <strong>특히 비멱등(non-idempotent) side effect — 외부 API 호출·DB 쓰기·브로커 주문 전송 — 보다 먼저</strong> 두는 것이다. 재개 시 <code>interrupt()</code> 이전의 순수 계산·State 읽기는 다시 실행되므로(아래에서 <code>order</code>·<code>signal</code> 을 읽는 것처럼 부작용 없는 코드는 무방하다), 부작용이 있는 호출을 그 앞에 두면 중복 실행된다.</p>
 <div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 8</span><span class="asset-caption__title">4.1. Step 4(2부) — interrupt() 로 사람을 1급으로</span></div>
-<pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="k">def</span><span class="w"> </span><span class="nf">human_review</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">EmailAgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Command</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;send_reply&quot;</span><span class="p">,</span> <span class="n">END</span><span class="p">]]:</span>
+<pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="k">def</span><span class="w"> </span><span class="nf">approve_order</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">TradingAgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Command</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;place_order&quot;</span><span class="p">,</span> <span class="n">END</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;interrupt 로 일시정지하고, 사람의 결정에 따라 라우팅&quot;&quot;&quot;</span>
 
-    <span class="n">classification</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;classification&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>  <span class="c1"># None 일 수 있으므로 or {}</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">)</span>          <span class="c1"># 리스크 차단 에스컬레이션이면 None 일 수 있다</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;signal&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
 
-    <span class="c1"># 재개 시 이 앞의 코드는 다시 실행된다 → 부작용 있는 호출을 앞에 두지 말 것</span>
+    <span class="c1"># 재개 시 이 앞의 코드는 다시 실행된다 → 부작용(브로커 호출) 있는 코드를 앞에 두지 말 것</span>
     <span class="n">human_decision</span> <span class="o">=</span> <span class="n">interrupt</span><span class="p">({</span>
-        <span class="s2">&quot;email_id&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;email_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-        <span class="s2">&quot;original_email&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;email_content&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-        <span class="s2">&quot;draft_response&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;draft_response&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-        <span class="s2">&quot;urgency&quot;</span><span class="p">:</span> <span class="n">classification</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;urgency&#39;</span><span class="p">),</span>
-        <span class="s2">&quot;intent&quot;</span><span class="p">:</span> <span class="n">classification</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intent&#39;</span><span class="p">),</span>
-        <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;이 답변을 검토하고 승인/수정해 주세요&quot;</span>
+        <span class="s2">&quot;instrument&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instrument&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="s2">&quot;order&quot;</span><span class="p">:</span> <span class="n">order</span><span class="p">,</span>
+        <span class="s2">&quot;conviction&quot;</span><span class="p">:</span> <span class="n">signal</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conviction&#39;</span><span class="p">),</span>
+        <span class="s2">&quot;approval_required&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;approval_required&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;이 주문을 승인/거부/수정해 주세요&quot;</span>
     <span class="p">})</span>
 
     <span class="c1"># 사람의 결정을 처리</span>
-    <span class="k">if</span> <span class="n">human_decision</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;approved&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">human_decision</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;approved&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Command</span><span class="p">(</span>
-            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;draft_response&quot;</span><span class="p">:</span> <span class="n">human_decision</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edited_response&quot;</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;draft_response&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))},</span>
-            <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;send_reply&quot;</span>
+            <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;order&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="n">order</span><span class="p">,</span> <span class="s2">&quot;qty&quot;</span><span class="p">:</span> <span class="n">human_decision</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edited_qty&quot;</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="s2">&quot;qty&quot;</span><span class="p">])}},</span>
+            <span class="n">goto</span><span class="o">=</span><span class="s2">&quot;place_order&quot;</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># 거절 = 사람이 직접 처리</span>
+        <span class="c1"># 거부 = 사람이 직접 처리</span>
         <span class="k">return</span> <span class="n">Command</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{},</span> <span class="n">goto</span><span class="o">=</span><span class="n">END</span><span class="p">)</span></code></pre>
 <h3 id="4.2.-step-5-노드를-그래프로-연결하고-컴파일">4.2. Step 5 — 노드를 그래프로 연결하고 컴파일</h3>
 <p>노드들이 스스로 라우팅을 결정하므로(<code>Command(goto=...)</code>), 필요한 엣지는 몇 개뿐이다. <code>interrupt()</code> 로 사람 개입을 쓰려면 상태를 저장할 <strong>checkpointer</strong> 와 함께 컴파일해야 한다.</p>
@@ -4279,27 +4273,25 @@ html.reader-size-large .continuous-mode {
 <pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.checkpoint.memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemorySaver</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">RetryPolicy</span>
 
-<span class="n">workflow</span> <span class="o">=</span> <span class="n">StateGraph</span><span class="p">(</span><span class="n">EmailAgentState</span><span class="p">)</span>
+<span class="n">workflow</span> <span class="o">=</span> <span class="n">StateGraph</span><span class="p">(</span><span class="n">TradingAgentState</span><span class="p">)</span>
 
-<span class="c1"># 노드 등록</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;read_email&quot;</span><span class="p">,</span> <span class="n">read_email</span><span class="p">)</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;classify_intent&quot;</span><span class="p">,</span> <span class="n">classify_intent</span><span class="p">)</span>
-
-<span class="c1"># 일시적 실패가 잦은 노드에는 재시도 정책</span>
+<span class="c1"># 노드 등록 — 일시적 실패가 잦은 시세 호출에 재시도 정책</span>
 <span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
-    <span class="s2">&quot;search_documentation&quot;</span><span class="p">,</span>
-    <span class="n">search_documentation</span><span class="p">,</span>
+    <span class="s2">&quot;fetch_market_data&quot;</span><span class="p">,</span>
+    <span class="n">fetch_market_data</span><span class="p">,</span>
     <span class="n">retry_policy</span><span class="o">=</span><span class="n">RetryPolicy</span><span class="p">(</span><span class="n">max_attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="p">)</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;bug_tracking&quot;</span><span class="p">,</span> <span class="n">bug_tracking</span><span class="p">)</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;draft_response&quot;</span><span class="p">,</span> <span class="n">draft_response</span><span class="p">)</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;human_review&quot;</span><span class="p">,</span> <span class="n">human_review</span><span class="p">)</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;send_reply&quot;</span><span class="p">,</span> <span class="n">send_reply</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;generate_signal&quot;</span><span class="p">,</span> <span class="n">generate_signal</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;check_risk&quot;</span><span class="p">,</span> <span class="n">check_risk</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;size_position&quot;</span><span class="p">,</span> <span class="n">size_position</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;approve_order&quot;</span><span class="p">,</span> <span class="n">approve_order</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;place_order&quot;</span><span class="p">,</span> <span class="n">place_order</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;flag_anomaly&quot;</span><span class="p">,</span> <span class="n">flag_anomaly</span><span class="p">)</span>
 
 <span class="c1"># 꼭 필요한 엣지만</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">START</span><span class="p">,</span> <span class="s2">&quot;read_email&quot;</span><span class="p">)</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;read_email&quot;</span><span class="p">,</span> <span class="s2">&quot;classify_intent&quot;</span><span class="p">)</span>
-<span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;send_reply&quot;</span><span class="p">,</span> <span class="n">END</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">START</span><span class="p">,</span> <span class="s2">&quot;fetch_market_data&quot;</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;fetch_market_data&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_signal&quot;</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;place_order&quot;</span><span class="p">,</span> <span class="n">END</span><span class="p">)</span>
 
 <span class="c1"># 영속성을 위해 checkpointer 와 함께 컴파일</span>
 <span class="n">memory</span> <span class="o">=</span> <span class="n">MemorySaver</span><span class="p">()</span>
@@ -4307,45 +4299,42 @@ html.reader-size-large .continuous-mode {
 <blockquote>
 <p><strong>유의 — <code>MemorySaver</code> 는 인메모리(개발·데모)용이다.</strong> 위 코드는 한 프로세스 안에서 interrupt/resume 흐름을 보여 주기 위한 것이다. 프로세스를 재시작해도 살아남는 &quot;며칠 뒤 재개&quot; 를 보장하려면 Postgres 같은 durable checkpointer(또는 LangSmith Deployment 계열의 영속 저장소)가 필요하다.</p>
 </blockquote>
-<p>그래프 구조가 이토록 작은 이유는 라우팅이 노드 안의 <code>Command</code> 로 일어나기 때문이다. 각 노드는 <code>Command[Literal[&quot;node1&quot;, &quot;node2&quot;]]</code> 타입 힌트로 자기가 갈 수 있는 곳을 선언하므로, 흐름이 명시적이고 추적 가능하다. (LangGraph 에는 이 방식 외에 <code>add_conditional_edges</code> 같은 조건부 엣지 라우팅도 있으나, 이 교안의 이메일 예제는 <code>Command(goto=...)</code> 를 택했다 — 조건부 엣지는 이번 범위 밖이다.)</p>
+<p>그래프 구조가 이토록 작은 이유는 라우팅이 노드 안의 <code>Command</code> 로 일어나기 때문이다. 각 노드는 <code>Command[Literal[&quot;node1&quot;, &quot;node2&quot;]]</code> 타입 힌트로 자기가 갈 수 있는 곳을 선언하므로, 흐름이 명시적이고 추적 가능하다. (LangGraph 에는 이 방식 외에 <code>add_conditional_edges</code> 같은 조건부 엣지 라우팅도 있으나, 이 교안의 트레이딩 예제는 <code>Command(goto=...)</code> 를 택했다 — 조건부 엣지는 이번 범위 밖이다.)</p>
 <h3 id="4.3.-멈췄다가-며칠-뒤에-이어서-실행과-재개">4.3. 멈췄다가 며칠 뒤에 이어서 — 실행과 재개</h3>
 <div class="asset-caption asset-caption--code"><span class="asset-caption__chip">코드 10</span><span class="asset-caption__title">4.3. 멈췄다가 며칠 뒤에 이어서 — 실행과 재개</span></div>
-<pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="c1"># 사람 검토가 필요한 긴급 청구 이슈로 테스트</span>
+<pre class="code-block code-block--python" data-lang="python"><code class="language-python"><span class="c1"># 사람 검토가 필요한 급등 과열(critical) 신호로 테스트</span>
 <span class="n">initial_state</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;email_content&quot;</span><span class="p">:</span> <span class="s2">&quot;구독료가 두 번 청구됐어요! 급해요!&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sender_email&quot;</span><span class="p">:</span> <span class="s2">&quot;customer@example.com&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;email_id&quot;</span><span class="p">:</span> <span class="s2">&quot;email_123&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[]</span>
+    <span class="s2">&quot;instrument&quot;</span><span class="p">:</span> <span class="s2">&quot;TSLA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;price_window&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">199</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">218</span><span class="p">,</span> <span class="mi">225</span><span class="p">],</span>   <span class="c1"># 최근 종가 윈도우</span>
+    <span class="s2">&quot;market_data_timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;2026-06-04T09:30:00Z&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;headline&quot;</span><span class="p">:</span> <span class="s2">&quot;단기 급등, 과열 우려&quot;</span>
 <span class="p">}</span>
 
 <span class="c1"># 영속성을 위해 thread_id 와 함께 실행</span>
-<span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;configurable&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="s2">&quot;customer_123&quot;</span><span class="p">}}</span>
+<span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;configurable&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="s2">&quot;TSLA-2026-06-04&quot;</span><span class="p">}}</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">initial_state</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-<span class="c1"># 그래프는 human_review 에서 멈춘다</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;human review interrupt:</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;__interrupt__&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># 그래프는 approve_order 에서 (주문 전송 직전) 멈춘다</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;order approval interrupt:</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;__interrupt__&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># 준비되면 사람의 입력으로 재개</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Command</span>
 
 <span class="n">human_response</span> <span class="o">=</span> <span class="n">Command</span><span class="p">(</span>
-    <span class="n">resume</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;approved&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s2">&quot;edited_response&quot;</span><span class="p">:</span> <span class="s2">&quot;이중 청구 건 진심으로 사과드립니다. 즉시 환불을 진행했습니다...&quot;</span>
-    <span class="p">}</span>
+    <span class="n">resume</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;approved&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;edited_qty&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>   <span class="c1"># 큰 베팅이라 수량을 줄여 승인</span>
 <span class="p">)</span>
 
 <span class="c1"># 재개</span>
 <span class="n">final_result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">human_response</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;이메일 전송 완료!&quot;</span><span class="p">)</span></code></pre>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;주문 전송 완료!&quot;</span><span class="p">)</span></code></pre>
 <p>그래프는 <code>interrupt()</code> 를 만나면 모든 것을 checkpointer 에 저장하고 <strong>기다린다.</strong> 같은 checkpointer 백엔드에 체크포인트가 남아 있고 같은 <code>thread_id</code> 로 다시 호출하면, 멈췄던 지점부터 이어진다. 여기서 <code>thread_id</code> 는 저장소 자체가 아니라 <strong>체크포인트를 식별·조회하는 키</strong> 이고, State 가 실제로 보존되는 곳은 checkpointer 다(이 예제에선 인메모리 <code>MemorySaver</code>).</p>
-<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 7</span><span class="asset-caption__title">interrupt → checkpointer → resume</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIgMjQgNTk2IDE3MCIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsQXJpYWwsJ0FwcGxlIFNEIEdvdGhpYyBOZW8nLCdNYWxndW4gR290aGljJyxzYW5zLXNlcmlmIj4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI1IiBtYXJrZXJIZWlnaHQ9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjMEYyQzU5Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDxyZWN0IHg9IjE0IiB5PSIzNiIgd2lkdGg9IjEwNCIgaGVpZ2h0PSI0NCIgcng9IjgiIGZpbGw9IiNFRUYyRkIiIHN0cm9rZT0iIzI1NjNFQiIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSI2NiIgeT0iNjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjJDNTkiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5pbnZva2UoKTwvdGV4dD4KCiAgPHJlY3QgeD0iMTUwIiB5PSIzNiIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0NCIgcng9IjgiIGZpbGw9IiNGNUYzRkYiIHN0cm9rZT0iIzdDM0FFRCIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSIyMTAiIHk9IjYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjN0MzQUVEIiBmb250LWZhbWlseT0iJ1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZSI+aW50ZXJydXB0KCk8L3RleHQ+CgogIDxyZWN0IHg9IjMwMiIgeT0iMzYiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDQiIHJ4PSI4IiBmaWxsPSIjRjFGNUY5IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS42Ii8+CiAgPHRleHQgeD0iMzYyIiB5PSI2MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij5jaGVja3BvaW50ZXI8L3RleHQ+CgogIDxyZWN0IHg9IjQ1NCIgeT0iMzYiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI4IiBmaWxsPSIjRjVGM0ZGIiBzdHJva2U9IiM3QzNBRUQiIHN0cm9rZS13aWR0aD0iMS40Ii8+CiAgPHRleHQgeD0iNTIwIiB5PSI2MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzdDM0FFRCIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPkNvbW1hbmQocmVzdW1lPSk8L3RleHQ+CgogIDxsaW5lIHgxPSIxMTgiIHkxPSI1OCIgeDI9IjE1MCIgeTI9IjU4IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS42IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgogIDxsaW5lIHgxPSIyNzAiIHkxPSI1OCIgeDI9IjMwMiIgeTI9IjU4IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS42IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgogIDxsaW5lIHgxPSI0MjIiIHkxPSI1OCIgeDI9IjQ1NCIgeTI9IjU4IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS42IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgoKICA8cmVjdCB4PSIxNCIgeT0iMTQyIiB3aWR0aD0iNTcyIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNkI2QjcyIiBzdHJva2Utd2lkdGg9IjEuMyIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgPHRleHQgeD0iMzAwIiB5PSIxNjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+dGhyZWFkX2lkID0gImN1c3RvbWVyXzEyMyI8L3RleHQ+CiAgPGxpbmUgeDE9IjY2IiB5MT0iODAiIHgyPSI2NiIgeTI9IjE0MiIgc3Ryb2tlPSIjNkI2QjcyIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1kYXNoYXJyYXk9IjMgMyIvPgogIDxsaW5lIHgxPSI1MjAiIHkxPSI4MCIgeDI9IjUyMCIgeTI9IjE0MiIgc3Ryb2tlPSIjNkI2QjcyIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1kYXNoYXJyYXk9IjMgMyIvPgo8L3N2Zz4K" alt="interrupt → checkpointer → resume" /><small class="asset-note"><code>interrupt()</code> 가 checkpointer 에 State 를 저장하고 멈춘다. 며칠 뒤라도 외부 호출자가 같은 <code>thread_id</code> 로 <code>Command(resume=...)</code> 를 호출하면, 런타임이 저장된 체크포인트를 조회해 멈춘 지점부터 재개한다.</small></figure>
+<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 7</span><span class="asset-caption__title">interrupt → checkpointer → resume</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjIgMjQgNTk2IDE3MCIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsQXJpYWwsJ0FwcGxlIFNEIEdvdGhpYyBOZW8nLCdNYWxndW4gR290aGljJyxzYW5zLXNlcmlmIj4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI1IiBtYXJrZXJIZWlnaHQ9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjMEYyQzU5Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDxyZWN0IHg9IjE0IiB5PSIzNiIgd2lkdGg9IjEwNCIgaGVpZ2h0PSI0NCIgcng9IjgiIGZpbGw9IiNFRUYyRkIiIHN0cm9rZT0iIzI1NjNFQiIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSI2NiIgeT0iNjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjJDNTkiIGZvbnQtZmFtaWx5PSInU0YgTW9ubycsTWVubG8sQ29uc29sYXMsbW9ub3NwYWNlIj5pbnZva2UoKTwvdGV4dD4KCiAgPHJlY3QgeD0iMTUwIiB5PSIzNiIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0NCIgcng9IjgiIGZpbGw9IiNGNUYzRkYiIHN0cm9rZT0iIzdDM0FFRCIgc3Ryb2tlLXdpZHRoPSIxLjQiLz4KICA8dGV4dCB4PSIyMTAiIHk9IjYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjN0MzQUVEIiBmb250LWZhbWlseT0iJ1NGIE1vbm8nLE1lbmxvLENvbnNvbGFzLG1vbm9zcGFjZSI+aW50ZXJydXB0KCk8L3RleHQ+CgogIDxyZWN0IHg9IjMwMiIgeT0iMzYiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDQiIHJ4PSI4IiBmaWxsPSIjRjFGNUY5IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS42Ii8+CiAgPHRleHQgeD0iMzYyIiB5PSI2MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMEYyQzU5Ij5jaGVja3BvaW50ZXI8L3RleHQ+CgogIDxyZWN0IHg9IjQ1NCIgeT0iMzYiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI4IiBmaWxsPSIjRjVGM0ZGIiBzdHJva2U9IiM3QzNBRUQiIHN0cm9rZS13aWR0aD0iMS40Ii8+CiAgPHRleHQgeD0iNTIwIiB5PSI2MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzdDM0FFRCIgZm9udC1mYW1pbHk9IidTRiBNb25vJyxNZW5sbyxDb25zb2xhcyxtb25vc3BhY2UiPkNvbW1hbmQocmVzdW1lPSk8L3RleHQ+CgogIDxsaW5lIHgxPSIxMTgiIHkxPSI1OCIgeDI9IjE1MCIgeTI9IjU4IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS42IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgogIDxsaW5lIHgxPSIyNzAiIHkxPSI1OCIgeDI9IjMwMiIgeTI9IjU4IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS42IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgogIDxsaW5lIHgxPSI0MjIiIHkxPSI1OCIgeDI9IjQ1NCIgeTI9IjU4IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS42IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgoKICA8cmVjdCB4PSIxNCIgeT0iMTQyIiB3aWR0aD0iNTcyIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNkI2QjcyIiBzdHJva2Utd2lkdGg9IjEuMyIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgPHRleHQgeD0iMzAwIiB5PSIxNjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+dGhyZWFkX2lkID0gIlRTTEEtMjAyNi0wNi0wNCI8L3RleHQ+CiAgPGxpbmUgeDE9IjY2IiB5MT0iODAiIHgyPSI2NiIgeTI9IjE0MiIgc3Ryb2tlPSIjNkI2QjcyIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1kYXNoYXJyYXk9IjMgMyIvPgogIDxsaW5lIHgxPSI1MjAiIHkxPSI4MCIgeDI9IjUyMCIgeTI9IjE0MiIgc3Ryb2tlPSIjNkI2QjcyIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1kYXNoYXJyYXk9IjMgMyIvPgo8L3N2Zz4K" alt="interrupt → checkpointer → resume" /><small class="asset-note"><code>interrupt()</code> 가 checkpointer 에 State 를 저장하고 멈춘다. 며칠 뒤라도 외부 호출자가 같은 <code>thread_id</code> 로 <code>Command(resume=...)</code> 를 호출하면, 런타임이 저장된 체크포인트를 조회해 멈춘 지점부터 재개한다.</small></figure>
 <h3 id="4.4.-노드를-얼마나-잘게-쪼갤까-granularity-트레이드오프">4.4. 노드를 얼마나 잘게 쪼갤까 — granularity 트레이드오프</h3>
-<p>&quot;<code>read_email</code> 과 <code>classify_intent</code> 를 한 노드로 합치면 안 되나?&quot; 라는 질문에 대한 답은 <strong>회복력 vs 관찰가능성</strong> 의 트레이드오프다.<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" target="_blank" rel="noopener">[1]</a></sup></p>
-<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 8</span><span class="asset-caption__title">노드 granularity 와 재실행 범위</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjEyIDAgNTY0IDE4MCIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsQXJpYWwsJ0FwcGxlIFNEIEdvdGhpYyBOZW8nLCdNYWxndW4gR290aGljJyxzYW5zLXNlcmlmIj4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI1IiBtYXJrZXJIZWlnaHQ9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjMEYyQzU5Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDwhLS0gTEVGVDogb25lIGJpZyBub2RlIC0tPgogIDx0ZXh0IHg9IjEzNSIgeT0iMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+7YGwIOuFuOuTnCDtlZjrgpg8L3RleHQ+CiAgPHJlY3QgeD0iMjQiIHk9IjQwIiB3aWR0aD0iMjIyIiBoZWlnaHQ9Ijg2IiByeD0iOCIgZmlsbD0iI0ZFRjJGMiIgc3Ryb2tlPSIjRTExRDQ4IiBzdHJva2Utd2lkdGg9IjEuNiIvPgogIDx0ZXh0IHg9IjEzNSIgeT0iNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMwRjJDNTkiPnJlYWQgKyBjbGFzc2lmeSArIHNlYXJjaDwvdGV4dD4KICA8dGV4dCB4PSIxMzUiIHk9Ijk2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExIiBmaWxsPSIjMEYyQzU5Ij4rIGRyYWZ0ICAo7ZWcIO2VqOyImCk8L3RleHQ+CiAgPCEtLSByZS1ydW4gc3BhbiAoZnVsbCkgLS0+CiAgPGxpbmUgeDE9IjI0IiB5MT0iMTQwIiB4Mj0iMjQ2IiB5Mj0iMTQwIiBzdHJva2U9IiNFMTFENDgiIHN0cm9rZS13aWR0aD0iMyIvPgogIDx0ZXh0IHg9IjEzNSIgeT0iMTU4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjRTExRDQ4Ij7snqzsi6Ttlokg67KU7JyEID0g7KCE7LK0PC90ZXh0PgoKICA8IS0tIGRpdmlkZXIgLS0+CiAgPGxpbmUgeDE9IjI4MCIgeTE9IjM0IiB4Mj0iMjgwIiB5Mj0iMTY4IiBzdHJva2U9IiNFNUU3RUIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CgogIDwhLS0gUklHSFQ6IHNtYWxsIG5vZGVzIC0tPgogIDx0ZXh0IHg9IjQzOCIgeT0iMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+7J6R7J2AIOuFuOuTnCDsl6zrn788L3RleHQ+CiAgPHJlY3QgeD0iMzEyIiB5PSI0OCIgd2lkdGg9IjY4IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iI0VFRjJGQiIgc3Ryb2tlPSIjMjU2M0VCIiBzdHJva2Utd2lkdGg9IjEuMyIvPgogIDx0ZXh0IHg9IjM0NiIgeT0iNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMwRjJDNTkiPnJlYWQ8L3RleHQ+CiAgPHJlY3QgeD0iNDA0IiB5PSI0OCIgd2lkdGg9IjY4IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iI0VFRjJGQiIgc3Ryb2tlPSIjMjU2M0VCIiBzdHJva2Utd2lkdGg9IjEuMyIvPgogIDx0ZXh0IHg9IjQzOCIgeT0iNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMwRjJDNTkiPmNsYXNzaWZ5PC90ZXh0PgogIDxyZWN0IHg9IjQ5NiIgeT0iNDgiIHdpZHRoPSI2OCIgaGVpZ2h0PSI0MCIgcng9IjYiIGZpbGw9IiNGRUYyRjIiIHN0cm9rZT0iI0UxMUQ0OCIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KICA8dGV4dCB4PSI1MzAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjMEYyQzU5Ij5zZWFyY2g8L3RleHQ+CgogIDxsaW5lIHgxPSIzODAiIHkxPSI2OCIgeDI9IjQwNCIgeTI9IjY4IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS40IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgogIDxsaW5lIHgxPSI0NzIiIHkxPSI2OCIgeDI9IjQ5NiIgeTI9IjY4IiBzdHJva2U9IiMwRjJDNTkiIHN0cm9rZS13aWR0aD0iMS40IiBtYXJrZXItZW5kPSJ1cmwoI2FyKSIvPgoKICA8IS0tIHJlLXJ1biBzcGFuIChvbmx5IGxhc3QpIC0tPgogIDxsaW5lIHgxPSI0OTYiIHkxPSIxNDAiIHgyPSI1NjQiIHkyPSIxNDAiIHN0cm9rZT0iI0UxMUQ0OCIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPGxpbmUgeDE9IjMxMiIgeTE9IjE0MCIgeDI9IjQ3MiIgeTI9IjE0MCIgc3Ryb2tlPSIjMDU5NjY5IiBzdHJva2Utd2lkdGg9IjMiLz4KICA8dGV4dCB4PSIzOTIiIHk9IjE1OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzA1OTY2OSI+7J207KCEIGNoZWNrcG9pbnQg67O07KG0PC90ZXh0PgogIDx0ZXh0IHg9IjUzMCIgeT0iMTU4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjRTExRDQ4Ij7snqzsi6Ttlok8L3RleHQ+Cjwvc3ZnPgo=" alt="노드 granularity 와 재실행 범위" /><small class="asset-note">노드를 작게 쪼갤수록 실패 시 재실행 범위가 줄어든다. 큰 노드는 끝에서 실패해도 처음부터 전부 다시 한다.</small></figure>
+<p>&quot;<code>fetch_market_data</code> 와 <code>generate_signal</code> 을 한 노드로 합치면 안 되나?&quot; 라는 질문에 대한 답은 <strong>회복력 vs 관찰가능성</strong> 의 트레이드오프다.<sup class="ref-cite"><a href="https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph" target="_blank" rel="noopener">[1]</a></sup></p>
+<figure class="report-figure"><figcaption class="asset-caption asset-caption--figure"><span class="asset-caption__chip">그림 8</span><span class="asset-caption__title">노드 granularity 와 재실행 범위</span></figcaption><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjEyIDAgNTY0IDE4MCIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsQXJpYWwsJ0FwcGxlIFNEIEdvdGhpYyBOZW8nLCdNYWxndW4gR290aGljJyxzYW5zLXNlcmlmIj4KICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI1IiBtYXJrZXJIZWlnaHQ9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMCBMMTAsNSBMMCwxMCB6IiBmaWxsPSIjMEYyQzU5Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CgogIDwhLS0gTEVGVDogb25lIGJpZyBub2RlIC0tPgogIDx0ZXh0IHg9IjEzNSIgeT0iMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+7YGwIOuFuOuTnCDtlZjrgpg8L3RleHQ+CiAgPHJlY3QgeD0iMjQiIHk9IjQwIiB3aWR0aD0iMjIyIiBoZWlnaHQ9Ijg2IiByeD0iOCIgZmlsbD0iI0ZFRjJGMiIgc3Ryb2tlPSIjRTExRDQ4IiBzdHJva2Utd2lkdGg9IjEuNiIvPgogIDx0ZXh0IHg9IjEzNSIgeT0iNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMwRjJDNTkiPmZldGNoICsgc2lnbmFsICsgc2l6ZTwvdGV4dD4KICA8dGV4dCB4PSIxMzUiIHk9Ijk2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExIiBmaWxsPSIjMEYyQzU5Ij4rIHBsYWNlX29yZGVyICAo7ZWcIO2VqOyImCk8L3RleHQ+CiAgPCEtLSByZS1ydW4gc3BhbiAoZnVsbCkgLS0+CiAgPGxpbmUgeDE9IjI0IiB5MT0iMTQwIiB4Mj0iMjQ2IiB5Mj0iMTQwIiBzdHJva2U9IiNFMTFENDgiIHN0cm9rZS13aWR0aD0iMyIvPgogIDx0ZXh0IHg9IjEzNSIgeT0iMTU4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjRTExRDQ4Ij7snqzsi6Ttlokg67KU7JyEID0g7KCE7LK0PC90ZXh0PgoKICA8IS0tIGRpdmlkZXIgLS0+CiAgPGxpbmUgeDE9IjI4MCIgeTE9IjM0IiB4Mj0iMjgwIiB5Mj0iMTY4IiBzdHJva2U9IiNFNUU3RUIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CgogIDwhLS0gUklHSFQ6IHNtYWxsIG5vZGVzIC0tPgogIDx0ZXh0IHg9IjQzOCIgeT0iMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBGMkM1OSI+7J6R7J2AIOuFuOuTnCDsl6zrn788L3RleHQ+CiAgPHJlY3QgeD0iMzEyIiB5PSI0OCIgd2lkdGg9IjY4IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iI0VFRjJGQiIgc3Ryb2tlPSIjMjU2M0VCIiBzdHJva2Utd2lkdGg9IjEuMyIvPgogIDx0ZXh0IHg9IjM0NiIgeT0iNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMwRjJDNTkiPmZldGNoPC90ZXh0PgogIDxyZWN0IHg9IjQwNCIgeT0iNDgiIHdpZHRoPSI2OCIgaGVpZ2h0PSI0MCIgcng9IjYiIGZpbGw9IiNFRUYyRkIiIHN0cm9rZT0iIzI1NjNFQiIgc3Ryb2tlLXdpZHRoPSIxLjMiLz4KICA8dGV4dCB4PSI0MzgiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjMEYyQzU5Ij5zaWduYWw8L3RleHQ+CiAgPHJlY3QgeD0iNDk2IiB5PSI0OCIgd2lkdGg9IjY4IiBoZWlnaHQ9IjQwIiByeD0iNiIgZmlsbD0iI0ZFRjJGMiIgc3Ryb2tlPSIjRTExRDQ4IiBzdHJva2Utd2lkdGg9IjEuNiIvPgogIDx0ZXh0IHg9IjUzMCIgeT0iNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMwRjJDNTkiPnBsYWNlPC90ZXh0PgoKICA8bGluZSB4MT0iMzgwIiB5MT0iNjgiIHgyPSI0MDQiIHkyPSI2OCIgc3Ryb2tlPSIjMEYyQzU5IiBzdHJva2Utd2lkdGg9IjEuNCIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KICA8bGluZSB4MT0iNDcyIiB5MT0iNjgiIHgyPSI0OTYiIHkyPSI2OCIgc3Ryb2tlPSIjMEYyQzU5IiBzdHJva2Utd2lkdGg9IjEuNCIgbWFya2VyLWVuZD0idXJsKCNhcikiLz4KCiAgPCEtLSByZS1ydW4gc3BhbiAob25seSBsYXN0KSAtLT4KICA8bGluZSB4MT0iNDk2IiB5MT0iMTQwIiB4Mj0iNTY0IiB5Mj0iMTQwIiBzdHJva2U9IiNFMTFENDgiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxsaW5lIHgxPSIzMTIiIHkxPSIxNDAiIHgyPSI0NzIiIHkyPSIxNDAiIHN0cm9rZT0iIzA1OTY2OSIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPHRleHQgeD0iMzkyIiB5PSIxNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiMwNTk2NjkiPuydtOyghCBjaGVja3BvaW50IOuztOyhtDwvdGV4dD4KICA8dGV4dCB4PSI1MzAiIHk9IjE1OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMCIgZmlsbD0iI0UxMUQ0OCI+7J6s7Iuk7ZaJPC90ZXh0Pgo8L3N2Zz4K" alt="노드 granularity 와 재실행 범위" /><small class="asset-note">노드를 작게 쪼갤수록 실패 시 재실행 범위가 줄어든다. 큰 노드는 끝에서 실패해도 처음부터 전부 다시 한다.</small></figure>
 <ul class="bullets">
 <li><strong>회복력</strong>: LangGraph 의 <strong>내구성 있는 실행(durable execution)</strong> 은 노드/슈퍼스텝 경계에서 체크포인트를 만든다. 중단 후 재개하면 멈춘 노드의 <strong>처음부터</strong> 다시 실행된다. 노드가 작을수록 재실행 비용이 작다. 여러 작업을 한 큰 노드에 몰면, 끝부분에서 실패해도 노드 처음부터 전부 다시 한다.</li>
-<li><strong>관찰가능성</strong>: <code>classify_intent</code> 를 독립 노드로 두면, 행동 전에 LLM 이 무엇으로 판단했는지 들여다볼 수 있다.</li>
-<li><strong>서로 다른 실패 양상</strong>: LLM 호출·DB 조회·이메일 발송은 재시도 전략이 제각각이다. 노드를 나누면 정책을 독립적으로 줄 수 있다.</li>
+<li><strong>관찰가능성</strong>: <code>generate_signal</code> 을 독립 노드로 두면, 주문 전에 무엇으로 판단했는지(z-score·방향·확신) 들여다볼 수 있다.</li>
+<li><strong>서로 다른 실패 양상</strong>: 시세 조회·지표 계산·브로커 주문 전송은 재시도 전략이 제각각이다. 노드를 나누면 정책을 독립적으로 줄 수 있다.</li>
 </ul>
 <blockquote>
 <p><strong>성능 오해 주의</strong>: 노드가 많다고 느려지지 않는다. LangGraph 는 기본적으로 체크포인트를 <strong>백그라운드(async durability 모드)</strong> 로 쓰므로, 그래프는 체크포인트 완료를 기다리지 않고 계속 실행된다. 필요하면 <code>&quot;exit&quot;</code> 모드(완료 시에만 체크포인트)나 <code>&quot;sync&quot;</code> 모드(매 체크포인트마다 블록)로 바꿀 수 있다.</p>

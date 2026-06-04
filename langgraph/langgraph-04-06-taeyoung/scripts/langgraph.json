@@ -1,7 +1,7 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "email_agent": "./email_agent.py:graph"
+    "trading_agent": "./trading_agent.py:graph"
   },
   "env": ".env"
 }

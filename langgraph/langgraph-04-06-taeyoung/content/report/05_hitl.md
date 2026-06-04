@@ -9,32 +9,32 @@
 
 > **핵심 메시지**: LangGraph 에서 **사람의 입력은 1급 시민(first-class)** 이다.
 
-`human_review` 노드는 답변 초안을 사람에게 보여 주고 승인/수정을 받는다. 핵심은 `interrupt()` 를 가능한 한 노드 앞쪽에, **특히 비멱등(non-idempotent) side effect — 외부 API 호출·DB 쓰기·이메일 발송 — 보다 먼저** 두는 것이다. 재개 시 `interrupt()` 이전의 순수 계산·State 읽기는 다시 실행되므로(아래에서 `classification` 을 읽는 것처럼 부작용 없는 코드는 무방하다), 부작용이 있는 호출을 그 앞에 두면 중복 실행된다.
+`approve_order` 노드는 주문 후보를 사람에게 보여 주고 승인/수정을 받는다. 핵심은 `interrupt()` 를 가능한 한 노드 앞쪽에, **특히 비멱등(non-idempotent) side effect — 외부 API 호출·DB 쓰기·브로커 주문 전송 — 보다 먼저** 두는 것이다. 재개 시 `interrupt()` 이전의 순수 계산·State 읽기는 다시 실행되므로(아래에서 `order`·`signal` 을 읽는 것처럼 부작용 없는 코드는 무방하다), 부작용이 있는 호출을 그 앞에 두면 중복 실행된다.
 
 ```python
-def human_review(state: EmailAgentState) -> Command[Literal["send_reply", END]]:
+def approve_order(state: TradingAgentState) -> Command[Literal["place_order", END]]:
     """interrupt 로 일시정지하고, 사람의 결정에 따라 라우팅"""
 
-    classification = state.get('classification') or {}  # None 일 수 있으므로 or {}
+    order = state.get('order')          # 리스크 차단 에스컬레이션이면 None 일 수 있다
+    signal = state.get('signal') or {}
 
-    # 재개 시 이 앞의 코드는 다시 실행된다 → 부작용 있는 호출을 앞에 두지 말 것
+    # 재개 시 이 앞의 코드는 다시 실행된다 → 부작용(브로커 호출) 있는 코드를 앞에 두지 말 것
     human_decision = interrupt({
-        "email_id": state.get('email_id', ''),
-        "original_email": state.get('email_content', ''),
-        "draft_response": state.get('draft_response', ''),
-        "urgency": classification.get('urgency'),
-        "intent": classification.get('intent'),
-        "action": "이 답변을 검토하고 승인/수정해 주세요"
+        "instrument": state.get('instrument', ''),
+        "order": order,
+        "conviction": signal.get('conviction'),
+        "approval_required": state.get('approval_required', False),
+        "action": "이 주문을 승인/거부/수정해 주세요"
     })
 
     # 사람의 결정을 처리
-    if human_decision.get("approved"):
+    if human_decision.get("approved") and order is not None:
         return Command(
-            update={"draft_response": human_decision.get("edited_response", state.get('draft_response', ''))},
-            goto="send_reply"
+            update={"order": {**order, "qty": human_decision.get("edited_qty", order["qty"])}},
+            goto="place_order"
         )
     else:
-        # 거절 = 사람이 직접 처리
+        # 거부 = 사람이 직접 처리
         return Command(update={}, goto=END)
 ```
 
@@ -46,27 +46,25 @@ def human_review(state: EmailAgentState) -> Command[Literal["send_reply", END]]:
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import RetryPolicy
 
-workflow = StateGraph(EmailAgentState)
+workflow = StateGraph(TradingAgentState)
 
-# 노드 등록
-workflow.add_node("read_email", read_email)
-workflow.add_node("classify_intent", classify_intent)
-
-# 일시적 실패가 잦은 노드에는 재시도 정책
+# 노드 등록 — 일시적 실패가 잦은 시세 호출에 재시도 정책
 workflow.add_node(
-    "search_documentation",
-    search_documentation,
+    "fetch_market_data",
+    fetch_market_data,
     retry_policy=RetryPolicy(max_attempts=3)
 )
-workflow.add_node("bug_tracking", bug_tracking)
-workflow.add_node("draft_response", draft_response)
-workflow.add_node("human_review", human_review)
-workflow.add_node("send_reply", send_reply)
+workflow.add_node("generate_signal", generate_signal)
+workflow.add_node("check_risk", check_risk)
+workflow.add_node("size_position", size_position)
+workflow.add_node("approve_order", approve_order)
+workflow.add_node("place_order", place_order)
+workflow.add_node("flag_anomaly", flag_anomaly)
 
 # 꼭 필요한 엣지만
-workflow.add_edge(START, "read_email")
-workflow.add_edge("read_email", "classify_intent")
-workflow.add_edge("send_reply", END)
+workflow.add_edge(START, "fetch_market_data")
+workflow.add_edge("fetch_market_data", "generate_signal")
+workflow.add_edge("place_order", END)
 
 # 영속성을 위해 checkpointer 와 함께 컴파일
 memory = MemorySaver()
@@ -75,38 +73,35 @@ app = workflow.compile(checkpointer=memory)
 
 > **유의 — `MemorySaver` 는 인메모리(개발·데모)용이다.** 위 코드는 한 프로세스 안에서 interrupt/resume 흐름을 보여 주기 위한 것이다. 프로세스를 재시작해도 살아남는 "며칠 뒤 재개" 를 보장하려면 Postgres 같은 durable checkpointer(또는 LangSmith Deployment 계열의 영속 저장소)가 필요하다.
 
-그래프 구조가 이토록 작은 이유는 라우팅이 노드 안의 `Command` 로 일어나기 때문이다. 각 노드는 `Command[Literal["node1", "node2"]]` 타입 힌트로 자기가 갈 수 있는 곳을 선언하므로, 흐름이 명시적이고 추적 가능하다. (LangGraph 에는 이 방식 외에 `add_conditional_edges` 같은 조건부 엣지 라우팅도 있으나, 이 교안의 이메일 예제는 `Command(goto=...)` 를 택했다 — 조건부 엣지는 이번 범위 밖이다.)
+그래프 구조가 이토록 작은 이유는 라우팅이 노드 안의 `Command` 로 일어나기 때문이다. 각 노드는 `Command[Literal["node1", "node2"]]` 타입 힌트로 자기가 갈 수 있는 곳을 선언하므로, 흐름이 명시적이고 추적 가능하다. (LangGraph 에는 이 방식 외에 `add_conditional_edges` 같은 조건부 엣지 라우팅도 있으나, 이 교안의 트레이딩 예제는 `Command(goto=...)` 를 택했다 — 조건부 엣지는 이번 범위 밖이다.)
 
 ### 4.3. 멈췄다가 며칠 뒤에 이어서 — 실행과 재개
 
 ```python
-# 사람 검토가 필요한 긴급 청구 이슈로 테스트
+# 사람 검토가 필요한 급등 과열(critical) 신호로 테스트
 initial_state = {
-    "email_content": "구독료가 두 번 청구됐어요! 급해요!",
-    "sender_email": "customer@example.com",
-    "email_id": "email_123",
-    "messages": []
+    "instrument": "TSLA",
+    "price_window": [200, 201, 199, ..., 218, 225],   # 최근 종가 윈도우
+    "market_data_timestamp": "2026-06-04T09:30:00Z",
+    "headline": "단기 급등, 과열 우려"
 }
 
 # 영속성을 위해 thread_id 와 함께 실행
-config = {"configurable": {"thread_id": "customer_123"}}
+config = {"configurable": {"thread_id": "TSLA-2026-06-04"}}
 result = app.invoke(initial_state, config)
-# 그래프는 human_review 에서 멈춘다
-print(f"human review interrupt:{result['__interrupt__']}")
+# 그래프는 approve_order 에서 (주문 전송 직전) 멈춘다
+print(f"order approval interrupt:{result['__interrupt__']}")
 
 # 준비되면 사람의 입력으로 재개
 from langgraph.types import Command
 
 human_response = Command(
-    resume={
-        "approved": True,
-        "edited_response": "이중 청구 건 진심으로 사과드립니다. 즉시 환불을 진행했습니다..."
-    }
+    resume={"approved": True, "edited_qty": 5}   # 큰 베팅이라 수량을 줄여 승인
 )
 
 # 재개
 final_result = app.invoke(human_response, config)
-print("이메일 전송 완료!")
+print("주문 전송 완료!")
 ```
 
 그래프는 `interrupt()` 를 만나면 모든 것을 checkpointer 에 저장하고 **기다린다.** 같은 checkpointer 백엔드에 체크포인트가 남아 있고 같은 `thread_id` 로 다시 호출하면, 멈췄던 지점부터 이어진다. 여기서 `thread_id` 는 저장소 자체가 아니라 **체크포인트를 식별·조회하는 키** 이고, State 가 실제로 보존되는 곳은 checkpointer 다(이 예제에선 인메모리 `MemorySaver`).
@@ -116,14 +111,14 @@ print("이메일 전송 완료!")
 
 ### 4.4. 노드를 얼마나 잘게 쪼갤까 — granularity 트레이드오프
 
-"`read_email` 과 `classify_intent` 를 한 노드로 합치면 안 되나?" 라는 질문에 대한 답은 **회복력 vs 관찰가능성** 의 트레이드오프다.[^1]
+"`fetch_market_data` 와 `generate_signal` 을 한 노드로 합치면 안 되나?" 라는 질문에 대한 답은 **회복력 vs 관찰가능성** 의 트레이드오프다.[^1]
 
 ![노드 granularity 와 재실행 범위](figs/fig08_node_granularity.svg)
 <small>Figure — 노드를 작게 쪼갤수록 실패 시 재실행 범위가 줄어든다. 큰 노드는 끝에서 실패해도 처음부터 전부 다시 한다.</small>
 
 - **회복력**: LangGraph 의 **내구성 있는 실행(durable execution)** 은 노드/슈퍼스텝 경계에서 체크포인트를 만든다. 중단 후 재개하면 멈춘 노드의 **처음부터** 다시 실행된다. 노드가 작을수록 재실행 비용이 작다. 여러 작업을 한 큰 노드에 몰면, 끝부분에서 실패해도 노드 처음부터 전부 다시 한다.
-- **관찰가능성**: `classify_intent` 를 독립 노드로 두면, 행동 전에 LLM 이 무엇으로 판단했는지 들여다볼 수 있다.
-- **서로 다른 실패 양상**: LLM 호출·DB 조회·이메일 발송은 재시도 전략이 제각각이다. 노드를 나누면 정책을 독립적으로 줄 수 있다.
+- **관찰가능성**: `generate_signal` 을 독립 노드로 두면, 주문 전에 무엇으로 판단했는지(z-score·방향·확신) 들여다볼 수 있다.
+- **서로 다른 실패 양상**: 시세 조회·지표 계산·브로커 주문 전송은 재시도 전략이 제각각이다. 노드를 나누면 정책을 독립적으로 줄 수 있다.
 
 > **성능 오해 주의**: 노드가 많다고 느려지지 않는다. LangGraph 는 기본적으로 체크포인트를 **백그라운드(async durability 모드)** 로 쓰므로, 그래프는 체크포인트 완료를 기다리지 않고 계속 실행된다. 필요하면 `"exit"` 모드(완료 시에만 체크포인트)나 `"sync"` 모드(매 체크포인트마다 블록)로 바꿀 수 있다.
 

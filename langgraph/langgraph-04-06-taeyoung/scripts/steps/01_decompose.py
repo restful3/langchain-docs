@@ -6,56 +6,55 @@
     - 그래프 = 노드 + 엣지. compile() 하면 실행 가능해진다
     - 아직 라우팅(분기) 없음 — 늘 같은 다음 노드로 가는 고정 엣지만
 
-업무(고객 이메일 처리)를 두 스텝으로 분해한다: read_email → classify_intent.
+업무(평균회귀 매매)를 두 스텝으로 분해한다: fetch_market_data → generate_signal.
 
 💻 실행:
     ../../../../deep-agents/.venv/bin/python 01_decompose.py
 """
 
-from typing import Literal, TypedDict
+import statistics
+from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
 
 # State — 일단 최소한만. (다음 단계에서 제대로 설계한다)
 class State(TypedDict, total=False):
-    email_content: str
-    intent: str
+    instrument: str
+    price_window: list[float]
+    direction: str
 
 
-def read_email(state: State) -> dict:
-    """[데이터 스텝] 이메일을 읽는다. 늘 classify_intent 로 간다(고정 엣지)."""
-    print(f"  📥 read_email: '{state['email_content']}'")
-    return {}  # State 변경 없음
+def fetch_market_data(state: State) -> dict:
+    """[데이터 스텝] 시세를 가져온다. 늘 generate_signal 로 간다(고정 엣지)."""
+    print(f"  📈 fetch_market_data: {state['instrument']} 종가 {len(state['price_window'])}개")
+    return {}  # State 변경 없음 (데모는 price_window 를 이미 들고 옴)
 
 
-def classify_intent(state: State) -> dict:
-    """[LLM 스텝] 의도를 분류한다. 지금은 규칙 기반(LLM 자리만 잡아둠)."""
-    text = state["email_content"]
-    if any(k in text for k in ("청구", "환불", "결제")):
-        intent = "billing"
-    elif any(k in text for k in ("버그", "오류", "안 돼")):
-        intent = "bug"
-    else:
-        intent = "question"
-    print(f"  🧠 classify_intent: intent={intent}")
-    return {"intent": intent}
+def generate_signal(state: State) -> dict:
+    """[계산 스텝] z-score 로 방향을 정한다. 지금은 규칙만(LLM 자리만 잡아둠)."""
+    w = state["price_window"]
+    z = (w[-1] - statistics.fmean(w)) / statistics.pstdev(w)
+    direction = "long" if z <= -1 else "short" if z >= 1 else "flat"
+    print(f"  🧮 generate_signal: z={z:+.2f} → {direction}")
+    return {"direction": direction}
 
 
 def build():
     g = StateGraph(State)
-    g.add_node("read_email", read_email)
-    g.add_node("classify_intent", classify_intent)
-    # 고정 엣지만 — START → read_email → classify_intent → END
-    g.add_edge(START, "read_email")
-    g.add_edge("read_email", "classify_intent")
-    g.add_edge("classify_intent", END)
+    g.add_node("fetch_market_data", fetch_market_data)
+    g.add_node("generate_signal", generate_signal)
+    # 고정 엣지만 — START → fetch_market_data → generate_signal → END
+    g.add_edge(START, "fetch_market_data")
+    g.add_edge("fetch_market_data", "generate_signal")
+    g.add_edge("generate_signal", END)
     return g.compile()
 
 
 if __name__ == "__main__":
     app = build()
     print("=" * 56)
-    print("[Step 1] 분해 — read_email → classify_intent")
+    print("[Step 1] 분해 — fetch_market_data → generate_signal")
     print("=" * 56)
-    result = app.invoke({"email_content": "구독료가 두 번 청구됐어요!"})
+    result = app.invoke({"instrument": "AAPL",
+                         "price_window": [150, 151, 149, 150, 152, 148, 150, 151, 149, 145]})
     print(f"\n최종 State: {result}")
