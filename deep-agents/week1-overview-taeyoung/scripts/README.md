@@ -40,13 +40,13 @@ $EDITOR .env
 | `OPENAI_BASE_URL` | OpenAI 호환 프록시의 베이스 URL | 비우면 OpenAI 직접. clipproxyapi 예: `http://localhost:8317/v1` |
 | `DEEPAGENT_MODEL` | 사용할 모델 식별자 (`provider:model` 의 `model` 부분) | `gpt-4o-mini` |
 | `TAVILY_API_KEY` | Tavily 검색 API 키 | `01` 에서만 필수. <https://tavily.com/> |
-| `OLLAMA_MODEL` | Ollama 모델명 | `llama3.1`. `03` 에서만 사용 |
+| `OLLAMA_MODEL` | Ollama 모델명 (tools 지원 필수) | `gemma4:e4b`. `03` 에서만 사용 |
 
 ### 2-3. (선택) Ollama 준비 — `03` 만
 
 ```bash
 # 별도 셸에서 ollama 데몬이 떠 있어야 한다
-ollama pull llama3.1
+ollama pull gemma4:e4b   # tools 호출 지원 모델
 ```
 
 ---

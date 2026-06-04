@@ -15,7 +15,7 @@
 | Walkthrough 노트북 | [scripts/walkthrough.ipynb](scripts/walkthrough.ipynb) | 4개 데모를 한 자리에서 실행 |
 | 단독 실행 스크립트 5종 | [scripts/](scripts/) (`01`\~`05`) | 노트북과 동일 데모를 CLI 한 줄로 — 자세한 셋업·트러블슈팅은 [scripts/README.md](scripts/README.md) |
 
-발표 시각자료는 [content/figs/](content/figs/) 의 SVG 9개 (노트북이 직접 참조).
+발표 시각자료는 [content/figs/](content/figs/) 의 SVG 9개 — 교안 PDF 와 walkthrough 노트북에 인라인 임베드되어 있다(노트북은 자체완결로 단독 열람 가능).
 
 ---
 

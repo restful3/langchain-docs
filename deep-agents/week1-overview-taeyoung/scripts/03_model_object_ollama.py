@@ -8,7 +8,7 @@
 이 길로 간다.
 
 사전 준비:
-    ollama pull llama3.1   # 또는 .env 의 OLLAMA_MODEL 값
+    ollama pull gemma4:e4b   # 또는 .env 의 OLLAMA_MODEL 값 (tools 지원 모델 필수)
 
 실행:
     python scripts/03_model_object_ollama.py
@@ -24,7 +24,7 @@ from deepagents import create_deep_agent
 
 load_dotenv(find_dotenv())
 
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma4:e4b")  # tools 지원 모델 필수
 
 # init_chat_model + provider 를 명시하면 ChatOllama 객체가 반환된다.
 # (langchain-ollama 패키지가 설치돼 있어야 한다)
