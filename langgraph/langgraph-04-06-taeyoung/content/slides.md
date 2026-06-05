@@ -49,7 +49,7 @@ date: 2026년 5월 30일
 
 > 로직(노드)과 제어 흐름(엣지)을 분리하고, State 로 잇는다
 
-<img src="figs/fig01_three_parts.svg" alt="노드·엣지·State 세 부품" style="display:block; margin:8px auto; max-width:70%; max-height:400px;" />
+<img src="figs/fig01_three_parts.svg" alt="노드·엣지·State 세 부품" style="display:block; margin:8px auto; max-width:70%; max-height:350px;" />
 
 > "노드는 작업을 수행하고, 엣지는 다음에 무엇을 할지 알려준다."
 
@@ -72,16 +72,16 @@ date: 2026년 5월 30일
 
 > 실선 = 늘 같은 다음 노드, 보라 점선 = 노드 내부 `Command(goto=...)` 분기
 
-<img src="figs/fig03_trading_agent_graph.svg" alt="트레이딩 에이전트 그래프" style="display:block; margin:4px auto; max-width:58%; max-height:430px;" />
+<img src="figs/fig03_trading_agent_graph.svg" alt="트레이딩 에이전트 그래프" style="display:block; margin:4px auto; max-width:58%; max-height:310px;" />
 
-> 라우팅을 노드 안에 두니 엣지는 최소 — 흐름이 명시적이고 추적 가능하다. (`approve_order` 가 두 번 보이는 건 같은 노드의 레이아웃 단순화 · 교육용 dry-run)
+> 라우팅을 노드 안에 두니 엣지는 최소 — 흐름이 명시적이고 추적 가능하다. (`check_risk` 가 차단하면 `size_position` 을 건너뛰고 `approve_order` 로 직행 — 같은 노드, 진입 엣지만 둘)
 
 <!-- slide: tag="§2 · Design" -->
 # Step 2 — 스텝 유형 식별
 
 > 같은 "노드" 라도 유형마다 재시도·캐싱·에러 정책이 다르다
 
-<img src="figs/fig04_step_types.svg" alt="네 가지 스텝 유형" style="display:block; margin:8px auto; max-width:72%; max-height:410px;" />
+<img src="figs/fig04_step_types.svg" alt="네 가지 스텝 유형" style="display:block; margin:8px auto; max-width:72%; max-height:350px;" />
 
 > 유형을 먼저 나눠 두면, 노드별 정책을 따로 줄 근거가 생긴다.
 
@@ -95,7 +95,7 @@ date: 2026년 5월 30일
 
 > 포맷된 문자열이 아니라 원시 데이터를 저장, 프롬프트는 노드에서 온디맨드
 
-<img src="figs/fig05_state_raw.svg" alt="State 는 raw, 포맷은 노드에서" style="display:block; margin:8px auto; max-width:74%; max-height:400px;" />
+<img src="figs/fig05_state_raw.svg" alt="State 는 raw, 포맷은 노드에서" style="display:block; margin:8px auto; max-width:74%; max-height:350px;" />
 
 > 같은 raw 를 노드마다 다르게 포맷 — 프롬프트만 바꿔도 State 스키마는 그대로.
 
@@ -142,7 +142,7 @@ date: 2026년 5월 30일
 
 > `langgraph.json` 에 등록된 그래프를 인메모리 서버(:2024)로
 
-<img src="figs/fig09_local_topology.svg" alt="langgraph dev 로컬 토폴로지" style="display:block; margin:6px auto; max-width:70%; max-height:360px;" />
+<img src="figs/fig09_local_topology.svg" alt="langgraph dev 로컬 토폴로지" style="display:block; margin:6px auto; max-width:70%; max-height:300px;" />
 
 - `langgraph dev` → 포트 2024 인메모리(개발용), 운영은 **LangSmith Deployment**
 - Studio 로 시각화·단계 디버깅, Python SDK / REST 로 호출
@@ -167,11 +167,30 @@ date: 2026년 5월 30일
 
 > 노드·엣지·State 로 "사고"하는 법을 봤다 — 다음은 그 사고를 떠받치는 메커니즘이다.
 
-- **Graph API** — 조건부 엣지 · 리듀서(`add_messages`) · 병렬 분기
-- **Persistence · Memory** — Postgres/Redis checkpointer · 스레드 간 Store · 시맨틱 검색
-- **Streaming** — `values`/`updates`/`messages` 스트림 모드로 실시간 진행 노출
-- **Subgraphs** — 복잡한 다단계 작업을 하위 그래프로 캡슐화
-- **Time Travel** — 과거 체크포인트로 돌아가 분기(fork) 실행
+<div style="display:flex; align-items:stretch; gap:20px; width:100%; max-width:1080px; margin:20px auto 0;">
+  <div style="flex:1; background:#F1F5F9; border:1px solid #E5E7EB; border-radius:14px; padding:22px 26px;">
+    <div style="font-size:13px; font-weight:800; letter-spacing:.04em; color:#6B6B72;">오늘 다룬 '지도'</div>
+    <div style="font-size:17px; font-weight:800; color:#0F2C59; margin:2px 0 14px;">노드·엣지·State 로 사고하기</div>
+    <ul style="list-style:none; padding:0; margin:0; line-height:2.0; font-size:15px;">
+      <li style="color:#0F2C59;"><span style="color:#059669; font-weight:800;">✓</span> 왜 그래프인가 — 노드·엣지·State</li>
+      <li style="color:#0F2C59;"><span style="color:#059669; font-weight:800;">✓</span> 에이전트 설계 5단계</li>
+      <li style="color:#0F2C59;"><span style="color:#059669; font-weight:800;">✓</span> State 설계 · 에러를 흐름으로</li>
+      <li style="color:#0F2C59;"><span style="color:#059669; font-weight:800;">✓</span> 사람 개입 · 내구성 · 로컬 실행</li>
+    </ul>
+  </div>
+  <div style="display:flex; align-items:center; font-size:26px; font-weight:800; color:#2563EB;">→</div>
+  <div style="flex:1.18; background:linear-gradient(180deg,#EEF2FB 0%,#F6F9FF 100%); border:1.5px solid #2563EB; border-radius:14px; padding:22px 26px;">
+    <div style="font-size:13px; font-weight:800; letter-spacing:.04em; color:#2563EB;">다음의 '깊이'</div>
+    <div style="font-size:17px; font-weight:800; color:#0F2C59; margin:2px 0 14px;">그 사고를 떠받치는 메커니즘</div>
+    <ul style="list-style:none; padding:0; margin:0; line-height:1.7; font-size:15px;">
+      <li style="margin-bottom:5px;"><strong style="color:#0F2C59;">Graph API</strong> <span style="color:#6B6B72;">— 조건부 엣지 · 리듀서 · 병렬 분기</span></li>
+      <li style="margin-bottom:5px;"><strong style="color:#0F2C59;">Persistence · Memory</strong> <span style="color:#6B6B72;">— checkpointer · 스레드 간 Store</span></li>
+      <li style="margin-bottom:5px;"><strong style="color:#0F2C59;">Streaming</strong> <span style="color:#6B6B72;">— values/updates/messages 실시간 노출</span></li>
+      <li style="margin-bottom:5px;"><strong style="color:#0F2C59;">Subgraphs</strong> <span style="color:#6B6B72;">— 다단계를 하위 그래프로 캡슐화</span></li>
+      <li><strong style="color:#0F2C59;">Time Travel</strong> <span style="color:#6B6B72;">— 과거 체크포인트로 돌아가 fork 실행</span></li>
+    </ul>
+  </div>
+</div>
 
 <!-- slide: variant=closing -->
 # 한 문장으로

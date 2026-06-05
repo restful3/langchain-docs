@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 -4 574 414" font-family="'Helvetica Neue',Arial,'Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 -4 460 414" font-family="'Helvetica Neue',Arial,'Apple SD Gothic Neo','Malgun Gothic',sans-serif">
   <defs>
     <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#0F2C59"/>
@@ -35,11 +35,7 @@
   <rect x="222" y="212" width="156" height="32" rx="7" class="n"/>
   <text x="300" y="232" text-anchor="middle" class="lbl">size_position</text>
 
-  <!-- approve_order (escalation entry, right) -->
-  <rect x="414" y="212" width="160" height="32" rx="7" class="n"/>
-  <text x="494" y="232" text-anchor="middle" class="lbl">approve_order</text>
-
-  <!-- approve_order (normal entry) -->
+  <!-- approve_order (single node, two incoming edges) -->
   <rect x="222" y="268" width="156" height="32" rx="7" class="n"/>
   <text x="300" y="288" text-anchor="middle" class="lbl">approve_order</text>
 
@@ -59,12 +55,11 @@
   <!-- dashed edges (node-internal Command(goto)) -->
   <path class="dash" d="M222,116 C150,130 104,138 104,156" marker-end="url(#ar)"/>
   <path class="dash" d="M300,132 L300,156" marker-end="url(#ar)"/>
-  <path class="dash" d="M378,170 C440,180 494,190 494,212" marker-end="url(#ar)"/>
+  <!-- check_risk -> approve_order (차단 에스컬레이션: size_position 우회) -->
+  <path class="dash" d="M378,172 C458,190 458,284 378,284" marker-end="url(#ar)"/>
   <path class="dash" d="M300,188 L300,212" marker-end="url(#ar)"/>
   <path class="dash" d="M300,244 L300,268" marker-end="url(#ar)"/>
   <path class="dash" d="M300,300 L300,324" marker-end="url(#ar)"/>
-  <!-- escalation approve_order -> place_order -->
-  <path class="dash" d="M494,244 L494,340 L378,340" marker-end="url(#ar)"/>
   <!-- flag_anomaly -> END -->
   <path class="dash" d="M104,188 L104,392 L266,392" marker-end="url(#ar)"/>
 </svg>
